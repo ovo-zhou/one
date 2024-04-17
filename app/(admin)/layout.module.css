@@ -1,0 +1,8 @@
+.admin{
+  display: flex;
+  flex-direction: row;
+
+  & .menu{
+    width: 120px;
+  }
+}
