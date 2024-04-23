@@ -11,26 +11,33 @@ export const metadata = {
 };
 
 export default async function RootLayout({ children }) {
-  const pages=await prisma.post.findMany({
-    where:{
-      kind:{
-        equals:"page"
+  const pages = await prisma.post.findMany({
+    where: {
+      kind: {
+        equals: "page"
       }
     }
   })
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div>
-          <Link href='/'>博客</Link>
-          {
-            pages.map(page=>{
-              return <Link key={page.id} href={`/post/${page.id}`}>{page.title}</Link>
-            })
-          }
-          <Link href='/admin/post/list'>后台</Link>
+        <div className="container">
+          <div className="nav">
+            <div className="menu">
+              <Link href='/'>博客</Link>
+              {
+                pages.map(page => {
+                  return <Link key={page.id} href={`/post/${page.id}`}>{page.title}</Link>
+                })
+              }
+            </div>
+            <div>
+              <Link href='/admin/post/list'>后台</Link>
+            </div>
+          </div>
+          {children}
+          <div style={{ textAlign: 'center' }}>Copyright 2019-{new Date().getFullYear()} ryan 版权所有 保留所有权利</div>
         </div>
-        {children}
       </body>
     </html>
   );

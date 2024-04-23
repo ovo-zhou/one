@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Markdown from 'react-markdown'
 
 export default function Page() {
-  const [post, setPost] = useState({ kind: 'post', title: '', content: '' });
+  const [post, setPost] = useState({ kind: 'post', title: '', content: '',abstract:'' });
   const router = useRouter();
   const handleSave = () => {
     const date = +new Date() + '';
@@ -40,7 +40,10 @@ export default function Page() {
         <label htmlFor="title">标题:</label>
         <input name="title" value={post.title} id="title" type="text" onChange={handleChange} />
       </div>
-
+      <div>
+      <label htmlFor="abstract">摘要:</label>
+        <input name="abstract" value={post.abstract} id="abstract" type="text" onChange={handleChange} />
+      </div>
       <div style={{display:'flex',flexDirection:'row'}}>
         <div style={{width:'50%'}}>
           <label htmlFor="content">内容:</label>

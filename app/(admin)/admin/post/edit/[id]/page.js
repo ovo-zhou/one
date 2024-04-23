@@ -52,7 +52,10 @@ export default function Page({params}) {
         <label htmlFor="title">标题:</label>
         <input name="title" value={post.title} id="title" type="text" onChange={handleChange} />
       </div>
-
+      <div>
+      <label htmlFor="abstract">摘要:</label>
+        <input name="abstract" value={post.abstract} id="abstract" type="text" onChange={handleChange} />
+      </div>
       <div style={{display:'flex',flexDirection:'row'}}>
         <div style={{width:'50%'}}>
           <label htmlFor="content">内容:</label>

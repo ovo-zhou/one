@@ -11,6 +11,7 @@ export default function RootLayout({ children }) {
         <div className={styles.admin}>
           <div>
             <div className={styles.menu}>博文管理</div>
+            <div className={styles.menu}>图床管理</div>
           </div>
           <div style={{flex:1}}>
             <div>标题栏</div>

@@ -11,16 +11,17 @@ datasource db {
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  displayName String
-  image String
+  id          Int    @id @default(autoincrement())
+  displayName String 
+  image       String
 }
 
 model Post {
-  id        Int      @id @default(autoincrement())
-  kind      String
-  title     String
-  content   String?
-  published String
-  updated   String
+  id        Int     @id @default(autoincrement())
+  kind      String  
+  title     String  
+  abstract  String? 
+  content   String  
+  published String  
+  updated   String  
 }
