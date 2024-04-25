@@ -1,11 +1,16 @@
 'use client'
 
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { useRouter } from 'next/navigation'
 import Markdown from 'react-markdown'
+import styles from './page.module.css'
+import Image from "next/image"
 
 export default function Page() {
-  const [post, setPost] = useState({ kind: 'post', title: '', content: '',abstract:'' });
+  const [post, setPost] = useState({ kind: 'post', title: '', content: '', abstract: '' });
+  const [imgBedVisiable, setImgBedVisiable] = useState(false)
+  const uploadElementRef = useRef(null)
+  const [imgUrl,setImgUrl]=useState('')
   const router = useRouter();
   const handleSave = () => {
     const date = +new Date() + '';
@@ -26,6 +31,23 @@ export default function Page() {
     const name = e.target.name;
     const value = e.target.value;
     setPost({ ...post, [name]: value })
+  } 
+  const handleImgUpload=()=>{
+    const files=uploadElementRef.current.files
+    if(files.length===0){
+      console.log('请选择文件')
+      return
+    }
+    const form= new FormData()
+    form.append('file',files[0])
+    fetch('/admin/imgs/api',{
+      method:'POST',
+      body:form
+    }).then(res=>{
+      return res.json()
+    }).then(res=>{
+      setImgUrl(res.url)
+    })
   }
   return <>
     <form>
@@ -41,15 +63,15 @@ export default function Page() {
         <input name="title" value={post.title} id="title" type="text" onChange={handleChange} />
       </div>
       <div>
-      <label htmlFor="abstract">摘要:</label>
+        <label htmlFor="abstract">摘要:</label>
         <input name="abstract" value={post.abstract} id="abstract" type="text" onChange={handleChange} />
       </div>
-      <div style={{display:'flex',flexDirection:'row'}}>
-        <div style={{width:'50%'}}>
+      <div style={{ display: 'flex', flexDirection: 'row' }}>
+        <div style={{ width: '50%' }}>
           <label htmlFor="content">内容:</label>
-          <textarea rows="50" name="content" value={post.content} id="content" type="text" onChange={handleChange} style={{width:"100%"}}/>
+          <textarea rows="50" name="content" value={post.content} id="content" type="text" onChange={handleChange} style={{ width: "100%" }} />
         </div>
-        <div style={{flex:1}}>
+        <div style={{ flex: 1 }}>
           <Markdown>{post.content}</Markdown>
         </div>
       </div>
@@ -57,5 +79,26 @@ export default function Page() {
         <input type="button" value='保存' onClick={handleSave} />
       </div>
     </form>
+    {
+      imgBedVisiable ? <div
+        className={styles.imgUploadModal}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <span>图床</span>
+          <span onClick={() => setImgBedVisiable(false)} style={{ color: 'red' }}>X</span>
+        </div>
+        <input type="file" ref={uploadElementRef}/>
+        <div>
+          <div>图片地址：{imgUrl}</div>
+          <Image src={imgUrl} alt="" width={100} height={100}/>
+        </div>
+        <button onClick={handleImgUpload}>上传</button>
+        <button onClick={() => setImgBedVisiable(false)}>取消</button>
+      </div> : <div className={styles.imgBedButton}
+        onClick={() => setImgBedVisiable(true)}
+      >
+        图床
+      </div>
+    }
   </>
 }

@@ -4,5 +4,6 @@
 
   & .menu{
     width: 120px;
+    display: block;
   }
 }
