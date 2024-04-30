@@ -11,6 +11,7 @@ export default function RootLayout({ children }) {
       <body>
         <div className={styles.admin}>
           <div>
+            <Link href='/'>回主页</Link>
             <Link href="/admin/post/list" className={styles.menu}>博文管理</Link>
             <Link href="/admin/imgs/list" className={styles.menu}>图床管理</Link>
           </div>

@@ -3,7 +3,6 @@ import styles from './page.module.css'
 import Image from "next/image"
 export default async function Page(){
   const imgs= await prisma.img.findMany()
-  console.log(imgs)
   return <div className={styles.imgContainer}>
     {
       imgs.map(img=>{
