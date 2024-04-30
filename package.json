@@ -11,6 +11,7 @@
   "dependencies": {
     "@prisma/client": "^5.12.1",
     "dayjs": "^1.11.10",
+    "jsonwebtoken": "^9.0.2",
     "next": "14.1.4",
     "prisma": "^5.12.1",
     "react": "^18",

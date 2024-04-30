@@ -20,7 +20,8 @@ export default function Page() {
   }
   const handleDelete=(id)=>{
     fetch(`/admin/post/delete/${id}`,{
-      method:"DELETE"
+      method:"DELETE",
+      credentials:'same-origin'
     }).then(res=>{
       return res.json()
     }).then(res=>{
@@ -44,7 +45,8 @@ export default function Page() {
       return item + '=' + searchParams[item]
     }).join('&')
     fetch(`/admin/post/list/api?${queryParams}`, {
-      method: 'GET'
+      method: 'GET',
+      credentials:'same-origin'
     }).then(res => {
       return res.json()
     }).then(res => {

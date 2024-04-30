@@ -13,7 +13,8 @@ export default function Page({params}) {
     const data = Object.assign(post, { updated: date });
     fetch(`/admin/post/edit/${id}/api`, {
       method: "POST",
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
+      credentials:'same-origin'
     }).then(res => {
       return res.json()
     }).then(res => {
@@ -30,7 +31,8 @@ export default function Page({params}) {
   }
   useEffect(()=>{
     fetch(`/admin/post/edit/${id}/api`,{
-      method:'GET'
+      method:'GET',
+      credentials:'same-origin'
     }).then(res=>{
       return res.json()
     }).then(res=>{

@@ -17,7 +17,8 @@ export default function Page() {
     const data = Object.assign(post, { published: date, updated: date });
     fetch('/admin/post/create/api', {
       method: "POST",
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
+      credentials:'same-origin'
     }).then(res => {
       return res.json()
     }).then(res => {
@@ -42,7 +43,8 @@ export default function Page() {
     form.append('file',files[0])
     fetch('/admin/imgs/api',{
       method:'POST',
-      body:form
+      body:form,
+      credentials:'same-origin'
     }).then(res=>{
       return res.json()
     }).then(res=>{
