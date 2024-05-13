@@ -14,6 +14,8 @@ model User {
   id          Int    @id @default(autoincrement())
   displayName String
   image       String
+  username    String
+  password    String
 }
 
 model Post {

@@ -1,6 +1,5 @@
 'use client'
-
-import { use, useState } from "react"
+import { useState } from "react"
 
 export default function Page() {
   const [user,setUser]= useState({
@@ -13,13 +12,21 @@ export default function Page() {
     setUser({...user,[name]:value})
   } 
   const handleLogin=()=>{
-    console.log(user)
     fetch('/login/api',{
       method:'POST',
       body:JSON.stringify(user),
       credentials:'same-origin'
-    }).then(res=>res.text()).then(res=>{
-      console.log(res)
+    }).then(res=>res.json()).then(res=>{
+      const {code,message}=res;
+      //登陆成功
+      if(code===0){
+        const url= new URL(location.href).searchParams.get('originHref')
+        location.href=url
+      }
+      // 登陆失败
+      if(code===-1){
+        console.log(message)
+      }
     }).catch((err)=>{
       console.log(err)
     })
