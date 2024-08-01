@@ -1,5 +1,5 @@
 'use client'
-import Link from 'next/link'
+import Link from '@/app/components/link'
 import { useEffect, useState } from 'react'
 
 export default function Page() {
@@ -59,7 +59,7 @@ export default function Page() {
     handleSearch()
   }, [])
   return <>
-    <Link href='/admin/post/create'>写博客</Link>
+    <Link type='link' href='/admin/post/create'>写博客</Link>
     <div>
       <label htmlFor='kind'>类型</label>
       <select name='kind' onChange={handleChange}>

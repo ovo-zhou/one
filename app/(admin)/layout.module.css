@@ -1,9 +1,11 @@
-.admin{
+.admin {
   display: flex;
   flex-direction: row;
-
-  & .menu{
-    width: 120px;
-    display: block;
-  }
+}
+.menuList {
+  color: black;
+  padding: 16px;
+}
+.menuList div{
+  height: 32px;
 }
