@@ -20,8 +20,8 @@ export default function Page() {
       const {code,message}=res;
       //登陆成功
       if(code===0){
-        const url= new URL(location.href).searchParams.get('originHref')
-        location.href=url
+        const pathname= new URL(location.href).searchParams.get('pathname')
+        location.href=location.origin+pathname
       }
       // 登陆失败
       if(code===-1){
