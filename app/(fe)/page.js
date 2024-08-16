@@ -3,6 +3,8 @@ import prisma from "@/prisma";
 import Link from 'next/link'
 import dayjs from "dayjs";
 
+export const dynamic = 'force-dynamic'
+
 export default async function Home() {
   const posts = await prisma.post.findMany({
     where:{
