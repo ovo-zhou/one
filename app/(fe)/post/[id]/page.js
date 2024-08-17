@@ -1,7 +1,7 @@
-import { useParams } from "next/navigation"
+
 import prisma from "@/prisma"
-import Markdown from 'react-markdown'
 import dayjs from "dayjs"
+import MarkdownRender from "@/app/components/markdown/MarkdownRender"
 import styles from './page.module.css'
 
 export default async function Page({ params }) {
@@ -23,7 +23,7 @@ export default async function Page({ params }) {
         </div>
       </>
     }
-    <Markdown>{post.content}</Markdown>
+    <MarkdownRender>{post.content}</MarkdownRender>
   </div>
 
 }
