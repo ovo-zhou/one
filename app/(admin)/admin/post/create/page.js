@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import MarkdownRender from "@/app/components/markdown/MarkdownRender";
 import styles from "./page.module.css";
 import Image from "next/image";
+import MarkdownEditor from "@/app/components/markdown/MarkdownEditor";
 
 export default function Page() {
   const [post, setPost] = useState({
@@ -13,11 +14,9 @@ export default function Page() {
     content: "",
     abstract: "",
   });
-  const [menuPoint, setMenuPoint] = useState({ x: 0, y: 0 });
   const [imgBedVisiable, setImgBedVisiable] = useState(false);
-  const [contextMenuVisible, setContextMenuVisible] = useState(false);
   const uploadElementRef = useRef(null);
-  const contextMenu = useRef(null);
+
   const [imgUrl, setImgUrl] = useState("");
   const router = useRouter();
   const handleSave = () => {
@@ -64,24 +63,7 @@ export default function Page() {
         setImgUrl(res.url);
       });
   };
-  const rightClickMenu = (event) => {
-    event.preventDefault();
-    console.log("右键点击", event);
-    // 打开菜单
-    setContextMenuVisible(true);
-    setMenuPoint({ x: event.clientX, y: event.clientY });
-  };
-  const handleClickOutside = (event) => {
-    if (contextMenu.current && !contextMenu.current.contains(event.target)) {
-      setContextMenuVisible(false);
-    }
-  };
-  useEffect(() => {
-    document.addEventListener("click", handleClickOutside);
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
-  }, []);
+
   return (
     <>
       <form>
@@ -117,21 +99,14 @@ export default function Page() {
           <div
             style={{ display: "flex", gap: "10px", padding: 10, width: 1200 }}
           >
-            <textarea
-              onContextMenu={rightClickMenu}
+            <div
               style={{
                 width: "50%",
                 boxSizing: "border-box",
-                padding: "10px",
-                resize: "none",
               }}
-              rows="50"
-              name="content"
-              value={post.content}
-              id="content"
-              type="text"
-              onChange={handleChange}
-            />
+            >
+              <MarkdownEditor value={post.content} onChange={handleChange} />
+            </div>
             <div
               style={{
                 width: "50%",
@@ -148,22 +123,6 @@ export default function Page() {
           <input type="button" value="保存" onClick={handleSave} />
         </div>
       </form>
-      {contextMenuVisible && (
-        <div
-          ref={contextMenu}
-          style={{
-            position: "fixed",
-            top: menuPoint.y,
-            left: menuPoint.x,
-            background: "red",
-          }}
-        >
-          <div>标题</div>
-          <div>引用</div>
-          <div>强调</div>
-        </div>
-      )}
-
       {imgBedVisiable ? (
         <div className={styles.imgUploadModal}>
           <div style={{ display: "flex", justifyContent: "space-between" }}>

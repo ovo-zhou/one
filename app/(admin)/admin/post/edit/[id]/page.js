@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import MarkdownRender from "@/app/components/markdown/MarkdownRender";
+import MarkdownEditor from "@/app/components/markdown/MarkdownEditor";
 
 export default function Page({ params }) {
   const { id } = params;
@@ -87,20 +88,18 @@ export default function Page({ params }) {
           <div
             style={{ display: "flex", gap: "10px", padding: 10, width: 1200 }}
           >
-            <textarea
+            <div
               style={{
                 width: "50%",
                 boxSizing: "border-box",
-                padding: "10px",
-                resize: "none",
               }}
-              rows="50"
-              name="content"
-              value={post.content}
-              id="content"
-              type="text"
-              onChange={handleChange}
-            />
+            >
+              <MarkdownEditor
+                value={post.content}
+                onChange={handleChange}
+                name="content"
+              />
+            </div>
             <div
               style={{
                 width: "50%",
