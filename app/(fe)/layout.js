@@ -1,9 +1,7 @@
 import { Inter } from "next/font/google";
-import "./globals.css";
 import prisma from "@/prisma";
-import Link from 'next/link'
-
-const inter = Inter({ subsets: ["latin"] });
+import Link from "next/link";
+import "../tailwind/tailwind.css";
 
 export const metadata = {
   title: "ryan",
@@ -14,29 +12,36 @@ export default async function RootLayout({ children }) {
   const pages = await prisma.post.findMany({
     where: {
       kind: {
-        equals: "page"
-      }
-    }
-  })
+        equals: "page",
+      },
+    },
+  });
+  const changeMode = () => {};
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <div className="container">
-          <div className="nav">
-            <div className="menu">
-              <Link href='/'>博客</Link>
-              {
-                pages.map(page => {
-                  return <Link key={page.id} href={`/post/${page.id}`}>{page.title}</Link>
-                })
-              }
+      <body>
+        <div className="container mx-auto bg-white">
+          <div className="flex justify-between items-center leading-10 text-blue-600">
+            <div className="flex gap-3">
+              <div>
+                <Link href="/">博客</Link>
+              </div>
+              {pages.map((page) => {
+                return (
+                  <div key={page.id}>
+                    <Link href={`/post/${page.id}`}>{page.title}</Link>
+                  </div>
+                );
+              })}
             </div>
             <div>
-              <Link href='/admin/post/list'>后台</Link>
+              <Link href="/admin/post/list">后台</Link>
             </div>
           </div>
-          {children}
-          <div style={{ textAlign: 'center' }}>Copyright 2019-{new Date().getFullYear()} ryan 版权所有 保留所有权利</div>
+          <div className="relative">{children}</div>
+          <div className="text-center">
+            Copyright 2019-{new Date().getFullYear()} ryan 版权所有 保留所有权利
+          </div>
         </div>
       </body>
     </html>

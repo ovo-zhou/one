@@ -1,37 +1,41 @@
-import styles from "./page.module.css";
 import prisma from "@/prisma";
-import Link from 'next/link'
+import Link from "next/link";
 import dayjs from "dayjs";
 
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const posts = await prisma.post.findMany({
-    where:{
-      kind:{
-        equals:'post'
-      }
+    where: {
+      kind: {
+        equals: "post",
+      },
     },
-    orderBy:{
-      published:'desc'
-    }
+    orderBy: {
+      published: "desc",
+    },
   });
   return (
     <div>
-      {
-        posts.map((item) => {
-          return <div key={item.id}  className={styles.post}>
-            <h1><Link href={`/post/${item.id}`}>{item.title}</Link></h1>
-            <div className={styles.info}>
-              <span className={styles.info_item}>最近更新：{dayjs(+item.published).format('YYYY-MM-DD HH:mm:ss')}</span>  
-              <span className={styles.info_item}>创建时间：{dayjs(+item.updated).format('YYYY-MM-DD HH:mm:ss')}</span> 
+      {posts.map((item) => {
+        return (
+          <div key={item.id} className="mb-6">
+            <h1 className="text-lg text-blue-600 leading-7">
+              <Link href={`/post/${item.id}`}>{item.title}</Link>
+            </h1>
+            <div className="text-xs">
+              <span>
+                最近更新：{dayjs(+item.published).format("YYYY-MM-DD HH:mm:ss")}
+              </span>
+              <span className="mx-3">
+                创建时间：{dayjs(+item.updated).format("YYYY-MM-DD HH:mm:ss")}
+              </span>
               <span>作者：ryan</span>
             </div>
-            <div className={styles.abstract}>{item.abstract}</div>
-          </div> 
-          
-        })
-      }
+            <div className="text-base leading-7 mt-2">{item.abstract}</div>
+          </div>
+        );
+      })}
     </div>
   );
 }

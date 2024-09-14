@@ -105,7 +105,11 @@ export default function Page() {
                 boxSizing: "border-box",
               }}
             >
-              <MarkdownEditor value={post.content} onChange={handleChange} />
+              <MarkdownEditor
+                value={post.content}
+                name="content"
+                onChange={handleChange}
+              />
             </div>
             <div
               style={{
