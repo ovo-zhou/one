@@ -11,7 +11,7 @@ export default async function Page({ params }) {
     },
   });
   return (
-    <div>
+    <div className="px-2">
       {post.kind === "post" && (
         <>
           <h1 className="text-xl leading-10 font-bold text-blue-600">

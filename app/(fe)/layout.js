@@ -1,6 +1,7 @@
 import { Inter } from "next/font/google";
 import prisma from "@/prisma";
 import Link from "next/link";
+import Nav from "../components/nav";
 import "../tailwind/tailwind.css";
 
 export const metadata = {
@@ -16,26 +17,27 @@ export default async function RootLayout({ children }) {
       },
     },
   });
+  const menuItems = [
+    {
+      href: "/",
+      title: "首页",
+    },
+    ...pages.map((item) => ({
+      href: `/post/${item.id}`,
+      title: item.title,
+    })),
+  ];
   const changeMode = () => {};
   return (
     <html lang="en">
       <body>
         <div className="container mx-auto bg-white">
-          <div className="flex justify-between items-center leading-10 text-blue-600">
-            <div className="flex gap-3">
-              <div>
-                <Link href="/">博客</Link>
+          <div className="flex justify-between items-center  h-12 text-black">
+            <Nav menuItems={menuItems}></Nav>
+            <div className="flex gap-3 justify-between items-center h-12">
+              <div className="hover:bg-slate-200 h-8 leading-8 px-3 rounded-md">
+                <Link href="/admin/post/list">后台</Link>
               </div>
-              {pages.map((page) => {
-                return (
-                  <div key={page.id}>
-                    <Link href={`/post/${page.id}`}>{page.title}</Link>
-                  </div>
-                );
-              })}
-            </div>
-            <div>
-              <Link href="/admin/post/list">后台</Link>
             </div>
           </div>
           <div className="relative">{children}</div>

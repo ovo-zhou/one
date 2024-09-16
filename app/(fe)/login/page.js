@@ -40,7 +40,7 @@ export default function Page() {
         <div className="mb-3">
           <div className="w-20 inline-block">用户名：</div>
           <input
-            className="border rounded-md"
+            className="border rounded-md px-2 py-1"
             type="text"
             name="username"
             value={user.username}
@@ -50,7 +50,7 @@ export default function Page() {
         <div className="mb-3">
           <div className="w-20 inline-block">密码：</div>
           <input
-            className="border rounded-md"
+            className="border rounded-md px-2 py-1"
             type="password"
             name="password"
             value={user.password}
