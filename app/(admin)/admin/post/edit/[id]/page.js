@@ -26,7 +26,6 @@ export default function Page({ params }) {
         return res.json();
       })
       .then((res) => {
-        console.log("创建成功", res);
         router.back();
       })
       .catch((err) => {

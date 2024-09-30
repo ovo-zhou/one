@@ -14,9 +14,7 @@ export default async function Page({ params }) {
     <div className="px-2">
       {post.kind === "post" && (
         <>
-          <h1 className="text-xl leading-10 font-bold text-blue-600">
-            {post.title}
-          </h1>
+          <h2 className="leading-10 text-blue-600">{post.title}</h2>
           <div className="text-xs pb-6">
             <span className={""}>
               最近更新：{dayjs(+post.published).format("YYYY-MM-DD HH:mm:ss")}

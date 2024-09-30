@@ -31,7 +31,6 @@ export default function Page() {
         return res.json();
       })
       .then((res) => {
-        console.log("创建成功", res);
         router.back();
       })
       .catch((err) => {
@@ -46,7 +45,6 @@ export default function Page() {
   const handleImgUpload = () => {
     const files = uploadElementRef.current.files;
     if (files.length === 0) {
-      console.log("请选择文件");
       return;
     }
     const form = new FormData();

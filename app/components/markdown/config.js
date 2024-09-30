@@ -1,62 +1,37 @@
-// markdonwEditor 右键菜单配置
-const config = [
-  {
-    name: "标题",
-    children: [
-      {
-        name: "一级标题",
-        value: "#",
-      },
-      {
-        name: "二级标题",
-        value: "##",
-      },
-      {
-        name: "三级标题",
-        value: "###",
-      },
-      {
-        name: "四级标题",
-        value: "####",
-      },
-      {
-        name: "五级标题",
-        value: "#####",
-      },
-      {
-        name: "六级标题",
-        value: "######",
-      },
-    ],
+/**
+ * markdown 自定义渲染
+ */
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { vscDarkPlus as theme } from "react-syntax-highlighter/dist/esm/styles/prism";
+export const components = {
+  code(props) {
+    const { children, className, node, ...rest } = props;
+    const match = /language-(\w+)/.exec(className || "");
+    return match ? (
+      <SyntaxHighlighter
+        {...rest}
+        PreTag="div"
+        showLineNumbers
+        language={match[1]}
+        style={theme}
+      >
+        {String(children).replace(/\n$/, "")}
+      </SyntaxHighlighter>
+    ) : (
+      <code
+        {...rest}
+        className={`${className} bg-gray-200 py-1 px-2 rounded-md border border-gray-300`}
+      >
+        {children}
+      </code>
+    );
   },
-  {
-    name: "强调",
-    children: [
-      {
-        name: "加粗",
-        value: "**",
-      },
-      {
-        name: "斜体",
-        value: "*",
-      },
-    ],
+  a(props) {
+    const { children, href } = props;
+    return (
+      <a href={href} className="text-blue-700 underline">
+        {children}
+      </a>
+    );
   },
-  {
-    name: "引用",
-    value: ">",
-  },
-  {
-    name: "列表",
-    children: [
-      {
-        name: "有序列表",
-        value: "1.",
-      },
-      {
-        name: "无序列表",
-        value: "-",
-      },
-    ],
-  },
-];
+};

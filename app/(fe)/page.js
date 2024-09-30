@@ -20,9 +20,9 @@ export default async function Home() {
       {posts.map((item) => {
         return (
           <div key={item.id} className="mb-6 hover:bg-slate-200 p-3 rounded-md">
-            <h1 className="text-lg text-blue-600 leading-7">
+            <h2 className="text-blue-600 leading-7">
               <Link href={`/post/${item.id}`}>{item.title}</Link>
-            </h1>
+            </h2>
             <div className="text-xs">
               <span>
                 最近更新：{dayjs(+item.published).format("YYYY-MM-DD HH:mm:ss")}
