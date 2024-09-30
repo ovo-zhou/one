@@ -1,9 +1,12 @@
 "use client";
 import NextLink from "next/link";
 import { useEffect, useState } from "react";
+import Modal from "@/app/components/modal";
 
 export default function Page() {
   const [dataSource, setDataSource] = useState({ total: 1 });
+  const [isShow, setIsShow] = useState(false);
+  const [selectedItemId, setSelectedItemId] = useState(null);
   const [searchParams, setSearchParams] = useState({
     kind: "",
     title: "",
@@ -18,8 +21,18 @@ export default function Page() {
       [name]: value,
     });
   };
+  const openModal = () => {
+    setIsShow(true);
+  };
+  const closeModal = () => {
+    setIsShow(false);
+  };
   const handleDelete = (id) => {
-    fetch(`/admin/post/delete/${id}`, {
+    setSelectedItemId(id);
+    openModal();
+  };
+  const deleteRecord = () => {
+    fetch(`/admin/post/delete/${selectedItemId}`, {
       method: "DELETE",
       credentials: "same-origin",
     })
@@ -27,6 +40,7 @@ export default function Page() {
         return res.json();
       })
       .then((res) => {
+        closeModal();
         handleSearch();
       })
       .catch((err) => console.log(err));
@@ -153,6 +167,14 @@ export default function Page() {
           每页 {searchParams.pageSize} 条 共 {dataSource.total} 页
         </div>
       </div>
+      <Modal
+        title={"提示"}
+        open={isShow}
+        onOk={deleteRecord}
+        onCancel={closeModal}
+      >
+        确认删除吗？
+      </Modal>
     </>
   );
 }
