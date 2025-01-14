@@ -31,6 +31,7 @@ export default function Page() {
     setSelectedItemId(id);
     openModal();
   };
+  // 删除一条post
   const deleteRecord = () => {
     fetch(`/admin/post/delete/${selectedItemId}`, {
       method: "DELETE",
@@ -173,7 +174,7 @@ export default function Page() {
         onOk={deleteRecord}
         onCancel={closeModal}
       >
-        确认删除吗？
+        删除后不可恢复，确认删除吗？
       </Modal>
     </>
   );
