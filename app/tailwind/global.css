@@ -22,10 +22,10 @@
     @apply text-sm font-light mt-4 mb-2;
   }
   ul {
-    @apply list-disc list-inside mt-4 mb-2;
+    @apply list-disc mt-4 mb-2 ml-[1em];
   }
   ol {
-    @apply list-decimal list-inside mt-4 mb-2;
+    @apply list-decimal mt-4 mb-2 ml-[1em];
   }
   blockquote {
     @apply border-l-4 border-gray-300 pl-4 mt-4 mb-2;

@@ -18,10 +18,7 @@ export const components = {
         {String(children).replace(/\n$/, "")}
       </SyntaxHighlighter>
     ) : (
-      <code
-        {...rest}
-        className={`${className} bg-gray-200 py-1 px-2 rounded-md border border-gray-300`}
-      >
+      <code {...rest} className={className}>
         {children}
       </code>
     );
