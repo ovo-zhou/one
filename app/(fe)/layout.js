@@ -45,7 +45,9 @@ export default async function RootLayout({ children }) {
               </div>
             </div>
           </div>
-          <div className="relative">{children}</div>
+          <div className="relative" style={{ minHeight: "calc(100vh - 6rem)" }}>
+            {children}
+          </div>
           <div className="text-center h-12">
             Copyright 2019-{new Date().getFullYear()} ryan 版权所有 保留所有权利
           </div>
