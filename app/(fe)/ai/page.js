@@ -12,6 +12,9 @@ const initContent = "思考中请稍后...";
 export default function Ai() {
   const scrollElement = useRef(null);
   const abortController = useRef(null);
+  const isComposition = useRef(false);
+  const [disableAutoScrollToBottom, setDisableAutoScrollToBottom] =
+    useState(false);
   const [chatRecords, setChatRecords] = useState([
     {
       id: 1,
@@ -22,8 +25,12 @@ export default function Ai() {
   const [chatStatus, setChatStatus] = useState(chatStatusEnum.NORMAL);
   const [message, setMessage] = useState("");
   useEffect(() => {
+    // 如果在流式输出的过程中向上滚动，则禁止自动向下滚动
+    if (disableAutoScrollToBottom) {
+      return;
+    }
     scroll2Bottom();
-  }, [chatRecords]);
+  }, [chatRecords, disableAutoScrollToBottom]);
   const scroll2Bottom = () => {
     if (!scrollElement || !scrollElement.current) {
       return;
@@ -43,12 +50,16 @@ export default function Ai() {
     };
     setChatRecords([...chatRecords, userRecord, systemRecord]);
     setMessage("");
+    setDisableAutoScrollToBottom(false);
     setChatStatus(chatStatusEnum.SEND);
     const newAbortController = new AbortController();
     abortController.current = newAbortController;
     try {
       const response = await fetch("/admin/ai/api", {
         method: "POST",
+        headers: {
+          Accept: "text/event-stream",
+        },
         body: JSON.stringify({
           model: "deepseek-chat",
           messages: [...chatRecords, userRecord].map((record) => ({
@@ -89,7 +100,8 @@ export default function Ai() {
     }
   };
   const handleKeyDown = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    // console.log(e);
+    if (e.key === "Enter" && !e.shiftKey && !isComposition.current) {
       e.preventDefault();
       sendMessage();
     }
@@ -103,9 +115,23 @@ export default function Ai() {
   const handleClearChatRecords = () => {
     setChatRecords([chatRecords.shift()]);
   };
+  const handleScroll = (e) => {
+    // console.log(e);
+    const { offsetHeight, scrollHeight, scrollTop } = e.target;
+    // 向上滚动，设置标记，在流式输出的时候，不自动滚动到底,反之允许滚动到底
+    if (scrollTop + offsetHeight < scrollHeight - 10) {
+      setDisableAutoScrollToBottom(true);
+    } else {
+      setDisableAutoScrollToBottom(false);
+    }
+  };
   return (
     <div className="flex flex-col" style={{ height: "calc(100vh - 6rem)" }}>
-      <div className="flex-1 overflow-y-auto">
+      <div
+        className="flex-1 overflow-y-auto scroll-smooth"
+        style={{ scrollbarWidth: "none" }}
+        onScroll={handleScroll}
+      >
         {chatRecords.map((record) => {
           return (
             <React.Fragment key={record.id}>
@@ -127,6 +153,12 @@ export default function Ai() {
       </div>
       <div className="relative">
         <textarea
+          onCompositionStart={() => {
+            isComposition.current = true;
+          }}
+          onCompositionEnd={() => {
+            isComposition.current = false;
+          }}
           value={message}
           onChange={(e) => {
             setMessage(e.target.value);
@@ -136,7 +168,7 @@ export default function Ai() {
           placeholder="简单讲两句吧！"
           onKeyDown={handleKeyDown}
         ></textarea>
-        <div className="absolute right-0 bottom-0 p-4 flex gap-2">
+        <div className="absolute right-0 bottom-0 p-4 flex gap-2 cursor-pointer">
           {chatRecords.length > 1 && chatStatus === chatStatusEnum.NORMAL && (
             <svg
               onClick={handleClearChatRecords}

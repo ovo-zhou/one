@@ -11,11 +11,10 @@ datasource db {
 }
 
 model User {
-  id          Int    @id @default(autoincrement())
+  id          Int    @id
   displayName String
   image       String
   username    String
-  password    String
 }
 
 model Post {
