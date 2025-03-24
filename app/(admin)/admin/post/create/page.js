@@ -34,7 +34,7 @@ export default function Page() {
         router.back();
       })
       .catch((err) => {
-        console.log(err);
+        // console.log(err);
       });
   };
   const handleChange = (e) => {

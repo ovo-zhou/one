@@ -2,7 +2,12 @@
 
 运行`npm serve`启动本地开发，会同时开启 next.js 本地开发和 tailwind.css 编译
 
-由于登录时，cookie和现网域名绑定，需要使用代理将现网域名代理到本地端口：`http://localhost:3000`
+由于登录时，cookie和现网域名绑定，需要使用代理将现网域名代理到本地端口，同时开启热更新
+
+```
+https://www.ryandev.cn http://localhost:3000
+wss://www.ryandev.cn/_next/webpack-hmr ws://127.0.0.1:3000/_next/webpack-hmr
+```
 
 ## 数据库修改
 

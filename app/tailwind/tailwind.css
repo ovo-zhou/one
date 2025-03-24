@@ -691,8 +691,16 @@ html {
   right: 0px;
 }
 
+.right-3 {
+  right: 0.75rem;
+}
+
 .top-0 {
   top: 0px;
+}
+
+.top-2 {
+  top: 0.5rem;
 }
 
 .mx-3 {
@@ -860,6 +868,11 @@ html {
 
 .border-2 {
   border-width: 2px;
+}
+
+.bg-\[rgb\(30\2c 30\2c 30\)\] {
+  --tw-bg-opacity: 1;
+  background-color: rgb(30 30 30 / var(--tw-bg-opacity));
 }
 
 .bg-\[rgba\(0\2c 0\2c 0\2c 0\.7\)\] {

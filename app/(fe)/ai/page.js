@@ -39,13 +39,13 @@ export default function Ai() {
   };
   const sendMessage = async () => {
     // 空消息返回
-    if (!message) {
+    if (!message || chatStatus !== chatStatusEnum.NORMAL) {
       return;
     }
     const userRecord = { id: +new Date() - 10, role: "user", content: message };
     const systemRecord = {
       id: +new Date() + 10,
-      role: "system",
+      role: "assistant",
       content: initContent,
     };
     setChatRecords([...chatRecords, userRecord, systemRecord]);
@@ -71,6 +71,10 @@ export default function Ai() {
         signal: newAbortController.signal,
       });
       setChatStatus(chatStatusEnum.CONTENT);
+      if (response.redirected) {
+        window.location.href = response.url;
+        return;
+      }
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let result = "";
@@ -135,7 +139,7 @@ export default function Ai() {
         {chatRecords.map((record) => {
           return (
             <React.Fragment key={record.id}>
-              {record.role === "system" ? (
+              {record.role !== "user" ? (
                 <div className="p-4">
                   <MarkdownRender>{record.content}</MarkdownRender>
                 </div>

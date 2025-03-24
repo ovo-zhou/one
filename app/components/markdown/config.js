@@ -8,15 +8,26 @@ export const components = {
     const { children, className, node, ...rest } = props;
     const match = /language-(\w+)/.exec(className || "");
     return match ? (
-      <SyntaxHighlighter
-        {...rest}
-        PreTag="div"
-        showLineNumbers
-        language={match[1]}
-        style={theme}
-      >
-        {String(children).replace(/\n$/, "")}
-      </SyntaxHighlighter>
+      <div className="bg-[rgb(30,30,30)] relative">
+        <button
+          className="absolute top-2 right-3 text-white"
+          onClick={() => {
+            navigator.clipboard.writeText(children);
+          }}
+        >
+          复制
+        </button>
+
+        <SyntaxHighlighter
+          {...rest}
+          PreTag="div"
+          showLineNumbers
+          language={match[1]}
+          style={theme}
+        >
+          {String(children).replace(/\n$/, "")}
+        </SyntaxHighlighter>
+      </div>
     ) : (
       <code {...rest} className={className}>
         {children}

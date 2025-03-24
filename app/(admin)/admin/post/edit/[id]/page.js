@@ -29,7 +29,7 @@ export default function Page({ params }) {
         router.back();
       })
       .catch((err) => {
-        console.log(err);
+        // console.log(err);
       });
   };
   const handleChange = (e) => {
@@ -49,7 +49,7 @@ export default function Page({ params }) {
         setPost(res);
       })
       .catch((err) => {
-        console.log(err);
+        // console.log(err);
       });
   }, [id]);
   return (

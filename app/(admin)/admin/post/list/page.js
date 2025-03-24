@@ -75,7 +75,7 @@ export default function Page() {
         setDataSource(res);
       })
       .catch((err) => {
-        console.log(err);
+        // console.log(err);
       });
   };
   useEffect(() => {

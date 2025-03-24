@@ -31,7 +31,7 @@ export async function POST(request) {
       Authorization: token_type + " " + access_token,
     },
   }).then((res) => res.json());
-  console.log(user);
+  // console.log(user);
   const { id, avatar_url, name } = user;
   // 用户不存在，注册,存在直接保存
   const localUser = await prisma.user.findUnique({
@@ -64,6 +64,7 @@ export async function POST(request) {
   const token = await new SignJWT({
     username: user.name,
     image: avatar_url,
+    uid: user.id,
   })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
