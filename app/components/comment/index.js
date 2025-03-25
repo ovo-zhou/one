@@ -1,12 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Comment(props) {
   const { postId } = props;
   const [comment, setComment] = useState("");
+  const [comments, setComments] = useState([{}]);
+  // 添加评论和回复评论，都走这个接口
   const addComment = async () => {
     // console.log(comment);
+    if (!comment) {
+      return;
+    }
     const response = await fetch("/admin/comment/api", {
       method: "POST",
       headers: {
@@ -15,11 +20,32 @@ export default function Comment(props) {
       body: JSON.stringify({ postId, content: comment }),
     });
     const data = await response.json();
-    console.log("ryan", data);
+    // console.log("ryan", data);
+    setComments([...comments, data]);
+    // 添加成功
+    setComment("");
   };
+  useEffect(() => {
+    // 查询评论列表
+    fetch("/comment/api?postId=" + postId, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        // console.log(data);
+        setComments(data);
+      });
+  }, []);
   return (
     <div>
-      <h3>Comment</h3>
+      <div>
+        {comments.map((item) => {
+          return <div key={item.id}>{item.content}</div>;
+        })}
+      </div>
       <div className="relative">
         <textarea
           placeholder="上来说两句吧！"

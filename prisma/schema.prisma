@@ -45,4 +45,5 @@ model comments {
   content   String
   published String
   updated   String
+  parentId  Int    @default(0)
 }
