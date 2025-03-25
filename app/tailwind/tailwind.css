@@ -691,16 +691,8 @@ html {
   right: 0px;
 }
 
-.right-3 {
-  right: 0.75rem;
-}
-
 .top-0 {
   top: 0px;
-}
-
-.top-2 {
-  top: 0.5rem;
 }
 
 .mx-3 {
@@ -752,6 +744,10 @@ html {
 
 .h-8 {
   height: 2rem;
+}
+
+.h-\[100px\] {
+  height: 100px;
 }
 
 .h-screen {
@@ -868,6 +864,11 @@ html {
 
 .border-2 {
   border-width: 2px;
+}
+
+.border-gray-300 {
+  --tw-border-opacity: 1;
+  border-color: rgb(209 213 219 / var(--tw-border-opacity));
 }
 
 .bg-\[rgb\(30\2c 30\2c 30\)\] {

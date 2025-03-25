@@ -2,6 +2,7 @@
 import React, { useEffect, useRef } from "react";
 import { useState } from "react";
 import MarkdownRender from "@/app/components/markdown/MarkdownRender";
+import Copy from "@/app/components/copy";
 const chatStatusEnum = {
   NORMAL: "normal", // 正常状态
   SEND: "send", // 发送中
@@ -136,17 +137,27 @@ export default function Ai() {
         style={{ scrollbarWidth: "none" }}
         onScroll={handleScroll}
       >
-        {chatRecords.map((record) => {
+        {chatRecords.map((record, index) => {
           return (
             <React.Fragment key={record.id}>
               {record.role !== "user" ? (
                 <div className="p-4">
                   <MarkdownRender>{record.content}</MarkdownRender>
+                  {index !== 0 && (
+                    <div className="pt-2">
+                      <Copy text={record.content}></Copy>
+                    </div>
+                  )}
                 </div>
               ) : (
-                <div className="p-4 flex justify-end">
-                  <div className="bg-slate-100 p-2 rounded-md">
-                    {record.content}
+                <div className="p-4">
+                  <div className="flex justify-end">
+                    <div className="bg-slate-100 p-2 rounded-md">
+                      {record.content}
+                    </div>
+                  </div>
+                  <div className="flex justify-end pt-2">
+                    <Copy text={record.content}></Copy>
                   </div>
                 </div>
               )}

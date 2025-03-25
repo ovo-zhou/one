@@ -4,6 +4,7 @@ import Link from "next/link";
 import Nav from "../components/nav";
 import "../tailwind/tailwind.css";
 import { title } from "process";
+import { Suspense } from "react";
 
 export const metadata = {
   title: "ryan",
@@ -46,7 +47,7 @@ export default async function RootLayout({ children }) {
             </div>
           </div>
           <div className="relative" style={{ minHeight: "calc(100vh - 6rem)" }}>
-            {children}
+            <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
           </div>
           <div className="text-center h-12">
             Copyright 2019-{new Date().getFullYear()} ryan 版权所有 保留所有权利

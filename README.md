@@ -14,4 +14,10 @@ wss://www.ryandev.cn/_next/webpack-hmr ws://127.0.0.1:3000/_next/webpack-hmr
 - 先修改 prisma/schema.prisma 下的文件，确保字段，类型配置正确
 - 运行迁移命令`npx prisma migrate dev --name <迁移名称>`，此命令会生成迁移文件，并且修改数据库
 - 将迁移文件提交到 git 仓库，便于将数据库修改同步到生产环境
+
+
+## 部署
+
 - 在生产环境运行`npx prisma migrate deploy`，将数据库迁移文件中的更改同步到生产数据库
+- 运行`npm run build`构建项目
+- 运行`npm run start`启动项目

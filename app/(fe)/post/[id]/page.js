@@ -1,6 +1,7 @@
 import prisma from "@/prisma";
 import dayjs from "dayjs";
 import MarkdownRender from "@/app/components/markdown/MarkdownRender";
+import Comment from "@/app/components/comment";
 
 export default async function Page({ params }) {
   const [post] = await prisma.post.findMany({
@@ -27,6 +28,7 @@ export default async function Page({ params }) {
         </>
       )}
       <MarkdownRender>{post.content}</MarkdownRender>
+      {post.kind === "post" && <Comment postId={params.id}></Comment>}
     </div>
   );
 }
