@@ -1,5 +1,9 @@
 import prisma from "@/prisma";
-
+/**
+ * Get comments by postId
+ * @param {postId} request
+ * @returns {comments}
+ */
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const postId = searchParams.get("postId");

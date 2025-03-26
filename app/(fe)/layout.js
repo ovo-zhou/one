@@ -3,8 +3,8 @@ import prisma from "@/prisma";
 import Link from "next/link";
 import Nav from "../components/nav";
 import "../tailwind/tailwind.css";
-import { title } from "process";
 import { Suspense } from "react";
+import { decodeCookie } from "../actions/index";
 
 export const metadata = {
   title: "ryan",
@@ -33,7 +33,7 @@ export default async function RootLayout({ children }) {
       title: "AI",
     },
   ];
-  const changeMode = () => {};
+  const user = await decodeCookie();
   return (
     <html lang="en">
       <body>
@@ -44,8 +44,13 @@ export default async function RootLayout({ children }) {
               <div className="hover:bg-slate-200 h-8 leading-8 px-3 rounded-md">
                 <Link href="/admin/post/list">后台</Link>
               </div>
+              <div>
+                <img src={user.image} className="w-4 h-4" />
+                {user.username}
+              </div>
             </div>
           </div>
+
           <div className="relative" style={{ minHeight: "calc(100vh - 6rem)" }}>
             <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
           </div>
