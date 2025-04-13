@@ -2,13 +2,14 @@
 import NextLink from "next/link";
 import { useEffect, useState } from "react";
 import Modal from "@/app/components/modal";
+import { getPostList, deletePost } from "@/app/actions";
 
 export default function Page() {
   const [dataSource, setDataSource] = useState({ total: 1 });
   const [isShow, setIsShow] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [searchParams, setSearchParams] = useState({
-    kind: "",
+    type: "",
     title: "",
     page: 1,
     pageSize: 10,
@@ -33,18 +34,10 @@ export default function Page() {
   };
   // 删除一条post
   const deleteRecord = () => {
-    fetch(`/admin/post/delete/${selectedItemId}`, {
-      method: "DELETE",
-      credentials: "same-origin",
-    })
-      .then((res) => {
-        return res.json();
-      })
-      .then((res) => {
-        closeModal();
-        handleSearch();
-      })
-      .catch((err) => console.log(err));
+    deletePost(selectedItemId).then(() => {
+      closeModal();
+      handleSearch();
+    });
   };
   const changaPage = (increment) => {
     const page = searchParams.page + increment;
@@ -58,25 +51,9 @@ export default function Page() {
     });
   };
   const handleSearch = () => {
-    const queryParams = Object.keys(searchParams)
-      .filter((item) => !!searchParams[item])
-      .map((item) => {
-        return item + "=" + searchParams[item];
-      })
-      .join("&");
-    fetch(`/admin/post/list/api?${queryParams}`, {
-      method: "GET",
-      credentials: "same-origin",
-    })
-      .then((res) => {
-        return res.json();
-      })
-      .then((res) => {
-        setDataSource(res);
-      })
-      .catch((err) => {
-        // console.log(err);
-      });
+    getPostList(searchParams).then((data) => {
+      setDataSource(data);
+    });
   };
   useEffect(() => {
     handleSearch();
@@ -84,19 +61,19 @@ export default function Page() {
   return (
     <>
       <NextLink
-        href="/admin/post/create"
+        href="/admin/post/createEditForm"
         className="border inline-block text-white bg-blue-500 rounded-md px-3 py-1"
       >
         写博客
       </NextLink>
       <div className="py-3">
-        <label htmlFor="kind">类型:</label>
-        <select name="kind" onChange={handleChange}>
+        <label htmlFor="type">类型:</label>
+        <select name="type" onChange={handleChange}>
           <option value="">全部</option>
           <option value="post">博客</option>
           <option value="page">页面</option>
         </select>
-        <label htmlFor="kind">标题:</label>
+        <label htmlFor="title">标题:</label>
         <input
           id="title"
           name="title"
@@ -128,15 +105,21 @@ export default function Page() {
               <tr key={post.id} className="leading-10">
                 <td className="px-2">{post.id}</td>
                 <td className="px-2">{post.title}</td>
-                <td className="px-2">{post.kind}</td>
+                <td className="px-2">{post.type}</td>
                 <td className="px-2">{post.updated}</td>
                 <td className="px-2">{post.published}</td>
                 <td className="px-2">
                   <NextLink
-                    href={`/admin/post/edit/${post.id}`}
+                    href={`/admin/post/createEditForm?postId=${post.id}`}
                     className="text-blue-500 px-2"
                   >
                     编辑
+                  </NextLink>
+                  <NextLink
+                    href={`/post/${post.id}`}
+                    className="text-blue-500 px-2"
+                  >
+                    查看
                   </NextLink>
                   <button
                     onClick={() => handleDelete(post.id)}
@@ -144,12 +127,6 @@ export default function Page() {
                   >
                     删除
                   </button>
-                  <NextLink
-                    href={`/post/${post.id}`}
-                    className="text-blue-500 px-2"
-                  >
-                    查看
-                  </NextLink>
                 </td>
               </tr>
             );

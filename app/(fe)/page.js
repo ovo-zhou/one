@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 export default async function Home() {
   const posts = await prisma.post.findMany({
     where: {
-      kind: {
+      type: {
         equals: "post",
       },
     },

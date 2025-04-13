@@ -28,7 +28,7 @@ export default async function Page({ params }) {
         </>
       )}
       <MarkdownRender>{post.content}</MarkdownRender>
-      {post.kind === "post" && <Comment postId={params.id}></Comment>}
+      {post.type === "post" && <Comment postId={params.id}></Comment>}
     </div>
   );
 }

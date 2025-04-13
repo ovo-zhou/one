@@ -3,39 +3,40 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import MarkdownRender from "@/app/components/markdown/MarkdownRender";
-import styles from "./page.module.css";
 import Image from "next/image";
 import MarkdownEditor from "@/app/components/markdown/MarkdownEditor";
+import { createPost, getPostById, updatePost } from "@/app/actions";
+import { useSearchParams } from "next/navigation";
 
 export default function Page() {
   const [post, setPost] = useState({
-    kind: "post",
+    type: "post",
     title: "",
     content: "",
     abstract: "",
   });
+  const searchParams = useSearchParams();
+  const postId = searchParams.get("postId");
   const [imgBedVisiable, setImgBedVisiable] = useState(false);
   const uploadElementRef = useRef(null);
 
   const [imgUrl, setImgUrl] = useState("");
   const router = useRouter();
-  const handleSave = () => {
-    const date = +new Date() + "";
-    const data = Object.assign(post, { published: date, updated: date });
-    fetch("/admin/post/create/api", {
-      method: "POST",
-      body: JSON.stringify(data),
-      credentials: "same-origin",
-    })
-      .then((res) => {
-        return res.json();
-      })
-      .then((res) => {
-        router.back();
-      })
-      .catch((err) => {
-        // console.log(err);
-      });
+  const handleSave = async () => {
+    // console.log("post", post);
+    // 创建
+    if (!postId) {
+      const data = await createPost(post);
+      if (data && data.id) {
+        router.push(`/admin/post/list`);
+      }
+    } else {
+      // 编辑
+      const data = await updatePost(postId, post);
+      if (data && data.id) {
+        router.push(`/admin/post/list`);
+      }
+    }
   };
   const handleChange = (e) => {
     const name = e.target.name;
@@ -61,13 +62,20 @@ export default function Page() {
         setImgUrl(res.url);
       });
   };
-
+  useEffect(() => {
+    if (postId) {
+      // 查询post
+      getPostById(postId).then((post) => {
+        setPost(post);
+      });
+    }
+  }, [postId]);
   return (
     <>
       <form>
         <div>
-          <label htmlFor="kind">类型:</label>
-          <select name="kind" onChange={handleChange} value={post.kind}>
+          <label htmlFor="type">类型:</label>
+          <select name="type" onChange={handleChange} value={post.type}>
             <option value="post">博客</option>
             <option value="page">页面</option>
           </select>
@@ -125,33 +133,29 @@ export default function Page() {
           <input type="button" value="保存" onClick={handleSave} />
         </div>
       </form>
-      {imgBedVisiable ? (
-        <div className={styles.imgUploadModal}>
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <span>图床</span>
-            <span
-              onClick={() => setImgBedVisiable(false)}
-              style={{ color: "red" }}
-            >
-              X
-            </span>
+      {
+        imgBedVisiable ? (
+          <div className={styles.imgUploadModal}>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <span>图床</span>
+              <span
+                onClick={() => setImgBedVisiable(false)}
+                style={{ color: "red" }}
+              >
+                X
+              </span>
+            </div>
+            <input type="file" ref={uploadElementRef} />
+            <div>
+              <div>图片地址：{imgUrl}</div>
+              <Image src={imgUrl} alt="" width={100} height={100} />
+            </div>
+            <button onClick={handleImgUpload}>上传</button>
+            <button onClick={() => setImgBedVisiable(false)}>取消</button>
           </div>
-          <input type="file" ref={uploadElementRef} />
-          <div>
-            <div>图片地址：{imgUrl}</div>
-            <Image src={imgUrl} alt="" width={100} height={100} />
-          </div>
-          <button onClick={handleImgUpload}>上传</button>
-          <button onClick={() => setImgBedVisiable(false)}>取消</button>
-        </div>
-      ) : (
-        <div
-          className={styles.imgBedButton}
-          onClick={() => setImgBedVisiable(true)}
-        >
-          图床
-        </div>
-      )}
+        ) : null
+        // <div onClick={() => setImgBedVisiable(true)}>图床</div>
+      }
     </>
   );
 }

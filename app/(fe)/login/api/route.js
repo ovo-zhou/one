@@ -31,12 +31,11 @@ export async function POST(request) {
       Authorization: token_type + " " + access_token,
     },
   }).then((res) => res.json());
-  const user = {
-    id: 56762217,
-    avatar_url: "https://avatars.githubusercontent.com/u/56762217?v=4",
-    name: "ryan",
-  };
-  console.log(user);
+  // const user = {
+  //   id: 56762217,
+  //   avatar_url: "https://avatars.githubusercontent.com/u/56762217?v=4",
+  //   name: "ryan",
+  // };
   const { id: uid, avatar_url, name } = user;
   // 用户不存在，注册,存在直接保存
   const localUser = await prisma.user.findUnique({
@@ -44,8 +43,10 @@ export async function POST(request) {
       uid,
     },
   });
+  let userId = null;
   if (localUser) {
-    const res = await prisma.user.update({
+    userId = localUser.id;
+    await prisma.user.update({
       where: {
         id: localUser.id,
       },
@@ -54,21 +55,22 @@ export async function POST(request) {
         avatar: avatar_url,
       },
     });
-    console.log("res", res);
   } else {
-    await prisma.user.create({
+    const newUser = await prisma.user.create({
       data: {
         name,
         avatar: avatar_url,
         uid,
       },
     });
+    userId = newUser.id;
   }
   // 不直接暴露github的token，重新签发我们自己的token
   const token = await new SignJWT({
     name,
     avatar: avatar_url,
     uid,
+    id: userId,
   })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
