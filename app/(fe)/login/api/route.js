@@ -31,40 +31,44 @@ export async function POST(request) {
       Authorization: token_type + " " + access_token,
     },
   }).then((res) => res.json());
-  // console.log(user);
-  const { id, avatar_url, name } = user;
+  const user = {
+    id: 56762217,
+    avatar_url: "https://avatars.githubusercontent.com/u/56762217?v=4",
+    name: "ryan",
+  };
+  console.log(user);
+  const { id: uid, avatar_url, name } = user;
   // 用户不存在，注册,存在直接保存
   const localUser = await prisma.user.findUnique({
     where: {
-      id,
+      uid,
     },
   });
   if (localUser) {
-    await prisma.user.update({
+    const res = await prisma.user.update({
       where: {
-        id,
+        id: localUser.id,
       },
       data: {
-        displayName: name,
-        image: avatar_url,
-        username: name,
+        name,
+        avatar: avatar_url,
       },
     });
+    console.log("res", res);
   } else {
     await prisma.user.create({
       data: {
-        id,
-        displayName: name,
-        image: avatar_url,
-        username: name,
+        name,
+        avatar: avatar_url,
+        uid,
       },
     });
   }
   // 不直接暴露github的token，重新签发我们自己的token
   const token = await new SignJWT({
-    username: user.name,
-    image: avatar_url,
-    uid: user.id,
+    name,
+    avatar: avatar_url,
+    uid,
   })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()

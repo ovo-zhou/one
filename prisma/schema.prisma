@@ -11,20 +11,23 @@ datasource db {
 }
 
 model User {
-  id          Int    @id
-  displayName String
-  image       String
-  username    String
+  id     Int    @id @default(autoincrement())
+  uid    Int    @unique
+  name   String
+  avatar String
+  posts  Post[]
 }
 
 model Post {
   id        Int    @id @default(autoincrement())
-  kind      String
+  type      String
   title     String
   abstract  String
   content   String
   published String
   updated   String
+  authorId  Int
+  author    User   @relation(fields: [authorId], references: [id])
 }
 
 model img {

@@ -1,10 +1,9 @@
-import { Inter } from "next/font/google";
 import prisma from "@/prisma";
-import Link from "next/link";
 import Nav from "../components/nav";
 import "../tailwind/tailwind.css";
-import { Suspense } from "react";
+import { Suspense, use } from "react";
 import { decodeCookie } from "../actions/index";
+import Link from "next/link";
 
 export const metadata = {
   title: "ryan",
@@ -33,21 +32,29 @@ export default async function RootLayout({ children }) {
       title: "AI",
     },
   ];
-  const user = await decodeCookie();
+  const userInfo = await decodeCookie();
   return (
     <html lang="en">
       <body>
         <div className="container mx-auto bg-white">
           <div className="flex justify-between items-center  h-12 text-black">
             <Nav menuItems={menuItems}></Nav>
-            <div className="flex gap-3 justify-between items-center h-12">
-              <div className="hover:bg-slate-200 h-8 leading-8 px-3 rounded-md">
-                <Link href="/admin/post/list">后台</Link>
-              </div>
-              <div>
-                <img src={user.image} className="w-4 h-4" />
-                {user.username}
-              </div>
+            <div className="flex h-12">
+              {userInfo ? (
+                <div className="flex justify-center items-center h-12 gap-3 cursor-pointer">
+                  <img
+                    src={userInfo.image}
+                    className="w-4 h-4"
+                    alt="头像"
+                    style={{ borderRadius: "50%", height: 36, width: 36 }}
+                  />
+                  {userInfo.username}
+                </div>
+              ) : (
+                <div className="hover:bg-slate-200 h-8 leading-8 px-3 rounded-md">
+                  <Link href="/login">登录</Link>
+                </div>
+              )}
             </div>
           </div>
 
