@@ -7,6 +7,7 @@ import Image from "next/image";
 import MarkdownEditor from "@/app/components/markdown/MarkdownEditor";
 import { createPost, getPostById, updatePost } from "@/app/actions";
 import { useSearchParams } from "next/navigation";
+import Select from "@/app/components/select";
 
 export default function Page() {
   const [post, setPost] = useState({
@@ -74,11 +75,22 @@ export default function Page() {
     <>
       <form>
         <div>
-          <label htmlFor="type">类型:</label>
-          <select name="type" onChange={handleChange} value={post.type}>
-            <option value="post">博客</option>
-            <option value="page">页面</option>
-          </select>
+          {/* <label htmlFor="type">类型:</label> */}
+          <Select
+            name="type"
+            onChange={handleChange}
+            value={post.type}
+            options={[
+              {
+                label: "博客",
+                value: "post",
+              },
+              {
+                label: "页面",
+                value: "page",
+              },
+            ]}
+          ></Select>
         </div>
         <div>
           <label htmlFor="title">标题:</label>

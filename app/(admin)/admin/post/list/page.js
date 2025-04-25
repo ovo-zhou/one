@@ -3,6 +3,7 @@ import NextLink from "next/link";
 import { useEffect, useState } from "react";
 import Modal from "@/app/components/modal";
 import { getPostList, deletePost } from "@/app/actions";
+import Select from "@/app/components/select";
 
 export default function Page() {
   const [dataSource, setDataSource] = useState({ total: 1 });
@@ -68,11 +69,24 @@ export default function Page() {
       </NextLink>
       <div className="py-3">
         <label htmlFor="type">类型:</label>
-        <select name="type" onChange={handleChange}>
-          <option value="">全部</option>
-          <option value="post">博客</option>
-          <option value="page">页面</option>
-        </select>
+        <Select
+          name="type"
+          onChange={handleChange}
+          options={[
+            {
+              label: "全部",
+              value: "",
+            },
+            {
+              label: "博客",
+              value: "post",
+            },
+            {
+              label: "页面",
+              value: "page",
+            },
+          ]}
+        ></Select>
         <label htmlFor="title">标题:</label>
         <input
           id="title"
