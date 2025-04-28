@@ -12,17 +12,17 @@ export default function CommentItem(props) {
         return (
           <div key={item.id} className="flex gap-3 mb-4">
             <div>
-              <img src={item.image} className="w-10 h-10 rounded-sm" />
+              <img src={item.author.avatar} className="w-10 h-10 rounded-sm" />
             </div>
             <div className="flex-1">
-              <div className="h-8 leading-8">{item.username}</div>
+              <div className="h-8 leading-8">{item.author.name}</div>
               <div>{item.content}</div>
               <div className="font-thin text-xs leading-8">
                 <span>
                   {dayjs(Number(item.published)).format("YYYY-MM-DD HH:mm:ss")}
                 </span>
                 <span className="pl-6 cursor-pointer">回复</span>
-                {item.userId == userInfo.uid && (
+                {item.author.id == userInfo.id && (
                   <span
                     className="pl-6 cursor-pointer"
                     onClick={() => deleteComment(item.id)}
