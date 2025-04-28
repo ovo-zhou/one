@@ -56,4 +56,5 @@ model Comments {
   published String
   updated   String
   parentId  Int    @default(0)
+  isDeleted Boolean @default(false)
 }

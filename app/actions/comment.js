@@ -1,5 +1,4 @@
 import prisma from "@/prisma";
-import { cookies } from "next/headers";
 import { decodeCookie } from "./common";
 // 根据post id获取评论,采用游标分页
 // todo 某个用户传入游标，但是这个游标被其他用户删除的情况
@@ -7,14 +6,15 @@ export async function getCommentsByPostId(postId, lastCursor = null) {
   const params = {
     take: 10,
     where: {
-      postId:+postId,
+      postId: +postId,
+      isDeleted: false,
     },
     include: {
       author: {
         select: {
           avatar: true,
           name: true,
-          id:true
+          id: true,
         },
       },
     },
@@ -22,6 +22,7 @@ export async function getCommentsByPostId(postId, lastCursor = null) {
       published: "desc",
     },
   };
+  // 游标被删，找到大于游标的最小记录，从之后开始查询
   if (lastCursor) {
     Object.assign(params, {
       cursor: {
@@ -34,7 +35,7 @@ export async function getCommentsByPostId(postId, lastCursor = null) {
   const lastPostInResults = data[9];
   const myCursor = lastPostInResults?.id;
   return {
-    cursor: myCursor>=0?myCursor:-1,
+    cursor: myCursor >= 0 ? myCursor : -1,
     data,
   };
 }
@@ -62,7 +63,7 @@ export async function addComment({ postId, comment, parentId }) {
         select: {
           avatar: true,
           name: true,
-          id:true
+          id: true,
         },
       },
     },
@@ -71,9 +72,12 @@ export async function addComment({ postId, comment, parentId }) {
 }
 
 export async function deleteComment(commentId) {
-  const data = await prisma.comments.delete({
+  const data = await prisma.comments.update({
     where: {
       id: commentId,
+    },
+    data: {
+      isDeleted: true,
     },
   });
   return data;

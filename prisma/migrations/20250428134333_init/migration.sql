@@ -1,19 +1,23 @@
-/*
-  Warnings:
+-- CreateTable
+CREATE TABLE "User" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "uid" INTEGER NOT NULL,
+    "name" TEXT NOT NULL,
+    "avatar" TEXT NOT NULL
+);
 
-  - You are about to drop the `comments` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `img` table. If the table is not empty, all the data it contains will be lost.
-
-*/
--- DropTable
-PRAGMA foreign_keys=off;
-DROP TABLE "comments";
-PRAGMA foreign_keys=on;
-
--- DropTable
-PRAGMA foreign_keys=off;
-DROP TABLE "img";
-PRAGMA foreign_keys=on;
+-- CreateTable
+CREATE TABLE "Post" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "type" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "abstract" TEXT NOT NULL,
+    "content" TEXT NOT NULL,
+    "published" TEXT NOT NULL,
+    "updated" TEXT NOT NULL,
+    "authorId" INTEGER NOT NULL,
+    CONSTRAINT "Post_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
 
 -- CreateTable
 CREATE TABLE "Img" (
@@ -38,6 +42,10 @@ CREATE TABLE "Comments" (
     "published" TEXT NOT NULL,
     "updated" TEXT NOT NULL,
     "parentId" INTEGER NOT NULL DEFAULT 0,
+    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
     CONSTRAINT "Comments_postId_fkey" FOREIGN KEY ("postId") REFERENCES "Post" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT "Comments_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_uid_key" ON "User"("uid");
