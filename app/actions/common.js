@@ -1,5 +1,8 @@
 import { cookies } from "next/headers";
-import { decodeJwt } from "jose";
+import { jwtVerify } from "jose";
+import { NextResponse } from "next/server";
+import { redirect } from "next/navigation";
+const encoder = new TextEncoder();
 /**
  * 解码cookie，返回用户信息
  * @param {cookie} request
@@ -7,11 +10,30 @@ import { decodeJwt } from "jose";
 export async function decodeCookie() {
   const cookieStore = cookies();
   const token = cookieStore.get("token");
-
   if (!token) {
     return null;
   }
   const { value } = token;
-  const userInfo = decodeJwt(value);
-  return userInfo;
+  try {
+    const { payload } = await jwtVerify(
+      value,
+      encoder.encode(process.env.JWT_SECRET)
+    );
+    return {
+      name: payload.name,
+      avatar: payload.avatar,
+      id: payload.id,
+    };
+  } catch (e) {
+    return null;
+  }
+}
+export function withAuth(actionFn) {
+  return async function (params) {
+    const user = await decodeCookie();
+    if (user) {
+      return await actionFn(params);
+    }
+    redirect("/login");
+  };
 }

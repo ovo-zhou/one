@@ -13,7 +13,7 @@ export default async function Page(){
             <div>路径：{img.url}</div>
             <div>文件大小：{img.size}</div>
             <div>文件名类型：{img.type}</div>
-            <div>创建时间：{img.published}</div>
+            <div>创建时间：{img.createdAt}</div>
           </div>
         </div>
       })

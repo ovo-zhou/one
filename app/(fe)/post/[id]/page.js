@@ -13,15 +13,15 @@ export default async function Page({ params }) {
   });
   return (
     <div className="px-2">
-      {post.kind === "post" && (
+      {post.type === "post" && (
         <>
           <h2 className="leading-10 text-blue-600">{post.title}</h2>
           <div className="text-xs pb-6">
             <span className={""}>
-              最近更新：{dayjs(+post.published).format("YYYY-MM-DD HH:mm:ss")}
+              最近更新：{dayjs(+post.createdAt).format("YYYY-MM-DD HH:mm:ss")}
             </span>
             <span className={""}>
-              创建时间：{dayjs(+post.updated).format("YYYY-MM-DD HH:mm:ss")}
+              创建时间：{dayjs(+post.updatedAt).format("YYYY-MM-DD HH:mm:ss")}
             </span>
             <span>作者：ryan</span>
           </div>

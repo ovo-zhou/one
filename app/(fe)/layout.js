@@ -42,16 +42,18 @@ export default async function RootLayout({ children }) {
             <Nav menuItems={menuItems}></Nav>
             <div className="flex h-12">
               {userInfo ? (
-                <div className="flex justify-center items-center h-12 gap-3 cursor-pointer">
-                  <Image
-                    src={userInfo.avatar}
-                    className="w-4 h-4"
-                    alt="头像"
-                    width={36}
-                    height={36}
-                  />
-                  {userInfo.name}
-                </div>
+                <Link href="/admin/post/list">
+                  <div className="flex justify-center items-center h-12 gap-3 cursor-pointer">
+                    <Image
+                      src={userInfo.avatar}
+                      className="w-4 h-4"
+                      alt="头像"
+                      width={36}
+                      height={36}
+                    />
+                    {userInfo.name}
+                  </div>
+                </Link>
               ) : (
                 <div className="hover:bg-slate-200 h-8 leading-8 px-3 rounded-md">
                   <Link href="/login">登录</Link>

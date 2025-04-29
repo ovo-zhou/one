@@ -23,7 +23,7 @@ export async function POST(request) {
       height: 0,
       size: file.size,
       type: file.type,
-      published: String(+date),
+      createdAt: String(+date),
     },
   });
   return Response.json({ url: `${imgUrlBase}/${+date}${extension}` });

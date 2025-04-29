@@ -1,23 +1,25 @@
 "use client";
 import React, { useState } from "react";
 import message from "../message/messageController";
+// size 值  small 小 normal正常
 export default function CommentInput(props) {
-  const { onOk } = props;
+  const { onOk,size='normal' } = props;
 
   const [comment, setComment] = useState("");
 
   const handleSubmit = () => {
     if (!comment) {
-      message.error({ content: "评论不能为空" });
+      message.error({ content: "还没有输入内容呢" });
       return;
     }
-    onOk(comment);
+    onOk?.(comment);
   };
   return (
     <div className="relative">
       <textarea
         placeholder="上来说两句吧！"
-        className="resize-none w-[100%] h-[100px] p-2 border border-gray-300 rounded-md"
+        rows={size==='small'?1:5}
+        className="resize-none w-[100%] p-2 border border-gray-300 rounded-md"
         value={comment}
         onChange={(e) => setComment(e.target.value)}
       ></textarea>

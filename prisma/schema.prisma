@@ -15,9 +15,10 @@ model User {
   uid      Int        @unique
   name     String
   avatar   String
-  posts    Post[]
-  Img      Img[]
+  Posts    Post[]
+  Img     Img[]
   Comments Comments[]
+  Replies  Comments[] @relation("Reply")
 }
 
 model Post {
@@ -26,8 +27,8 @@ model Post {
   title     String
   abstract  String
   content   String
-  published String
-  updated   String
+  createdAt String
+  updatedAt   String
   author    User       @relation(fields: [authorId], references: [id])
   authorId  Int
   Comments  Comments[]
@@ -41,20 +42,22 @@ model Img {
   height    Int
   size      Int
   type      String
-  published String
+  createdAt String
   author    User   @relation(fields: [authorId], references: [id])
   authorId  Int
 }
 
 model Comments {
-  id        Int    @id @default(autoincrement())
-  postId    Int
-  post      Post   @relation(fields: [postId], references: [id])
-  authorId  Int
-  author    User   @relation(fields: [authorId], references: [id])
-  content   String
-  published String
-  updated   String
-  parentId  Int    @default(0)
-  isDeleted Boolean @default(false)
+  id              Int     @id @default(autoincrement())
+  postId          Int
+  post            Post    @relation(fields: [postId], references: [id])
+  authorId        Int
+  author          User    @relation(fields: [authorId], references: [id])
+  replyToAuthorId Int?
+  replyToAuthor   User?   @relation("Reply", fields: [replyToAuthorId], references: [id])
+  content         String
+  createdAt       String
+  updatedAt         String
+  parentId        Int     @default(0)
+  isDeleted       Boolean @default(false)
 }

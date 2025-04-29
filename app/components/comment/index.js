@@ -32,7 +32,7 @@ export default function Comment(props) {
     if (data) {
       setComments(comments.filter((item) => item.id !== commentId));
     }
-    console.log("删除评论", data);
+    // console.log("删除评论", data);
   };
 const handleLoadMoreComments=()=>{
    getCommentsByPostId(postId, cursor).then((res) => {

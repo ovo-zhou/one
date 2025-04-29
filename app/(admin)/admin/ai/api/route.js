@@ -3,7 +3,7 @@ const base_url = "https://api.deepseek.com";
 const apikey = process.env.deepseek_apikey;
 export async function POST(request) {
   const requestParams = await request.json();
-  console.log(requestParams);
+  // console.log(requestParams);
   const totalParams = {
     ...requestParams,
     frequency_penalty: 0,

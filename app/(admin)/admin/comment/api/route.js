@@ -15,8 +15,8 @@ export async function POST(request) {
     postId: +requestParams.postId,
     userId: decode.payload.uid,
     content: requestParams.content,
-    published: String(+new Date()),
-    updated: String(+new Date()),
+    createdAt: String(+new Date()),
+    updatedAt: String(+new Date()),
   };
   const res = await prisma.comments.create({
     data: comment,

@@ -120,8 +120,8 @@ export default function Page() {
                 <td className="px-2">{post.id}</td>
                 <td className="px-2">{post.title}</td>
                 <td className="px-2">{post.type}</td>
-                <td className="px-2">{post.updated}</td>
-                <td className="px-2">{post.published}</td>
+                <td className="px-2">{post.updatedAt}</td>
+                <td className="px-2">{post.createdAt}</td>
                 <td className="px-2">
                   <NextLink
                     href={`/admin/post/createEditForm?postId=${post.id}`}

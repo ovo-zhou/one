@@ -2,11 +2,11 @@
 import { decodeCookie } from "./common";
 export async function createPost(post) {
   const userInfo = await decodeCookie();
-  const published = String(+new Date());
-  const updated = String(+new Date());
+  const createdAt = String(+new Date());
+  const updatedAt = String(+new Date());
   const data = Object.assign({}, post, {
-    published,
-    updated,
+    createdAt,
+    updatedAt,
     author: {
       connect: {
         id: userInfo.id,
@@ -31,7 +31,7 @@ export async function getPostList(searchParams) {
   }
   const posts = await prisma.post.findMany({
     orderBy: {
-      published: "desc",
+      createdAt: "desc",
     },
     where,
     skip: 10 * (Number(page) - 1),
@@ -39,7 +39,7 @@ export async function getPostList(searchParams) {
   });
   const count = await prisma.post.count({
     orderBy: {
-      published: "desc",
+      createdAt: "desc",
     },
     where,
   });
@@ -74,12 +74,12 @@ export async function getPostById(id) {
   };
 }
 export async function updatePost(id, post) {
-  const data = Object.assign({}, post, { updated: String(+new Date()) });
-  const updatedPost = await prisma.post.update({
+  const data = Object.assign({}, post, { updatedAt: String(+new Date()) });
+  const updatedAtPost = await prisma.post.update({
     where: {
       id: +id,
     },
     data,
   });
-  return updatedPost;
+  return updatedAtPost;
 }

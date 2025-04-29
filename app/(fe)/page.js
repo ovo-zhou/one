@@ -12,7 +12,7 @@ export default async function Home() {
       },
     },
     orderBy: {
-      published: "desc",
+      createdAt: "desc",
     },
   });
   return (
@@ -25,10 +25,10 @@ export default async function Home() {
             </h2>
             <div className="text-xs">
               <span>
-                最近更新：{dayjs(+item.published).format("YYYY-MM-DD HH:mm:ss")}
+                最近更新：{dayjs(+item.createdAt).format("YYYY-MM-DD HH:mm:ss")}
               </span>
               <span className="mx-3">
-                创建时间：{dayjs(+item.updated).format("YYYY-MM-DD HH:mm:ss")}
+                创建时间：{dayjs(+item.updatedAt).format("YYYY-MM-DD HH:mm:ss")}
               </span>
               <span>作者：ryan</span>
             </div>
