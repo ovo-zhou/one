@@ -1,10 +1,11 @@
 import prisma from "@/prisma";
 import Nav from "../components/nav";
-import "../tailwind/tailwind.css";
+// import "../tailwind/tailwind.css";
 import { Suspense, use } from "react";
 import { decodeCookie } from "../actions/index";
 import Link from "next/link";
 import Image from "next/image";
+import '../globals.css'
 
 export const metadata = {
   title: "ryan",
