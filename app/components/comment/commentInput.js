@@ -13,12 +13,13 @@ export default function CommentInput(props) {
       return;
     }
     onOk?.(comment);
+    setComment("");
   };
   return (
     <div className="relative">
       <textarea
         placeholder="上来说两句吧！"
-        rows={size==='small'?1:5}
+        rows={size==='small'?1:3}
         className="resize-none w-[100%] p-2 border border-gray-300 rounded-md"
         value={comment}
         onChange={(e) => setComment(e.target.value)}

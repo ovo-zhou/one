@@ -1,63 +1,102 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useContext, useEffect, useReducer, useState } from "react";
 import { getCommentsByPostId, addComment, deleteComment } from "@/app/actions";
 import message from "../message/messageController";
 import CommentInput from "./commentInput";
-
 import CommentItem from "./commentItem";
 
-export default function Comment(props) {
-  const { postId } = props;
-  const [comments, setComments] = useState([]);
-  // 游标，用于处理分页
-  // 使用游标分页时，除一次查询传入null以外，后面的查询有两种情况
-  // 一种是上一次查询最后一条记录的游标
-  // 另外一种是 约定值 -1 ，表示没有下一页了
-  const [cursor,setCursor]= useState(null) 
 
-  // 添加评论和回复评论，都走这个接口
-  const handleAddComment = async (comment) => {
-    const res = await addComment({ comment, postId, parentId:0 });
-    if (!res) {
-      message.success({ content: "请先登录" });
-      return;
-    }
-    // console.log("添加评论", res);
-    setComments([res,...comments ]);
+function Comment(props) {
+  // parentId=0 是评论，其他值是回复
+  const { postId, parentId = 0 } = props;
+  const [comments, setComments] = useState([]);
+  const [cursor, setCursor] = useState(null);
+  const { currentInput, dispatch } = useContext(CommentContext);
+  // console.log("currentInput", currentInput);
+
+  // 评论和回复都走这个接口，只需要传递不同的 parentId 值即可
+  const handleAddComment = async (comment, parentId) => {
+    const res = await addComment({ comment, postId, parentId });
+      setComments([res, ...comments]);
   };
- // todo 删除的时候有个bug,把游标的记录删了，会查询不到
   const handleDeleteComment = async (commentId) => {
     const data = await deleteComment(commentId);
     if (data) {
       setComments(comments.filter((item) => item.id !== commentId));
     }
-    // console.log("删除评论", data);
   };
-const handleLoadMoreComments=()=>{
-   getCommentsByPostId(postId, cursor).then((res) => {
-     const { data, cursor } = res;
-     setComments([...comments,...data]);
-     setCursor(cursor);
-   });
-}
-  useEffect(() => {
-    // 查询评论列表
-    getCommentsByPostId(postId, cursor).then((res) => {
+  const handleLoadMoreComments = () => {
+    getCommentsByPostId(postId, parentId,cursor).then((res) => {
       const { data, cursor } = res;
-      setComments([...data]);
-      setCursor(cursor)
+      setComments([...comments, ...data]);
+      setCursor(cursor);
     });
-  }, [postId]);
-  console.log(comments)
+  };
+  useEffect(() => {
+    getCommentsByPostId(postId, parentId, cursor).then((res) => {
+      const { data, cursor } = res;
+      // console.log("data", data);
+      setComments([...data]);
+      setCursor(cursor);
+    });
+  }, [postId, parentId]);
   return (
     <div>
-      <CommentItem
-        comments={comments}
-        deleteComment={handleDeleteComment}
-      ></CommentItem>
-      {cursor!=-1?<div onClick={handleLoadMoreComments}>加载更多</div>:<div>暂无更多</div>}
-      <CommentInput onOk={handleAddComment}></CommentInput>
+      {(parentId === 0||currentInput === parentId)&& <CommentInput
+          size={parentId === 0 ? "normal" : "small"}
+          onOk={(message) => {
+            handleAddComment(message, parentId);
+          }}
+        ></CommentInput>}
+
+      {comments.map((comment) => {
+        return (
+          <React.Fragment key={comment.id}>
+            <CommentItem
+              comment={comment}
+              onReply={() => {
+                dispatch({ payload: comment.id });
+              }}
+              onDelete={handleDeleteComment}
+            ></CommentItem>
+            {parentId != 0 && currentInput === comment.id && (
+              <CommentInput
+                onOk={(message) => {
+                  handleAddComment(message, parentId);
+                }}
+                size="small"
+              ></CommentInput>
+            )}
+
+            {comment.parentId === 0 && (
+              <div className="ml-4 bg-fuchsia-400 p-4">
+                <Comment postId={postId} parentId={comment.id} />
+              </div>
+            )}
+          </React.Fragment>
+        );
+      })}
+      {cursor != -1 ? (
+        <div onClick={handleLoadMoreComments}>加载更多</div>
+      ) : (
+        <div>暂无更多</div>
+      )}
     </div>
+  );
+}
+const reducer = (state, action) => {
+  // console.log("reducer", state, action);
+  return action.payload;
+};
+const CommentContext= React.createContext()
+
+export default function CommentProvider(props) {
+  const { postId } = props;
+  const [currentInput, dispatch] = useReducer(reducer, null);
+  return (
+    <CommentContext.Provider value={{ currentInput, dispatch }}>
+      <Comment postId={postId} />
+    </CommentContext.Provider>
   );
 }
