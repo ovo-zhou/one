@@ -19,8 +19,8 @@ export default function CommentInput(props) {
     <div className="relative">
       <textarea
         placeholder="上来说两句吧！"
-        rows={size==='small'?1:3}
-        className="resize-none w-[100%] p-2 border border-gray-300 rounded-md"
+        rows={size === "small" ? 1 : 3}
+        className="resize-none w-full p-2 border rounded-md focus:border-primary  focus:ring-primary focus:outline-none"
         value={comment}
         onChange={(e) => setComment(e.target.value)}
       ></textarea>

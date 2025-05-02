@@ -19,9 +19,16 @@ export async function getCommentsByPostId(postId, parentId,lastCursor = null) {
           id: true,
         },
       },
+      replyToAuthor: {
+        select: {
+          avatar: true,
+          name: true,
+          id: true,
+        },
+      },
     },
     orderBy: {
-      createdAt: "desc",
+      createdAt: parentId===0? "desc":'asc',
     },
   };
   // 传递了游标，查找游标的下一项有效记录作为新的游标
@@ -61,6 +68,7 @@ export const addComment = withAuth(async function ({
   postId,
   comment,
   parentId,
+  replyToAuthorId,
 }) {
   const userInfo = await decodeCookie();
   const userId = userInfo.id;
@@ -72,6 +80,7 @@ export const addComment = withAuth(async function ({
       createdAt: String(+new Date()),
       updatedAt: String(+new Date()),
       parentId,
+      replyToAuthorId,
     },
   });
   const newComment = await prisma.comments.findUnique({

@@ -16,9 +16,14 @@ function Comment(props) {
   // console.log("currentInput", currentInput);
 
   // 评论和回复都走这个接口，只需要传递不同的 parentId 值即可
-  const handleAddComment = async (comment, parentId) => {
-    const res = await addComment({ comment, postId, parentId });
-      setComments([res, ...comments]);
+  const handleAddComment = async (comment, parentId, replyToAuthorId) => {
+    const res = await addComment({
+      comment,
+      postId,
+      parentId,
+      replyToAuthorId,
+    });
+    setComments([res, ...comments]);
   };
   const handleDeleteComment = async (commentId) => {
     const data = await deleteComment(commentId);
@@ -41,6 +46,7 @@ function Comment(props) {
       setCursor(cursor);
     });
   }, [postId, parentId]);
+  console.log('comments', comments);
   return (
     <div>
       {(parentId === 0||currentInput === parentId)&& <CommentInput
@@ -63,15 +69,19 @@ function Comment(props) {
             {parentId != 0 && currentInput === comment.id && (
               <CommentInput
                 onOk={(message) => {
-                  handleAddComment(message, parentId);
+                  handleAddComment(message, parentId, comment.authorId);
                 }}
                 size="small"
               ></CommentInput>
             )}
 
             {comment.parentId === 0 && (
-              <div className="ml-4 bg-fuchsia-400 p-4">
-                <Comment postId={postId} parentId={comment.id} />
+              <div className="ml-4 p-4">
+                <Comment
+                  postId={postId}
+                  parentId={comment.id}
+                  replyToAuthorId={comment.authorId}
+                />
               </div>
             )}
           </React.Fragment>

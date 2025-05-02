@@ -29,5 +29,12 @@ export const components = {
         {children}
       </code>
     );
-  }
+  },
+  table(props) {
+    return (
+      <div className="overflow-x-auto rounded-lg shadow-md mb-4">
+        <table {...props}></table>
+      </div>
+    );
+  },
 };

@@ -16,11 +16,22 @@ export default function CommentItem(props) {
             src={comment.author.avatar}
             width={40}
             height={40}
-            className="rounded-sm"
+            className="rounded-full"
           />
         </div>
         <div className="flex-1">
-          <div className="h-8 leading-8">{comment.author.name}</div>
+          <div className="h-8 leading-8">
+            {comment.author.name}
+
+            {comment.replyToAuthor && (
+              <>
+                <span className="px-2">回复</span>
+                <span className="text-secondary">
+                  @{comment.replyToAuthor.name}
+                </span>
+              </>
+            )}
+          </div>
           <div>{comment.content}</div>
           <div className="font-thin text-xs leading-8">
             <span>

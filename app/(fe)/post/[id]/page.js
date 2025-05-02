@@ -16,7 +16,7 @@ export default async function Page({ params }) {
     <div className="px-2">
       {post.type === "post" && (
         <>
-          <h1 className="text-primary py-4">{post.title}</h1>
+          <h1>{post.title}</h1>
           <div className="text-xs mb-4">
             <span>最近更新：{dayjs(+post.createdAt).format("YYYY/MM/DD")}</span>
             <span className="px-6">
