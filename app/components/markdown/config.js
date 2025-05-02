@@ -29,13 +29,5 @@ export const components = {
         {children}
       </code>
     );
-  },
-  a(props) {
-    const { children, href } = props;
-    return (
-      <a href={href} className="text-blue-700 underline">
-        {children}
-      </a>
-    );
-  },
+  }
 };

@@ -2,7 +2,7 @@
 import NextLink from "next/link";
 import { useEffect, useState } from "react";
 import Modal from "@/app/components/modal";
-import { getPostList, deletePost } from "@/app/actions";
+import { getPostList, deletePost, changeDeleteStatus } from "@/app/actions";
 import Select from "@/app/components/select";
 
 export default function Page() {
@@ -39,6 +39,13 @@ export default function Page() {
       closeModal();
       handleSearch();
     });
+  };
+
+  // 上线/下线
+  const handleChangeDeleteStatus = async (id) => {
+    const data = await changeDeleteStatus(id);
+    await handleSearch();
+    console.log(data);
   };
   const changaPage = (increment) => {
     const page = searchParams.page + increment;
@@ -123,6 +130,12 @@ export default function Page() {
                 <td className="px-2">{post.updatedAt}</td>
                 <td className="px-2">{post.createdAt}</td>
                 <td className="px-2">
+                  <button
+                    onClick={() => handleChangeDeleteStatus(post.id)}
+                    className="text-blue-500 px-2"
+                  >
+                    {post.isDeleted ? "上线" : "下架"}
+                  </button>
                   <NextLink
                     href={`/admin/post/createEditForm?postId=${post.id}`}
                     className="text-blue-500 px-2"

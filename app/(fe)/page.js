@@ -10,32 +10,35 @@ export default async function Home() {
       type: {
         equals: "post",
       },
+      isDeleted: {
+        equals: false,
+      },
     },
     orderBy: {
       createdAt: "desc",
     },
   });
   return (
-    <div>
+    <>
       {posts.map((item) => {
         return (
-          <div key={item.id} className="mb-6 hover:bg-slate-200 p-3 rounded-md">
-            <h2 className="text-blue-600 leading-7">
+          <div key={item.id} className="py-4">
+            <h1 className="text-primary">
               <Link href={`/post/${item.id}`}>{item.title}</Link>
-            </h2>
-            <div className="text-xs">
-              <span>
-                最近更新：{dayjs(+item.createdAt).format("YYYY-MM-DD HH:mm:ss")}
-              </span>
-              <span className="mx-3">
-                创建时间：{dayjs(+item.updatedAt).format("YYYY-MM-DD HH:mm:ss")}
-              </span>
-              <span>作者：ryan</span>
+            </h1>
+            <div className="text-xs leading-5 flex gap-4 pb-4">
+              <div>
+                最近更新：{dayjs(+item.createdAt).format("YYYY/MM/DD")}
+              </div>
+              <div>
+                发布于：{dayjs(+item.updatedAt).format("YYYY/MM/DD")}
+              </div>
+              <div>作者：ryan</div>
             </div>
-            <div className="text-base leading-7 mt-2">{item.abstract}</div>
+            <div>{item.abstract}</div>
           </div>
         );
       })}
-    </div>
+    </>
   );
 }

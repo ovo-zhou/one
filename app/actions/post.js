@@ -13,6 +13,7 @@ export async function createPost(post) {
       },
     },
   });
+  // console.log(data)
   const newPost = await prisma.post.create({ data });
   return newPost;
 }
@@ -51,7 +52,24 @@ export async function getPostList(searchParams) {
   };
   return list;
 }
-
+export async function changeDeleteStatus(id) {
+  const post = await prisma.post.findUnique({
+    where: {
+      id: +id,
+    },
+  });
+  // console.log('ryan',post);
+  const data = Object.assign({}, post, {
+    isDeleted: !post.isDeleted,
+  });
+  const updatedPost = await prisma.post.update({
+    where: {
+      id: +id,
+    },
+    data,
+  });
+  return updatedPost;
+}
 export async function deletePost(id) {
   const post = await prisma.post.delete({
     where: {

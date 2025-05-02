@@ -4,10 +4,11 @@ import MarkdownRender from "@/app/components/markdown/MarkdownRender";
 import Comment from "@/app/components/comment";
 
 export default async function Page({ params }) {
+  const { id } = await params;
   const [post] = await prisma.post.findMany({
     where: {
       id: {
-        equals: +params.id,
+        equals: +id,
       },
     },
   });
@@ -15,20 +16,18 @@ export default async function Page({ params }) {
     <div className="px-2">
       {post.type === "post" && (
         <>
-          <h2 className="leading-10 text-blue-600">{post.title}</h2>
-          <div className="text-xs pb-6">
-            <span className={""}>
-              最近更新：{dayjs(+post.createdAt).format("YYYY-MM-DD HH:mm:ss")}
-            </span>
-            <span className={""}>
-              创建时间：{dayjs(+post.updatedAt).format("YYYY-MM-DD HH:mm:ss")}
+          <h1 className="text-primary py-4">{post.title}</h1>
+          <div className="text-xs mb-4">
+            <span>最近更新：{dayjs(+post.createdAt).format("YYYY/MM/DD")}</span>
+            <span className="px-6">
+              创建时间：{dayjs(+post.updatedAt).format("YYYY/MM/DD")}
             </span>
             <span>作者：ryan</span>
           </div>
         </>
       )}
       <MarkdownRender>{post.content}</MarkdownRender>
-      {post.type === "post" && <Comment postId={params.id}></Comment>}
+      {post.type === "post" && <Comment postId={id}></Comment>}
     </div>
   );
 }

@@ -13,6 +13,7 @@ CREATE TABLE "Post" (
     "title" TEXT NOT NULL,
     "abstract" TEXT NOT NULL,
     "content" TEXT NOT NULL,
+    "isDeleted" BOOLEAN NOT NULL DEFAULT true,
     "createdAt" TEXT NOT NULL,
     "updatedAt" TEXT NOT NULL,
     "authorId" INTEGER NOT NULL,

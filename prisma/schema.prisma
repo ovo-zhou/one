@@ -16,7 +16,7 @@ model User {
   name     String
   avatar   String
   Posts    Post[]
-  Img     Img[]
+  Img      Img[]
   Comments Comments[]
   Replies  Comments[] @relation("Reply")
 }
@@ -27,8 +27,9 @@ model Post {
   title     String
   abstract  String
   content   String
+  isDeleted Boolean   @default(true)
   createdAt String
-  updatedAt   String
+  updatedAt String
   author    User       @relation(fields: [authorId], references: [id])
   authorId  Int
   Comments  Comments[]
@@ -57,7 +58,7 @@ model Comments {
   replyToAuthor   User?   @relation("Reply", fields: [replyToAuthorId], references: [id])
   content         String
   createdAt       String
-  updatedAt         String
+  updatedAt       String
   parentId        Int     @default(0)
   isDeleted       Boolean @default(false)
 }
