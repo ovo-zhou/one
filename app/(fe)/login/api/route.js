@@ -69,7 +69,7 @@ export async function POST(request) {
   const token = await new SignJWT({
     name,
     avatar: avatar_url,
-    uid,
+    isAdmin: uid === +process.env.github_id,
     id: userId,
   })
     .setProtectedHeader({ alg: "HS256" })

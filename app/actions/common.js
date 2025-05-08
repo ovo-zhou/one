@@ -1,15 +1,14 @@
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
-import { NextResponse } from "next/server";
 import { redirect } from "next/navigation";
 const encoder = new TextEncoder();
 /**
- * 解码cookie，返回用户信息
- * @param {cookie} request
+ * 解码cookie，返回用户信息，如果没有登录或者登陆过期，返回null
  */
-export async function decodeCookie() {
+export async function getUserInfo() {
   const cookieStore =await cookies();
   const token = cookieStore.get("token");
+  // token为空，返回null
   if (!token) {
     return null;
   }
@@ -23,14 +22,16 @@ export async function decodeCookie() {
       name: payload.name,
       avatar: payload.avatar,
       id: payload.id,
+      isAdmin: payload.isAdmin,
     };
   } catch (e) {
+    // 解码失败，返回空
     return null;
   }
 }
 export function withAuth(actionFn) {
   return async function (params) {
-    const user = await decodeCookie();
+    const user = await getUserInfo();
     if (user) {
       return await actionFn(params);
     }

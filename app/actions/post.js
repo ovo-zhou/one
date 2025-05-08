@@ -1,7 +1,7 @@
 "use server";
-import { decodeCookie } from "./common";
+import { getUserInfo } from "./common";
 export async function createPost(post) {
-  const userInfo = await decodeCookie();
+  const userInfo = await getUserInfo();
   const createdAt = String(+new Date());
   const updatedAt = String(+new Date());
   const data = Object.assign({}, post, {

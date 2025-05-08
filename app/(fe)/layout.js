@@ -2,7 +2,7 @@ import prisma from "@/prisma";
 import Nav from "../components/nav";
 // import "../tailwind/tailwind.css";
 import { Suspense, use } from "react";
-import { decodeCookie } from "../actions/index";
+import { getUserInfo } from "../actions/index";
 import Link from "next/link";
 import Image from "next/image";
 import '../globals.css'
@@ -34,7 +34,8 @@ export default async function RootLayout({ children }) {
       title: "AI",
     },
   ];
-  const userInfo = await decodeCookie();
+  const userInfo = await getUserInfo();
+  console.log(userInfo);
   return (
     <html lang="en">
       <body>
@@ -43,7 +44,7 @@ export default async function RootLayout({ children }) {
             <Nav menuItems={menuItems}></Nav>
             <div className="flex h-12">
               {userInfo ? (
-                <Link href="/admin/post/list">
+                <Link href={userInfo.isAdmin ? "/admin/post/list" : "#"}>
                   <div className="flex justify-center items-center h-12 gap-3 cursor-pointer">
                     <Image
                       src={userInfo.avatar}

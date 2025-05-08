@@ -1,5 +1,5 @@
 import prisma from "@/prisma";
-import { decodeCookie, withAuth } from "./common";
+import { getUserInfo, withAuth } from "./common";
 // 根据post id获取评论,采用游标分页
 // todo 某个用户传入游标，但是这个游标被其他用户删除的情况
 export async function getCommentsByPostId(postId, parentId,lastCursor = null) {
@@ -70,7 +70,7 @@ export const addComment = withAuth(async function ({
   parentId,
   replyToAuthorId,
 }) {
-  const userInfo = await decodeCookie();
+  const userInfo = await getUserInfo();
   const userId = userInfo.id;
   const { id } = await prisma.comments.create({
     data: {
