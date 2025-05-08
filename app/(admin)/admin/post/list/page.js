@@ -3,8 +3,25 @@ import NextLink from "next/link";
 import { useEffect, useState } from "react";
 import Modal from "@/app/components/modal";
 import { getPostList, deletePost, changeDeleteStatus } from "@/app/actions";
-import Select from "@/app/components/select";
-
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 export default function Page() {
   const [dataSource, setDataSource] = useState({ total: 1 });
   const [isShow, setIsShow] = useState(false);
@@ -15,6 +32,7 @@ export default function Page() {
     page: 1,
     pageSize: 10,
   });
+  const router = useRouter();
   const handleChange = (e) => {
     const name = e.target.name;
     const value = e.target.value;
@@ -68,98 +86,112 @@ export default function Page() {
   }, []);
   return (
     <>
-      <NextLink
-        href="/admin/post/createEditForm"
-        className="border inline-block text-white bg-blue-500 rounded-md px-3 py-1"
-      >
-        写博客
-      </NextLink>
-      <div className="py-3">
-        <label htmlFor="type">类型:</label>
-        <Select
-          name="type"
-          onChange={handleChange}
-          options={[
-            {
-              label: "全部",
-              value: "",
-            },
-            {
-              label: "博客",
-              value: "post",
-            },
-            {
-              label: "页面",
-              value: "page",
-            },
-          ]}
-        ></Select>
-        <label htmlFor="title">标题:</label>
-        <input
-          id="title"
-          name="title"
-          value={searchParams.title}
-          onChange={handleChange}
-          className="border rounded-md"
-        />
-        <button
-          onClick={handleSearch}
-          className="border inline-block text-white bg-blue-500 rounded-md px-3 py-1"
-        >
-          搜索
-        </button>
+      <div className="py-3 flex gap-4 items-center">
+        <div className="flex gap-4 items-center">
+          <label className="w-10">类型:</label>
+          <Select
+            onValueChange={(value) => {
+              handleChange({ target: { name: "type", value } });
+            }}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="博客类型" />
+            </SelectTrigger>
+            <SelectContent>
+              {[
+                {
+                  label: "博客",
+                  value: "post",
+                },
+                {
+                  label: "页面",
+                  value: "page",
+                },
+              ].map((option) => {
+                return (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex gap-4 items-center">
+          <label className="w-20">标题:</label>
+          <Input
+            id="title"
+            value={searchParams.title}
+            onChange={handleChange}
+          />
+        </div>
+        <Button onClick={handleSearch}>搜索</Button>
       </div>
-      <table className="table-auto border-collapse border rounded-md">
-        <thead className="leading-10 bg-gray-200">
-          <tr>
-            <th>ID</th>
-            <th>标题</th>
-            <th>类型</th>
-            <th>更新时间</th>
-            <th>创建时间</th>
-            <th>操作</th>
-          </tr>
-        </thead>
-        <tbody>
-          {dataSource?.data?.map((post) => {
-            return (
-              <tr key={post.id} className="leading-10">
-                <td className="px-2">{post.id}</td>
-                <td className="px-2">{post.title}</td>
-                <td className="px-2">{post.type}</td>
-                <td className="px-2">{post.updatedAt}</td>
-                <td className="px-2">{post.createdAt}</td>
-                <td className="px-2">
-                  <button
-                    onClick={() => handleChangeDeleteStatus(post.id)}
-                    className="text-blue-500 px-2"
-                  >
-                    {post.isDeleted ? "上线" : "下架"}
-                  </button>
-                  <NextLink
-                    href={`/admin/post/createEditForm?postId=${post.id}`}
-                    className="text-blue-500 px-2"
-                  >
-                    编辑
-                  </NextLink>
-                  <NextLink
-                    href={`/post/${post.id}`}
-                    className="text-blue-500 px-2"
-                  >
-                    查看
-                  </NextLink>
-                  <button
-                    onClick={() => handleDelete(post.id)}
-                    className="text-red-500 px-2"
-                  >
-                    删除
-                  </button>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+      <Button
+        onClick={() => {
+          router.push("/admin/post/createEditForm");
+        }}
+      >
+        新建博客
+      </Button>
+      <div className="overflow-x-auto w-max">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>ID</TableHead>
+              <TableHead>标题</TableHead>
+              <TableHead>类型</TableHead>
+              <TableHead>更新时间</TableHead>
+              <TableHead>创建时间</TableHead>
+              <TableHead>状态</TableHead>
+              <TableHead>操作</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {dataSource?.data?.map((post) => {
+              return (
+                <TableRow key={post.id} className="leading-10">
+                  <TableCell className="px-2">{post.id}</TableCell>
+                  <TableCell className="px-2">{post.title}</TableCell>
+                  <TableCell className="px-2">{post.type}</TableCell>
+                  <TableCell className="px-2">{post.updatedAt}</TableCell>
+                  <TableCell className="px-2">{post.createdAt}</TableCell>
+                  <TableCell className="px-2">
+                    {post.isDeleted ? "隐藏" : "发布"}
+                  </TableCell>
+                  <TableCell className="px-2">
+                    <button
+                      onClick={() => handleChangeDeleteStatus(post.id)}
+                      className="text-blue-500 px-2"
+                    >
+                      {post.isDeleted ? "上线" : "下线"}
+                    </button>
+                    <NextLink
+                      href={`/admin/post/createEditForm?postId=${post.id}`}
+                      className="text-blue-500 px-2"
+                    >
+                      编辑
+                    </NextLink>
+                    <NextLink
+                      href={`/post/${post.id}`}
+                      className="text-blue-500 px-2"
+                    >
+                      查看
+                    </NextLink>
+                    <button
+                      onClick={() => handleDelete(post.id)}
+                      className="text-red-500 px-2"
+                    >
+                      删除
+                    </button>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </div>
+
       <div className="py-2 flex gap-4">
         <div onClick={() => changaPage(-1)} className="text-blue-500">
           上一页
