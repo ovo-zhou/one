@@ -1,5 +1,6 @@
 "use server";
 import { getUserInfo, withAuth } from "./common";
+import prisma from "@/prisma";
 export async function createPost(post) {
   const userInfo = await getUserInfo();
   const createdAt = String(+new Date());

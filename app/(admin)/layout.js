@@ -1,4 +1,5 @@
 import Nav from "../components/nav";
+import { Suspense } from "react";
 import "../globals.css";
 export const metadata = {
   title: "ryan",
@@ -26,7 +27,7 @@ export default function RootLayout({ children }) {
           <div className="px-2 pt-2">
             <Nav menuItems={menuItems} orientation="vertical"></Nav>
           </div>
-          <div className="flex-1 pt-2">{children}</div>
+          <div className="flex-1 pt-2"><Suspense fallback={<div>Loading...</div>}>{children}</Suspense></div>
         </div>
       </body>
     </html>

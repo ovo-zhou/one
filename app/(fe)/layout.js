@@ -1,7 +1,7 @@
 import prisma from "@/prisma";
 import Nav from "../components/nav";
 // import "../tailwind/tailwind.css";
-import { Suspense, use } from "react";
+import { Suspense } from "react";
 import { getUserInfo } from "../actions/index";
 import Link from "next/link";
 import Image from "next/image";
