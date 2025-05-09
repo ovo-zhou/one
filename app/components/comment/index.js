@@ -2,7 +2,6 @@
 
 import React, { useContext, useEffect, useReducer, useState } from "react";
 import { getCommentsByPostId, addComment, deleteComment } from "@/app/actions";
-import message from "../message/messageController";
 import CommentInput from "./commentInput";
 import CommentItem from "./commentItem";
 
@@ -46,7 +45,7 @@ function Comment(props) {
       setCursor(cursor);
     });
   }, [postId, parentId]);
-  console.log('comments', comments);
+  // console.log('comments', comments);
   return (
     <div>
       {(parentId === 0||currentInput === parentId)&& <CommentInput

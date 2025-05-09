@@ -20,7 +20,7 @@ export async function middleware(request) {
 
   // 非管理员，重定向到非管理员提示页面
   if (!user.isAdmin) {
-    const url = new URL(request.nextUrl.origin + "/error");
+    const url = new URL(request.nextUrl.origin + "/404");
     return NextResponse.redirect(url);
   }
 }

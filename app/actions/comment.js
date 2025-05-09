@@ -100,7 +100,7 @@ export const addComment = withAuth(async function ({
   return newComment;
 });
 
-export async function deleteComment(commentId) {
+export const deleteComment=withAuth(async (commentId) =>{
   const data = await prisma.comments.update({
     where: {
       id: commentId,
@@ -110,4 +110,4 @@ export async function deleteComment(commentId) {
     },
   });
   return data;
-}
+}) 

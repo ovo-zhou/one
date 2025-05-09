@@ -1,5 +1,5 @@
 "use server";
-import { getUserInfo } from "./common";
+import { getUserInfo, withAuth } from "./common";
 export async function createPost(post) {
   const userInfo = await getUserInfo();
   const createdAt = String(+new Date());
@@ -17,7 +17,7 @@ export async function createPost(post) {
   const newPost = await prisma.post.create({ data });
   return newPost;
 }
-export async function getPostList(searchParams) {
+export const getPostList = withAuth(async (searchParams) => {
   const { page, pageSize, type, title } = searchParams;
   const where = {};
   if (type) {
@@ -51,8 +51,8 @@ export async function getPostList(searchParams) {
     data: posts,
   };
   return list;
-}
-export async function changeDeleteStatus(id) {
+});
+export const changeDeleteStatus = withAuth(async (id) => {
   const post = await prisma.post.findUnique({
     where: {
       id: +id,
@@ -69,15 +69,15 @@ export async function changeDeleteStatus(id) {
     data,
   });
   return updatedPost;
-}
-export async function deletePost(id) {
+});
+export const deletePost = withAuth(async (id) => {
   const post = await prisma.post.delete({
     where: {
       id: +id,
     },
   });
   return post;
-}
+});
 export async function getPostById(id) {
   const post = await prisma.post.findUnique({
     where: {

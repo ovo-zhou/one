@@ -29,10 +29,10 @@ export default async function RootLayout({ children }) {
       href: `/post/${item.id}`,
       title: item.title,
     })),
-    {
-      href: "/ai",
-      title: "AI",
-    },
+    // {
+    //   href: "/ai",
+    //   title: "AI",
+    // },
   ];
   const userInfo = await getUserInfo();
   console.log(userInfo);
