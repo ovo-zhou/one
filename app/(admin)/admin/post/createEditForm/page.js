@@ -7,14 +7,50 @@ import Image from "next/image";
 import MarkdownEditor from "@/app/components/markdown/MarkdownEditor";
 import { createPost, getPostById, updatePost } from "@/app/actions";
 import { useSearchParams } from "next/navigation";
-import Select from "@/app/components/select";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem
+} from "@/components/ui/select";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+const postSchema = z.object({
+  type: z.enum(["post", "page"]),
+  title: z
+    .string()
+    .min(1, { message: "标题不能为空" })
+    .max(100, { message: "标题长度不超过 100 个字符" }),
+  content: z
+    .string()
+    .min(1, { message: "内容不能为空" })
+    .max(1024 * 10, { message: "内容长度不超过 1024*10 个字符" }),
+  abstract: z.string().optional(),
+});
 
 export default function Page() {
-  const [post, setPost] = useState({
-    type: "post",
-    title: "",
-    content: "",
-    abstract: "",
+  const form = useForm({
+    resolver: zodResolver(postSchema),
+    defaultValues: {
+      type: "post",
+      title: "",
+      content: "",
+      abstract: "",
+    },
   });
   const searchParams = useSearchParams();
   const postId = searchParams.get("postId");
@@ -23,26 +59,21 @@ export default function Page() {
 
   const [imgUrl, setImgUrl] = useState("");
   const router = useRouter();
-  const handleSave = async () => {
-    // console.log("post", post);
+  const handleSave = async (values) => {
+    // console.log("post", values);
     // 创建
     if (!postId) {
-      const data = await createPost(post);
+      const data = await createPost(values);
       if (data && data.id) {
         router.push(`/admin/post/list`);
       }
     } else {
       // 编辑
-      const data = await updatePost(postId, post);
+      const data = await updatePost(postId, values);
       if (data && data.id) {
         router.push(`/admin/post/list`);
       }
     }
-  };
-  const handleChange = (e) => {
-    const name = e.target.name;
-    const value = e.target.value;
-    setPost({ ...post, [name]: value });
   };
   const handleImgUpload = () => {
     const files = uploadElementRef.current.files;
@@ -67,84 +98,107 @@ export default function Page() {
     if (postId) {
       // 查询post
       getPostById(postId).then((post) => {
-        setPost(post);
+        // console.log("post", post);
+        form.setValue("type", post.type);
+        form.setValue("title", post.title);
+        form.setValue("content", post.content);
+        form.setValue("abstract", post.abstract);
       });
     }
-  }, [postId]);
+  }, [postId, form.setValue]);
   return (
     <>
-      <form>
-        <div>
-          {/* <label htmlFor="type">类型:</label> */}
-          <Select
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(handleSave)}
+          className="flex flex-col gap-4 w-full sm:w-1/2 p-4"
+        >
+          <FormField
+            control={form.control}
             name="type"
-            onChange={handleChange}
-            value={post.type}
-            options={[
-              {
-                label: "博客",
-                value: "post",
-              },
-              {
-                label: "页面",
-                value: "page",
-              },
-            ]}
-          ></Select>
-        </div>
-        <div>
-          <label htmlFor="title">标题:</label>
-          <input
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>博客类型</FormLabel>
+                <FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="博客类型" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {[
+                        {
+                          label: "博客",
+                          value: "post",
+                        },
+                        {
+                          label: "页面",
+                          value: "page",
+                        },
+                      ].map((option) => {
+                        return (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
             name="title"
-            value={post.title}
-            id="title"
-            type="text"
-            onChange={handleChange}
+            render={({ field }) => {
+              return (
+                <FormItem>
+                  <FormLabel>标题</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              );
+            }}
           />
-        </div>
-        <div>
-          <label htmlFor="abstract">摘要:</label>
-          <input
+
+          <FormField
             name="abstract"
-            value={post.abstract}
-            id="abstract"
-            type="text"
-            onChange={handleChange}
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>摘要</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </div>
-        <div>
-          <label htmlFor="content">内容:</label>
-          <div
-            style={{ display: "flex", gap: "10px", padding: 10, width: 1200 }}
-          >
-            <div
-              style={{
-                width: "50%",
-                boxSizing: "border-box",
-              }}
-            >
-              <MarkdownEditor
-                value={post.content}
-                name="content"
-                onChange={handleChange}
-              />
-            </div>
-            <div
-              style={{
-                width: "50%",
-                boxSizing: "border-box",
-                padding: "10px",
-                border: "1px solid #ccc",
-              }}
-            >
-              <MarkdownRender>{post.content}</MarkdownRender>
-            </div>
-          </div>
-        </div>
-        <div>
-          <input type="button" value="保存" onClick={handleSave} />
-        </div>
-      </form>
+
+          <FormField
+            name="content"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>内容</FormLabel>
+                <FormControl>
+                  <Textarea {...field} className="h-96" />
+                  {/* <MarkdownRender>{field.value}</MarkdownRender> */}
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type="submit">提交</Button>
+        </form>
+      </Form>
+
       {
         imgBedVisiable ? (
           <div className={styles.imgUploadModal}>

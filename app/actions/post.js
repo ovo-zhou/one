@@ -79,7 +79,7 @@ export const deletePost = withAuth(async (id) => {
   });
   return post;
 });
-export async function getPostById(id) {
+export const getPostById = withAuth(async (id) => {
   const post = await prisma.post.findUnique({
     where: {
       id: +id,
@@ -91,7 +91,7 @@ export async function getPostById(id) {
     content: post.content,
     abstract: post.abstract,
   };
-}
+});
 export async function updatePost(id, post) {
   const data = Object.assign({}, post, { updatedAt: String(+new Date()) });
   const updatedAtPost = await prisma.post.update({

@@ -22,6 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import dayjs from "dayjs";
 export default function Page() {
   const [dataSource, setDataSource] = useState({ total: 1 });
   const [isShow, setIsShow] = useState(false);
@@ -63,7 +64,7 @@ export default function Page() {
   const handleChangeDeleteStatus = async (id) => {
     const data = await changeDeleteStatus(id);
     await handleSearch();
-    console.log(data);
+    // console.log(data);
   };
   const changaPage = (increment) => {
     const page = searchParams.page + increment;
@@ -154,8 +155,12 @@ export default function Page() {
                   <TableCell className="px-2">{post.id}</TableCell>
                   <TableCell className="px-2">{post.title}</TableCell>
                   <TableCell className="px-2">{post.type}</TableCell>
-                  <TableCell className="px-2">{post.updatedAt}</TableCell>
-                  <TableCell className="px-2">{post.createdAt}</TableCell>
+                  <TableCell className="px-2">
+                    {dayjs(+post.updatedAt).format("YYYY-MM-DD HH:mm:ss")}
+                  </TableCell>
+                  <TableCell className="px-2">
+                    {dayjs(+post.createdAt).format("YYYY-MM-DD HH:mm:ss")}
+                  </TableCell>
                   <TableCell className="px-2">
                     {post.isDeleted ? "隐藏" : "发布"}
                   </TableCell>

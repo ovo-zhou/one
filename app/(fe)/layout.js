@@ -18,6 +18,7 @@ export default async function RootLayout({ children }) {
       type: {
         equals: "page",
       },
+      isDeleted:false,
     },
   });
   const menuItems = [
@@ -35,7 +36,7 @@ export default async function RootLayout({ children }) {
     // },
   ];
   const userInfo = await getUserInfo();
-  console.log(userInfo);
+  // console.log(userInfo);
   return (
     <html lang="en">
       <body>

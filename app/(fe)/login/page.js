@@ -23,7 +23,7 @@ const oauthLoginConfig = [
     ),
     authorizeUrl:
       "https://github.com/login/oauth/authorize?client_id=Ov23lip5jG5LIRef8yS4&redirect_uri=https://www.ryandev.cn/authorize?loginOrigin=github",
-    disable: false,
+    disable: true,
   },
   {
     name: "gitee",

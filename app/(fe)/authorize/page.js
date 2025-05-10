@@ -5,7 +5,7 @@ export default function Authorize() {
   const searchParams = useSearchParams();
   const code = searchParams.get("code");
   const loginOrigin = searchParams.get("loginOrigin");
-  console.log(code, loginOrigin);
+  // console.log(code, loginOrigin);
   useEffect(() => {
     fetch("/login/api", {
       method: "POST",

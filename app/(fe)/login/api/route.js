@@ -42,7 +42,7 @@ export async function POST(request) {
       Accept: "application/json",
     },
   }).then((res) => res.json());
-  console.log('ryan',response);
+  // console.log('ryan',response);
   const { token_type, access_token } = response;
   let user=null;
   if(loginOrigin === 'github') {
@@ -60,7 +60,7 @@ export async function POST(request) {
       }
     ).then((res) => res.json());
   }
-  console.log('ryan',user);
+  // console.log('ryan',user);
   const { id: uid, avatar_url, name } = user;
   const localUser = await prisma.user.findUnique({
     where: {
