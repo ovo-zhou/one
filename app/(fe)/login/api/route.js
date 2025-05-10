@@ -1,43 +1,67 @@
 import prisma from "@/prisma";
+import { url } from "inspector";
 import { SignJWT } from "jose";
 const encoder = new TextEncoder();
 
-export async function POST(request) {
-  const { code } = await request.json();
-  // console.log(code);
-  // 使用code换取github token
-  const githubResponse = await fetch(
-    "https://github.com/login/oauth/access_token",
-    {
-      method: "POST",
-      body: JSON.stringify({
+const getOauthConfig = (loginOrigin, code) => {
+  // 通过code获取access_token的请求配置
+  const oauthConfig = {
+    github: {
+      accessTokenUrl: "https://github.com/login/oauth/access_token",
+      userInfoUrl: "https://api.github.com/user",
+      params: {
         client_id: process.env.github_client_id,
         client_secret: process.env.github_client_secrets,
         code,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
       },
-    }
-  ).then((res) => res.json());
-  // console.log(githubResponse);
-  const { token_type, access_token } = githubResponse;
-  // todo:登录功能有待完善
-  // 使用access_token换取个人信息
-  const user = await fetch("https://api.github.com/user", {
+    },
+    gitee: {
+      accessTokenUrl: "https://gitee.com/oauth/token",
+      userInfoUrl: "https://gitee.com/api/v5/user",
+      params: {
+        grant_type: "authorization_code",
+        redirect_uri: "https://www.ryandev.cn/authorize?loginOrigin=gitee",
+        client_id: process.env.gitee_client_id,
+        client_secret: process.env.gitee_client_secrets,
+        code,
+      },
+    },
+  };
+  return oauthConfig[loginOrigin];
+};
+
+export async function POST(request) {
+  const { code, loginOrigin } = await request.json();
+  // console.log(code, loginOrigin);
+  const oauthConfig = getOauthConfig(loginOrigin, code);
+  const response = await fetch(oauthConfig.accessTokenUrl, {
+    method: "POST",
+    body: JSON.stringify(oauthConfig.params),
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+  }).then((res) => res.json());
+  console.log('ryan',response);
+  const { token_type, access_token } = response;
+  let user=null;
+  if(loginOrigin === 'github') {
+   user = await fetch(oauthConfig.userInfoUrl, {
     method: "GET",
     headers: {
       Authorization: token_type + " " + access_token,
     },
   }).then((res) => res.json());
-  // const user = {
-  //   id: 56762217,
-  //   avatar_url: "https://avatars.githubusercontent.com/u/56762217?v=4",
-  //   name: "ryan",
-  // };
+  }else{
+    user = await fetch(
+      oauthConfig.userInfoUrl + `?access_token=${access_token}`,
+      {
+        method: "GET",
+      }
+    ).then((res) => res.json());
+  }
+  console.log('ryan',user);
   const { id: uid, avatar_url, name } = user;
-  // 用户不存在，注册,存在直接保存
   const localUser = await prisma.user.findUnique({
     where: {
       uid,
@@ -65,11 +89,10 @@ export async function POST(request) {
     });
     userId = newUser.id;
   }
-  // 不直接暴露github的token，重新签发我们自己的token
   const token = await new SignJWT({
     name,
     avatar: avatar_url,
-    isAdmin: uid === +process.env.github_id,
+    isAdmin: uid === +process.env.github_id&&loginOrigin==='github',
     id: userId,
   })
     .setProtectedHeader({ alg: "HS256" })

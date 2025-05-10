@@ -6,7 +6,7 @@ const nextConfig = {
     },
   },
   images: {
-    domains: ["avatars.githubusercontent.com"],
+    domains: ["avatars.githubusercontent.com", "gitee.com"],
   },
 };
 

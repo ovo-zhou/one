@@ -4,10 +4,12 @@ import { useEffect } from "react";
 export default function Authorize() {
   const searchParams = useSearchParams();
   const code = searchParams.get("code");
+  const loginOrigin = searchParams.get("loginOrigin");
+  console.log(code, loginOrigin);
   useEffect(() => {
     fetch("/login/api", {
       method: "POST",
-      body: JSON.stringify({ code }),
+      body: JSON.stringify({ code, loginOrigin }),
       headers: {
         "Content-Type": "application/json",
       },

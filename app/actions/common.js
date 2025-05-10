@@ -29,6 +29,9 @@ export async function getUserInfo() {
     return null;
   }
 }
+// todo
+// 这里判断安全问题，只判断了登陆，没有判断是不是管理员
+// 评论删除也需要判断管理员身份
 export function withAuth(actionFn) {
   return async function (params) {
     const user = await getUserInfo();
