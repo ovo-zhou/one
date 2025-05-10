@@ -16,7 +16,7 @@ export default function Authorize() {
     })
       .then((res) => res.json())
       .then((res) => {
-        // console.log(res);
+        location.href = '/';
       });
   }, [code]);
   if (!code) {
