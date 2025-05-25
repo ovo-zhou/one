@@ -21,13 +21,13 @@ export default async function Page({ params }) {
             <span>
               最近一次更新：
               <span className="font-bold">
-                {dayjs(+post.createdAt).format("YYYY-MM-DD HH:mm:ss")}
+                {dayjs(+post.updatedAt).format("YYYY-MM-DD HH:mm:ss")}
               </span>
             </span>
             <span className="px-6">
               <span className="font-bold">
-                首次发布于：
-                {dayjs(+post.updatedAt).format("YYYY-MM-DD HH:mm:ss")}
+                首次发布：
+                {dayjs(+post.createdAt).format("YYYY-MM-DD HH:mm:ss")}
               </span>
             </span>
             <span>
@@ -39,7 +39,7 @@ export default async function Page({ params }) {
       <MarkdownRender>{post.content}</MarkdownRender>
       {post.type === "post" && (
         <>
-        <div className="font-bold text-xl pt-8 pb-4">评论列表</div>
+          <div className="font-bold text-xl pt-8 pb-4">评论列表</div>
           <Comment postId={id}></Comment>
         </>
       )}
