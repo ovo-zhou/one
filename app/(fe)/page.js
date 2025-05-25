@@ -22,18 +22,26 @@ export default async function Home() {
     <>
       {posts.map((item) => {
         return (
-          <div key={item.id} className="py-4">
+          <div key={item.id} className="pt-4 pb-20">
             <h1 className="text-primary">
               <Link href={`/post/${item.id}`}>{item.title}</Link>
             </h1>
-            <div className="text-xs leading-5 flex gap-4 pb-4">
+            <div className="text-xs leading-5 flex gap-8 pb-10">
               <div>
-                最近更新：{dayjs(+item.createdAt).format("YYYY/MM/DD")}
+                最近一次更新：
+                <span className="font-bold">
+                  {dayjs(+item.createdAt).format("YYYY-MM-DD HH:mm:ss")}
+                </span>
               </div>
               <div>
-                发布于：{dayjs(+item.updatedAt).format("YYYY/MM/DD")}
+                首次发布于：
+                <span className="font-bold">
+                  {dayjs(+item.updatedAt).format("YYYY-MM-DD HH:mm:ss")}
+                </span>
               </div>
-              <div>作者：ryan</div>
+              <div>
+                作者：<span className="font-bold">ryan</span>
+              </div>
             </div>
             <div>{item.abstract}</div>
           </div>

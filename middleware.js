@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { getUserInfo } from "./app/actions";
-import { jwtVerify } from "jose";
+import { getUserInfo } from "./actions";
 
 const encoder = new TextEncoder();
 /**

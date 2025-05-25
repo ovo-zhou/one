@@ -1,8 +1,7 @@
 "use client";
 import NextLink from "next/link";
 import { useEffect, useState } from "react";
-import Modal from "@/app/components/modal";
-import { getPostList, deletePost, changeDeleteStatus } from "@/app/actions";
+import { getPostList, deletePost, changeDeleteStatus } from "@/actions";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import {
@@ -23,10 +22,20 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import dayjs from "dayjs";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
 export default function Page() {
   const [dataSource, setDataSource] = useState({ total: 1 });
-  const [isShow, setIsShow] = useState(false);
-  const [selectedItemId, setSelectedItemId] = useState(null);
   const [searchParams, setSearchParams] = useState({
     type: "",
     title: "",
@@ -42,20 +51,10 @@ export default function Page() {
       [name]: value,
     });
   };
-  const openModal = () => {
-    setIsShow(true);
-  };
-  const closeModal = () => {
-    setIsShow(false);
-  };
-  const handleDelete = (id) => {
-    setSelectedItemId(id);
-    openModal();
-  };
+
   // 删除一条post
-  const deleteRecord = () => {
-    deletePost(selectedItemId).then(() => {
-      closeModal();
+  const deleteRecord = (id) => {
+    deletePost(id).then(() => {
       handleSearch();
     });
   };
@@ -189,6 +188,25 @@ export default function Page() {
                     >
                       删除
                     </button>
+                    <AlertDialog>
+                      <AlertDialogTrigger>删除</AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            确认删除{post.type === "post" ? "博客" : "页面"}吗?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            删除后将无法恢复，请谨慎操作。
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>取消</AlertDialogCancel>
+                          <AlertDialogAction onClick={()=>{
+                            deleteRecord(post.id);
+                          }}>确认</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </TableCell>
                 </TableRow>
               );
@@ -209,14 +227,6 @@ export default function Page() {
           每页 {searchParams.pageSize} 条 共 {dataSource.total} 页
         </div>
       </div>
-      <Modal
-        title={"提示"}
-        open={isShow}
-        onOk={deleteRecord}
-        onCancel={closeModal}
-      >
-        删除后不可恢复，确认删除吗？
-      </Modal>
     </>
   );
 }

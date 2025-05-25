@@ -1,4 +1,4 @@
-import Nav from "../components/nav";
+import Nav from "../../components/nav";
 import { Suspense } from "react";
 import "../globals.css";
 export const metadata = {

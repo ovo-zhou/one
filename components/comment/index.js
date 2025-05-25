@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useContext, useEffect, useReducer, useState } from "react";
-import { getCommentsByPostId, addComment, deleteComment } from "@/app/actions";
+import { getCommentsByPostId, addComment, deleteComment } from "@/actions";
 import CommentInput from "./commentInput";
 import CommentItem from "./commentItem";
 
@@ -87,9 +87,9 @@ function Comment(props) {
         );
       })}
       {cursor != -1 ? (
-        <div onClick={handleLoadMoreComments}>加载更多</div>
+        <div onClick={handleLoadMoreComments}>加载更多评论</div>
       ) : (
-        <div>暂无更多</div>
+        <div>暂无更多评论</div>
       )}
     </div>
   );

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import dayjs from "dayjs";
-import useUserInfo from "@/app/hooks/useUserInfo";
+import useUserInfo from "@/hooks/useUserInfo";
 import Image from "next/image";
 
 export default function CommentItem(props) {

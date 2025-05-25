@@ -1,8 +1,8 @@
 import prisma from "@/prisma";
-import Nav from "../components/nav";
+import Nav from "../../components/nav";
 // import "../tailwind/tailwind.css";
 import { Suspense } from "react";
-import { getUserInfo } from "../actions/index";
+import { getUserInfo } from "@/actions/index";
 import Link from "next/link";
 import Image from "next/image";
 import '../globals.css'
@@ -64,7 +64,6 @@ export default async function RootLayout({ children }) {
               )}
             </div>
           </div>
-
           <div className="relative" style={{ minHeight: "calc(100vh - 6rem)" }}>
             <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
           </div>

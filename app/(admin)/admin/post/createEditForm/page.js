@@ -2,10 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import MarkdownRender from "@/app/components/markdown/MarkdownRender";
+import MarkdownRender from "@/components/markdown/MarkdownRender";
 import Image from "next/image";
-import MarkdownEditor from "@/app/components/markdown/MarkdownEditor";
-import { createPost, getPostById, updatePost } from "@/app/actions";
+import MarkdownEditor from "@/components/markdown/MarkdownEditor";
+import { createPost, getPostById, updatePost } from "@/actions";
 import { useSearchParams } from "next/navigation";
 import {
   Select,
