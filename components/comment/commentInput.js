@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import message from "../message/messageController";
+import { toast } from "sonner";
 // size 值  small 小 normal正常
 export default function CommentInput(props) {
   const { onOk,size='normal' } = props;
@@ -9,7 +9,7 @@ export default function CommentInput(props) {
 
   const handleSubmit = () => {
     if (!comment) {
-      message.error({ content: "还没有输入内容呢" });
+      toast.error("还没有输入内容呢");
       return;
     }
     onOk?.(comment);

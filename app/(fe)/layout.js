@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { getUserInfo } from "@/actions/index";
 import Link from "next/link";
 import Image from "next/image";
+import { Toaster } from "@/components/ui/sonner";
 import '../globals.css'
 
 export const metadata = {
@@ -67,6 +68,7 @@ export default async function RootLayout({ children }) {
           <div className="relative" style={{ minHeight: "calc(100vh - 6rem)" }}>
             <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
           </div>
+          <Toaster position="top-center" expand={true} richColors />
           <div className="text-center h-12">
             Copyright 2019-{new Date().getFullYear()} ryan 版权所有 保留所有权利
           </div>

@@ -59,7 +59,9 @@
   blockquote {
     @apply mb-4 border-l-4 pl-4 border-accent;
   }
-
+  button{
+    @apply cursor-pointer
+  }
 }
 
 
