@@ -1,10 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect} from "react";
 import { useRouter } from "next/navigation";
 import MarkdownRender from "@/components/markdown/MarkdownRender";
-import Image from "next/image";
-import MarkdownEditor from "@/components/markdown/MarkdownEditor";
 import { createPost, getPostById, updatePost } from "@/actions";
 import { useSearchParams } from "next/navigation";
 import {
@@ -53,10 +51,6 @@ export default function Page() {
   });
   const searchParams = useSearchParams();
   const postId = searchParams.get("postId");
-  const [imgBedVisiable, setImgBedVisiable] = useState(false);
-  const uploadElementRef = useRef(null);
-
-  const [imgUrl, setImgUrl] = useState("");
   const router = useRouter();
   const handleSave = async (values) => {
     // console.log("post", values);
@@ -74,25 +68,6 @@ export default function Page() {
       }
     }
   };
-  const handleImgUpload = () => {
-    const files = uploadElementRef.current.files;
-    if (files.length === 0) {
-      return;
-    }
-    const form = new FormData();
-    form.append("file", files[0]);
-    fetch("/admin/imgs/api", {
-      method: "POST",
-      body: form,
-      credentials: "same-origin",
-    })
-      .then((res) => {
-        return res.json();
-      })
-      .then((res) => {
-        setImgUrl(res.url);
-      });
-  };
   useEffect(() => {
     if (postId) {
       // 查询post
@@ -106,121 +81,101 @@ export default function Page() {
     }
   }, [postId, form.setValue]);
   return (
-    <>
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(handleSave)}
-          className="flex flex-col gap-4 w-full sm:w-1/2 p-4"
-        >
-          <FormField
-            control={form.control}
-            name="type"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>博客类型</FormLabel>
-                <FormControl>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="博客类型" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {[
-                        {
-                          label: "博客",
-                          value: "post",
-                        },
-                        {
-                          label: "页面",
-                          value: "page",
-                        },
-                      ].map((option) => {
-                        return (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        );
-                      })}
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="title"
-            render={({ field }) => {
-              return (
+    <div className="flex gap-4">
+      <div className="w-full lg:w-1/4 h-screen">
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(handleSave)}
+            className="flex flex-col gap-4 p-4"
+          >
+            <FormField
+              control={form.control}
+              name="type"
+              render={({ field }) => (
                 <FormItem>
-                  <FormLabel>标题</FormLabel>
+                  <FormLabel>博客类型</FormLabel>
+                  <FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="博客类型" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {[
+                          {
+                            label: "博客",
+                            value: "post",
+                          },
+                          {
+                            label: "页面",
+                            value: "page",
+                          },
+                        ].map((option) => {
+                          return (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => {
+                return (
+                  <FormItem>
+                    <FormLabel>标题</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                );
+              }}
+            />
+
+            <FormField
+              name="abstract"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>摘要</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
-              );
-            }}
-          />
+              )}
+            />
 
-          <FormField
-            name="abstract"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>摘要</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            name="content"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>内容</FormLabel>
-                <FormControl>
-                  <Textarea {...field} className="h-96" />
-                  {/* <MarkdownRender>{field.value}</MarkdownRender> */}
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button type="submit">提交</Button>
-        </form>
-      </Form>
-
-      {
-        imgBedVisiable ? (
-          <div className={styles.imgUploadModal}>
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <span>图床</span>
-              <span
-                onClick={() => setImgBedVisiable(false)}
-                style={{ color: "red" }}
-              >
-                X
-              </span>
-            </div>
-            <input type="file" ref={uploadElementRef} />
-            <div>
-              <div>图片地址：{imgUrl}</div>
-              <Image src={imgUrl} alt="" width={100} height={100} />
-            </div>
-            <button onClick={handleImgUpload}>上传</button>
-            <button onClick={() => setImgBedVisiable(false)}>取消</button>
-          </div>
-        ) : null
-        // <div onClick={() => setImgBedVisiable(true)}>图床</div>
-      }
-    </>
+            <FormField
+              name="content"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>内容</FormLabel>
+                  <FormControl>
+                    <Textarea {...field} className="h-200" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit">提交</Button>
+          </form>
+        </Form>
+      </div>
+      <div className="flex-1 h-screen overflow-auto pt-2 hidden lg:block">
+        <MarkdownRender>{form.watch("content")}</MarkdownRender>
+      </div>
+    </div>
   );
 }

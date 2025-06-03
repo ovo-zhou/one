@@ -14,20 +14,16 @@ const menuItems = [
     href: "/admin/post/list",
     title: "博客管理",
   },
-  {
-    href: "/admin/imgs/list",
-    title: "图床管理",
-  },
 ];
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
         <div className="flex">
-          <div className="px-2 pt-2">
+          <div className="px-2">
             <Nav menuItems={menuItems} orientation="vertical"></Nav>
           </div>
-          <div className="flex-1 pt-2"><Suspense fallback={<div>Loading...</div>}>{children}</Suspense></div>
+          <div className="flex-1"><Suspense fallback={<div>Loading...</div>}>{children}</Suspense></div>
         </div>
       </body>
     </html>

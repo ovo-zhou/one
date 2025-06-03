@@ -31,17 +31,13 @@ export default async function RootLayout({ children }) {
       href: `/post/${item.id}`,
       title: item.title,
     })),
-    // {
-    //   href: "/ai",
-    //   title: "AI",
-    // },
   ];
   const userInfo = await getUserInfo();
   // console.log(userInfo);
   return (
     <html lang="en">
       <body>
-        <div className="container mx-auto bg-white">
+        <div className="w-full sm:w-xl md:w-2xl lg:w-3xl xl:w-4xl mx-auto bg-white">
           <div className="flex justify-between items-center  h-12 text-black">
             <Nav menuItems={menuItems}></Nav>
             <div className="flex h-12">

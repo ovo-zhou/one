@@ -33,6 +33,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 
 export default function Page() {
   const [dataSource, setDataSource] = useState({ total: 1 });
@@ -161,35 +162,49 @@ export default function Page() {
                     {dayjs(+post.createdAt).format("YYYY-MM-DD HH:mm:ss")}
                   </TableCell>
                   <TableCell className="px-2">
-                    {post.isDeleted ? "隐藏" : "发布"}
+                    {post.isDeleted ? (
+                      <Badge
+                        variant="destructive"
+                      >
+                        隐藏
+                      </Badge>
+                    ) : (
+                      <Badge
+                        variant="secondary"
+                        className="bg-blue-500 text-white dark:bg-blue-600"
+                      >
+                        发布
+                      </Badge>
+                    )}
                   </TableCell>
                   <TableCell className="px-2">
-                    <button
+                    <Button
                       onClick={() => handleChangeDeleteStatus(post.id)}
+                      variant="link"
                       className="text-blue-500 px-2"
                     >
                       {post.isDeleted ? "上线" : "下线"}
-                    </button>
-                    <NextLink
-                      href={`/admin/post/createEditForm?postId=${post.id}`}
-                      className="text-blue-500 px-2"
-                    >
-                      编辑
-                    </NextLink>
-                    <NextLink
-                      href={`/post/${post.id}`}
-                      className="text-blue-500 px-2"
-                    >
-                      查看
-                    </NextLink>
-                    <button
-                      onClick={() => handleDelete(post.id)}
-                      className="text-red-500 px-2"
-                    >
-                      删除
-                    </button>
+                    </Button>
+                    <Button variant="link">
+                      <NextLink
+                        href={`/admin/post/createEditForm?postId=${post.id}`}
+                        className="text-blue-500 px-2"
+                      >
+                        编辑
+                      </NextLink>
+                    </Button>
+                    <Button variant="link">
+                      <NextLink
+                        href={`/post/${post.id}`}
+                        className="text-blue-500 px-2"
+                      >
+                        查看
+                      </NextLink>
+                    </Button>
                     <AlertDialog>
-                      <AlertDialogTrigger>删除</AlertDialogTrigger>
+                      <AlertDialogTrigger className="text-destructive">
+                          删除
+                      </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
                           <AlertDialogTitle>
@@ -201,9 +216,13 @@ export default function Page() {
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                           <AlertDialogCancel>取消</AlertDialogCancel>
-                          <AlertDialogAction onClick={()=>{
-                            deleteRecord(post.id);
-                          }}>确认</AlertDialogAction>
+                          <AlertDialogAction
+                            onClick={() => {
+                              deleteRecord(post.id);
+                            }}
+                          >
+                            确认
+                          </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
                     </AlertDialog>
