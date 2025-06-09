@@ -152,22 +152,20 @@ export default function Page() {
             {dataSource?.data?.map((post) => {
               return (
                 <TableRow key={post.id} className="leading-10">
-                  <TableCell className="px-2">{post.id}</TableCell>
-                  <TableCell className="px-2">{post.title}</TableCell>
-                  <TableCell className="px-2">{post.type}</TableCell>
-                  <TableCell className="px-2">
+                  <TableCell>{post.id}</TableCell>
+                  <TableCell>
+                    <div className="w-xs overflow-hidden text-ellipsis">{post.title}</div>
+                  </TableCell>
+                  <TableCell>{post.type}</TableCell>
+                  <TableCell>
                     {dayjs(+post.updatedAt).format("YYYY-MM-DD HH:mm:ss")}
                   </TableCell>
-                  <TableCell className="px-2">
+                  <TableCell>
                     {dayjs(+post.createdAt).format("YYYY-MM-DD HH:mm:ss")}
                   </TableCell>
-                  <TableCell className="px-2">
+                  <TableCell>
                     {post.isDeleted ? (
-                      <Badge
-                        variant="destructive"
-                      >
-                        隐藏
-                      </Badge>
+                      <Badge variant="destructive">隐藏</Badge>
                     ) : (
                       <Badge
                         variant="secondary"
@@ -203,7 +201,7 @@ export default function Page() {
                     </Button>
                     <AlertDialog>
                       <AlertDialogTrigger className="text-destructive">
-                          删除
+                        删除
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
