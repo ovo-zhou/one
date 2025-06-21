@@ -1,0 +1,19 @@
+{
+  "name": "origin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [
+    "桌面助手",
+    "开发伴侣"
+  ],
+  "author": "ryan",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^36.5.0"
+  },
+  "type": "module"
+}

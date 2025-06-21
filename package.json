@@ -2,11 +2,12 @@
   "name": "one",
   "version": "1.0.0",
   "main": "index.js",
-  "repository": "https://github.com/ovo-zhou/blogger.git",
+  "repository": "https://github.com/ovo-zhou/one.git",
   "author": "ryan <ryanhhuang@tencent.com>",
   "license": "MIT",
   "workspaces":[
-    "packages/**",
-    "app/**"
-  ]
+    "packages/*",
+    "apps/*"
+  ],
+  "private":true
 }
