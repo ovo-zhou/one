@@ -1,14 +1,15 @@
 import dotenv from 'dotenv';
 import { OpenAI } from 'openai';
 import {agentConfig} from '../agentConfig.js';
+import { ChatCompletionMessageParam } from 'openai/resources/index.js';
 dotenv.config();
-export async function sendMessage(agent, message) {
+export async function sendMessage(agent:string, message:string ) {
     // 倒入环境变量
     const apiKey = process.env.api_key;
     if(!apiKey){
         throw new Error("api_key 为空！");
     }
-    const messages=[];
+  const messages: ChatCompletionMessageParam[] =[];
     if (agent) {
       const currentAgent = agentConfig.find((item) => item.agent === agent);
       if (currentAgent){

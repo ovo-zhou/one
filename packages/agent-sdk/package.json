@@ -1,11 +1,19 @@
 {
   "name": "agent-sdk",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "license": "MIT",
   "dependencies": {
     "dotenv": "^16.5.0",
     "openai": "^5.7.0"
   },
-  "type": "module"
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "tsc"
+  },
+  "type": "module",
+  "devDependencies": {
+    "ts-node": "^10.9.2"
+  }
 }
