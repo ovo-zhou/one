@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import { OpenAI } from 'openai';
-import {agentConfig} from '../agentConfig.js';
+import {agentConfig} from '../config/agentConfig.js';
 import { ChatCompletionMessageParam } from 'openai/resources/index.js';
 dotenv.config();
 export async function sendMessage(agent:string, message:string ) {

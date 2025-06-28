@@ -1,4 +1,8 @@
-export const agentConfig=[
+interface IAgentConfig{
+  agent:string;
+  prompt:string;
+}
+export const agentConfig:IAgentConfig[] =[
   {
     "agent":"code",
     "prompt":"你是一位前端开发专家，熟悉前端所有领域的专业知识，当用户问你有关前端开发的问题时，请从专家的角度给出回答。"

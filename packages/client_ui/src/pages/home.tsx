@@ -10,9 +10,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useEffect, useState } from "react";
 
 const [word1, word2] = getTimeGreeting();
 export default function Home() {
+  const [message, setMessage] = useState("");
+  useEffect(()=>{
+    agent.ping();
+  },[])
   return (
     <div className="w-screen h-screen flex flex-col justify-center items-center gap-10">
       <div className="text-7xl font-bold">origin</div>
@@ -21,9 +26,13 @@ export default function Home() {
       </div>
       <div className="relative">
         <Textarea
+          value={message}
           autoFocus
           placeholder="从 origin 开始"
           className="w-3xl h-40 resize-none text-10xl"
+          onChange={(e) => {
+            setMessage(e.target.value);
+          }}
         ></Textarea>
         <div className="absolute left-3 bottom-3">
           <Select>
@@ -38,7 +47,15 @@ export default function Home() {
             </SelectContent>
           </Select>
         </div>
-        <button disabled className="absolute right-3 bottom-3 disabled:">
+        <button
+          disabled={!message}
+          className="absolute right-3 bottom-3 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+          onClick={() => {
+            agent.sendMessage("code", message).then(res=>{
+              console.log(res)
+            });
+          }}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"

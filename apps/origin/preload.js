@@ -1,8 +1,10 @@
-const { contextBridge, ipcRenderer } = require("electron");
+const { contextBridge, ipcRenderer } =require("electron");
 
-contextBridge.exposeInMainWorld("versions", {
-  // 这里面的 process 对象，实际上是 electron 的 process 对象
-  node: () => process.versions.node,
-  chrome: () => process.versions.chrome,
-  electron: () => process.versions.electron,
+contextBridge.exposeInMainWorld("agent", {
+  sendMessage:(agent,messages)=>{
+    return ipcRenderer.invoke("sendMessage", agent, messages);
+  },
+  ping:()=>{
+    console.info('preload.js load success!')
+  }
 });

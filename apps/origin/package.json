@@ -4,7 +4,7 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "dev": "electron ."
   },
   "keywords": [
     "桌面助手",
@@ -12,8 +12,11 @@
   ],
   "author": "ryan",
   "license": "ISC",
-  "devDependencies": {
-    "electron": "^36.5.0"
+  "dependencies": {
+    "agent-sdk": "0.0.0"
   },
-  "type": "module"
+  "devDependencies": {
+    "electron": "^36.5.0",
+    "electron-reloader": "^1.2.3"
+  }
 }
