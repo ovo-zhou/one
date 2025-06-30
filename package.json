@@ -9,5 +9,13 @@
     "packages/*",
     "apps/*"
   ],
-  "private": true
+  "scripts": {
+    "test": "jest"
+  },
+  "private": true,
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "jest": "^30.0.3",
+    "ts-jest": "^29.4.0"
+  }
 }
