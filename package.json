@@ -5,9 +5,9 @@
   "repository": "https://github.com/ovo-zhou/one.git",
   "author": "ryan <ryanhhuang@tencent.com>",
   "license": "MIT",
-  "workspaces":[
+  "workspaces": [
     "packages/*",
     "apps/*"
   ],
-  "private":true
+  "private": true
 }

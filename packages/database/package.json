@@ -1,0 +1,22 @@
+{
+  "name": "database",
+  "version": "0.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@prisma/client": "5.22.0",
+    "@types/node": "^24.0.7",
+    "sqlite3": "^5.1.7"
+  }
+}
