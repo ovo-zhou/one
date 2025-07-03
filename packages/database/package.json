@@ -5,8 +5,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "dev": "tsc --watch",
-    "test": "jest"
+    "dev": "tsc --watch"
   },
   "keywords": [],
   "author": "",
