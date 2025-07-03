@@ -13,7 +13,7 @@
   "author": "ryan",
   "license": "ISC",
   "dependencies": {
-    "agent-sdk": "0.0.0"
+    "agent-sdk": "workspace:*"
   },
   "devDependencies": {
     "electron": "^36.5.0",

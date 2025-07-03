@@ -5,12 +5,8 @@
   "license": "MIT",
   "dependencies": {
     "dotenv": "^16.5.0",
-    "openai": "^5.7.0"
-  },
-  "exports": {
-    ".": {
-      "require": "./dist/index.js"
-    }
+    "openai": "^5.7.0",
+    "database":"workspace:*"
   },
   "scripts": {
     "dev": "tsc --watch",

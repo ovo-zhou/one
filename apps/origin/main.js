@@ -20,7 +20,7 @@ const createWindow = () => {
 };
 
 app.on("ready", () => {
-  ipcMain.handle('sendMessage', async (event,agent,message)=>{
+  ipcMain.on('sendMessage', async (event,agent,message)=>{
    const completion= await agentSdk.sendMessage(agent, message);
    for await (let text of completion){
     console.log(text)
@@ -39,9 +39,9 @@ app.on("window-all-closed", () => {
   }
 });
 // 这里使用动态倒入，避免在生成环境引入
-if(isDev){
-    require("electron-reloader")(module,{
-      debug:true,
-      watchRenderer:false
-    });
-}
+// if(isDev){
+//     require("electron-reloader")(module,{
+//       debug:true,
+//       watchRenderer:false
+//     });
+// }
