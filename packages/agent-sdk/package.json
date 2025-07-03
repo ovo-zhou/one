@@ -6,7 +6,7 @@
   "dependencies": {
     "dotenv": "^16.5.0",
     "openai": "^5.7.0",
-    "database":"workspace:*"
+    "database":"0.0.0"
   },
   "scripts": {
     "dev": "tsc --watch",
