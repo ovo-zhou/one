@@ -11,6 +11,7 @@ import {
   SidebarHeader,
   SidebarFooter,
 } from "@/components/ui/sidebar";
+import { Link } from "react-router-dom";
 const items = [
   {
     title: "Home",
@@ -37,6 +38,7 @@ export default function ChatSidebar() {
   return (
     <Sidebar>
       <SidebarHeader>
+        <Link to={'/'}>首页</Link>
         <SidebarTrigger />
       </SidebarHeader>
       <SidebarContent>

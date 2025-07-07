@@ -9,7 +9,7 @@ const [word1, word2] = getTimeGreeting();
 export default function Home() {
   const navigate= useNavigate()
   useEffect(() => {
-    agent.ping();
+    bridge.ping();
   }, []);
   return (
     <div className="w-screen h-screen flex flex-col justify-center items-center gap-10">

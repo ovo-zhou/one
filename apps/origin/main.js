@@ -23,9 +23,9 @@ app.on("ready", () => {
   ipcMain.on('sendMessage', async (event,agent,message)=>{
    const completion= await agentSdk.sendMessage(agent, message);
    for await (let text of completion){
-    console.log(text)
+    console.log('main',text)
+    event.sender.send('onMessage', JSON.stringify(text));
    } 
-   return [agent, message];
   })
   createWindow();
   app.on("activate", () => {

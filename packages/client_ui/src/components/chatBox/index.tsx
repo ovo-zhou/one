@@ -1,23 +1,28 @@
-interface IProps {
+interface IChatBox {
   className: string;
+  chatList: IChatItem[];
 }
-interface IChatItem {
+export interface IChatItem {
+  id:string;
   role: "user" | "system" | "assistant";
   content: string;
 }
-export default function ChatBox(props: IProps) {
-  const { className } = props;
+
+export default function ChatBox(props: IChatBox) {
+  const { className, chatList } = props;
   return (
     <div className={`overflow-y-auto overflow-x-hidden ${className}`}>
-      <ChatItem role="user" content="nihao" />
-      <ChatItem
-        role="system"
-        content="你在干嘛啊你在干嘛啊你在干嘛啊你在干嘛啊你在干嘛啊你在干嘛啊你在干嘛啊你在干嘛啊你在干嘛啊你在干嘛啊你在干嘛啊你在干嘛啊"
-      />
+      {chatList.map((chatItem) => (
+        <ChatItem
+          role={chatItem.role}
+          content={chatItem.content}
+          key={chatItem.id}
+        />
+      ))}
     </div>
   );
 }
-export function ChatItem(props: IChatItem) {
+export function ChatItem(props: Pick<IChatItem,'role'|'content'>) {
   const { role, content } = props;
   const renderMessage = () => {
     if (role === "user") {
@@ -56,7 +61,7 @@ export function ChatItem(props: IChatItem) {
         >
           <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
           <path
-            fill-rule="evenodd"
+            fillRule="evenodd"
             d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"
           />
         </svg>
