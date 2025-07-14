@@ -1,3 +1,4 @@
+import Markdown from "../markdown";
 interface IChatBox {
   className: string;
   chatList: IChatItem[];
@@ -7,7 +8,11 @@ export interface IChatItem {
   role: "user" | "system" | "assistant";
   content: string;
 }
-
+/**
+ * 聊天盒子
+ * @param props 聊天列表
+ * @returns 
+ */
 export default function ChatBox(props: IChatBox) {
   const { className, chatList } = props;
   return (
@@ -22,22 +27,27 @@ export default function ChatBox(props: IChatBox) {
     </div>
   );
 }
+/**
+ * 聊天项目
+ * @param props 
+ * @returns 
+ */
 export function ChatItem(props: Pick<IChatItem,'role'|'content'>) {
   const { role, content } = props;
   const renderMessage = () => {
     if (role === "user") {
       return (
-        <div className="bg-amber-200 flex justify-end py-2">
-          <div className="bg-amber-700 p-2 rounded-tl-lg rounded-tr-none rounded-br-lg rounded-bl-lg">
+        <div className="flex justify-end py-2">
+          <div className="p-2 rounded-tl-lg rounded-tr-none rounded-br-lg rounded-bl-lg">
             {content}
           </div>
         </div>
       );
     }
     return (
-      <div className="bg-amber-200 py-2">
-        <div className="bg-amber-700 p-2 rounded-tl-none rounded-tr-lg rounded-br-lg rounded-bl-lg">
-          {content}
+      <div className="py-2">
+        <div className="p-2 rounded-tl-none rounded-tr-lg rounded-br-lg rounded-bl-lg">
+          <Markdown content={content} />
         </div>
       </div>
     );

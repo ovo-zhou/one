@@ -23,6 +23,7 @@
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
     "lucide-react": "^0.525.0",
+    "markdown-it": "^14.1.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.59.0",
@@ -33,6 +34,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
+    "@types/markdown-it": "^14.1.2",
     "@types/node": "^24.0.3",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",

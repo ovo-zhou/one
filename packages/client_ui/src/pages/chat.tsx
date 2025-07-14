@@ -46,7 +46,7 @@ export default function Chat() {
   return (
     <SidebarProvider>
       <ChatSidebar />
-      <main className="w-full bg-amber-100 flex flex-col box-border px-2">
+      <main className="w-full flex flex-col box-border px-2">
         <div className="h-14 leading-14 text-center">head</div>
         <ChatBox className="flex-1" chatList={chatList} />
         <div className="py-4 flex justify-center">
