@@ -23,9 +23,10 @@ app.on("ready", () => {
   ipcMain.on('sendMessage', async (event,agent,message)=>{
    const completion= await agentSdk.sendMessage(agent, message);
    for await (let text of completion){
-    console.log('main',text)
     event.sender.send('onMessage', JSON.stringify(text));
    } 
+   // 结束时发送一个空字符串，表示消息结束
+    event.sender.send("onMessage", JSON.stringify(''));
   })
   createWindow();
   app.on("activate", () => {

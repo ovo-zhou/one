@@ -12,8 +12,18 @@ export default function Chat() {
   const [chatList, setChatList] = useState<IChatItem[]>([]);
   const hasSend = useRef<boolean>(false);
   const sendMessage = (agent: string, message: string) => {
+    setChatList([
+      ...chatList,
+      {
+        id: (+new Date() - 10).toString(),
+        role: "user",
+        content: message,
+      },
+      { id: (+new Date() + 10).toString(), role: "assistant", content: "..." },
+    ]);
     window.agent.sendMessage(agent, message);
   };
+  // 这里接受其他页面传过来的值，直接发送消息
   useEffect(() => {
     if (formValues && hasSend.current === false) {
       setChatList([
@@ -29,6 +39,11 @@ export default function Chat() {
     let content = "";
     const off = window.agent.onMessage((data: string) => {
       const message: IChatItem = JSON.parse(data);
+      // 空字符串意味发送结束
+      if (!message) {
+        content = "";
+        return;
+      }
       content += message.content;
       setChatList((pre) => {
         const newChatList = [...pre];
@@ -46,13 +61,13 @@ export default function Chat() {
   return (
     <SidebarProvider>
       <ChatSidebar />
-      <main className="w-full flex flex-col box-border px-2">
+      <main className="w-full flex flex-col items-center box-border px-2">
         <div className="h-14 leading-14 text-center">head</div>
-        <ChatBox className="flex-1" chatList={chatList} />
+        <ChatBox className="flex-1 w-3xl" chatList={chatList} />
         <div className="py-4 flex justify-center">
           <ChatInput
             submit={(values) => {
-              console.log(values);
+              sendMessage(values.agentType, values.message);
             }}
           />
         </div>

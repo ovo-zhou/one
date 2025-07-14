@@ -37,19 +37,20 @@ export default function ChatInput(props:IProps){
       },
     });
     const onSubmit = (formValues: z.infer<typeof FormSchema>) => {
-      // submit(formValues);
+      submit(formValues);
+      form.reset({ message :""});
     };
     return (
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="relative max-w-3xl"
+          className="relative w-3xl"
         >
           <FormField
             control={form.control}
             name="message"
             render={({ field }) => (
-              <FormItem className="w-3xl">
+              <FormItem>
                 <FormControl>
                   <Textarea
                     {...field}

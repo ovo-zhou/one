@@ -1,4 +1,3 @@
-
 import dayjs from "dayjs";
 import { getTimeGreeting } from "@/lib/utils";
 import { useEffect } from "react";
@@ -7,9 +6,9 @@ import { useNavigate } from "react-router-dom";
 
 const [word1, word2] = getTimeGreeting();
 export default function Home() {
-  const navigate= useNavigate()
+  const navigate = useNavigate();
   useEffect(() => {
-    bridge.ping();
+    window.bridge.ping();
   }, []);
   return (
     <div className="w-screen h-screen flex flex-col justify-center items-center gap-10">
@@ -17,11 +16,13 @@ export default function Home() {
       <div className="text-2xl font-thin">
         {word1}，今天是 {dayjs().format("YYYY 年 M 月 D 日")}，{word2}
       </div>
-      <ChatInput submit={(formValues)=>{
-        navigate('/chat',{
-          state:formValues
-        });
-      }}/>
+      <ChatInput
+        submit={(formValues) => {
+          navigate("/chat", {
+            state: formValues,
+          });
+        }}
+      />
     </div>
   );
 }
