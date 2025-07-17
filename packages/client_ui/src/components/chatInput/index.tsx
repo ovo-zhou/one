@@ -47,14 +47,14 @@ export default function ChatInput(props: IProps) {
     }
   };
   return (
-    <div className="relative w-3xl">
+    <div className="relative max-w-3xl">
       <Textarea
         value={message}
         onChange={(e) => {
           setMessage(e.target.value);
         }}
         placeholder="从 origin 开始"
-        className="h-40 resize-none"
+        className="h-40 resize-none w-3xl"
         onKeyDown={handleKeyDown}
       ></Textarea>
       <Select

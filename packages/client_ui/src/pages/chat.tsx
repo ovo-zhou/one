@@ -3,13 +3,13 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import ChatInput from "@/components/chatInput";
 import ChatSidebar from "@/components/chatSidebar";
 import ChatBox from "@/components/chatBox";
-import { useEffect, useRef, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import type { IChatItem } from "@/components/chatBox";
-
 export default function Chat() {
   const location = useLocation();
   const formValues = location.state;
   const [chatList, setChatList] = useState<IChatItem[]>([]);
+  const chatBoxRef = useRef<HTMLDivElement>(null);
   const hasSend = useRef<boolean>(false);
   const sendMessage = (agent: string, message: string) => {
     setChatList([
@@ -23,6 +23,21 @@ export default function Chat() {
     ]);
     window.agent.sendMessage(agent, message);
   };
+  useEffect(() => {
+    const chatBoxElement = chatBoxRef.current;
+    if (chatBoxElement) {
+      const resizeObserver = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          console.log("新高度:", entry.contentRect.height);
+          // 在这里处理高度变化
+        }
+      });
+      resizeObserver.observe(chatBoxElement);
+      return () => {
+        resizeObserver.unobserve(chatBoxElement);
+      };
+    }
+  }, []);
   // 这里接受其他页面传过来的值，直接发送消息
   useEffect(() => {
     if (formValues && hasSend.current === false) {
@@ -61,13 +76,20 @@ export default function Chat() {
   return (
     <SidebarProvider>
       <ChatSidebar />
-      <main className="w-full flex flex-col items-center box-border px-2">
-        <div className="h-14 leading-14 text-center">head</div>
-        <ChatBox className="flex-1 w-3xl" chatList={chatList} />
-        <div className="py-4 flex justify-center">
+      <main className="relative w-full">
+        <div className="w-full h-14 leading-14 text-center bg-amber-800 absolute top-0 left-0">
+          head
+        </div>
+        <div
+          className="w-full h-[100vh] overflow-x-scroll pt-14 pb-50 flex justify-center box-border"
+          ref={chatBoxRef}
+        >
+          <ChatBox chatList={chatList} className="w-3xl max-w-3xl"/>
+        </div>
+        <div className="w-full bg-amber-200 absolute bottom-0 left-0 flex justify-center">
           <ChatInput
             submit={(values) => {
-              sendMessage(values.agentType, values.message);
+              sendMessage(values.type, values.message);
             }}
           />
         </div>

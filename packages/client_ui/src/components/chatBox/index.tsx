@@ -1,6 +1,6 @@
 import Markdown from "../markdown";
 interface IChatBox {
-  className: string;
+  className?: string;
   chatList: IChatItem[];
 }
 export interface IChatItem {
@@ -16,7 +16,7 @@ export interface IChatItem {
 export default function ChatBox(props: IChatBox) {
   const { className, chatList } = props;
   return (
-    <div className={`overflow-y-auto overflow-x-hidden ${className}`}>
+    <div className={className}>
       {chatList.map((chatItem) => (
         <ChatItem
           role={chatItem.role}
@@ -28,7 +28,7 @@ export default function ChatBox(props: IChatBox) {
   );
 }
 /**
- * 聊天项目
+ * 聊天项
  * @param props 
  * @returns 
  */
@@ -56,6 +56,7 @@ export function ChatItem(props: Pick<IChatItem,'role'|'content'>) {
   return (
     <div className="group">
       {renderMessage()}
+      {/* 按钮组合 */}
       <div
         className={`flex gap-2 invisible group-hover:visible ${
           role === "user" ? "justify-end" : "justify-start"
