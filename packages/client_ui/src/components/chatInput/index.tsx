@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Select,
   SelectContent,
@@ -6,105 +7,89 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-
-const FormSchema = z.object({
-  message: z.string().max(1024 * 10, {
-    message: "输入长度超限",
-  }),
-  agentType: z.string(),
-});
 interface IProps {
-  submit: (formValues: z.infer<typeof FormSchema>) => undefined;
+  submit: (value: { message: string; type: string }) => undefined;
 }
-export default function ChatInput(props:IProps){
-  const {submit}=props;
-    const form = useForm<z.infer<typeof FormSchema>>({
-      resolver: zodResolver(FormSchema),
-      defaultValues: {
-        message: "",
-        agentType: "",
-      },
-    });
-    const onSubmit = (formValues: z.infer<typeof FormSchema>) => {
-      submit(formValues);
-      form.reset({ message :""});
-    };
-    return (
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="relative w-3xl"
+export default function ChatInput(props: IProps) {
+  const { submit } = props;
+  const [message, setMessage] = useState<string>("");
+  const [type, setType] = useState<string>("normal");
+  const handleSubmit = () => {
+    if (message) {
+      submit({ message, type });
+      // 重置一下表单值
+      setMessage("");
+    }
+  };
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (e.metaKey || e.ctrlKey) {
+        const textarea = e.target as HTMLTextAreaElement;
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        // 手动插入换行符
+        setMessage(
+          (prev) => prev.substring(0, start) + "\n" + prev.substring(end)
+        );
+
+        // 恢复光标位置到换行符后
+        setTimeout(() => {
+          textarea.selectionStart = textarea.selectionEnd = start + 1;
+        }, 0);
+      } else {
+        if (e.nativeEvent.isComposing) {
+          return;
+        }
+        handleSubmit();
+      }
+    }
+  };
+  return (
+    <div className="relative w-3xl">
+      <Textarea
+        value={message}
+        onChange={(e) => {
+          setMessage(e.target.value);
+        }}
+        placeholder="从 origin 开始"
+        className="h-40 resize-none"
+        onKeyDown={handleKeyDown}
+      ></Textarea>
+      <Select
+        value={type}
+        onValueChange={(value) => {
+          setType(value);
+        }}
+      >
+        <SelectTrigger className="absolute left-3 bottom-3 w-[100px]">
+          <SelectValue placeholder="未设定" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            <SelectItem value="normal">通用</SelectItem>
+            <SelectItem value="code">编程</SelectItem>
+            <SelectItem value="banana">翻译</SelectItem>
+          </SelectGroup>
+        </SelectContent>
+      </Select>
+      {!!message && (
+        <button
+          className="absolute right-3 bottom-3 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+          onClick={handleSubmit}
         >
-          <FormField
-            control={form.control}
-            name="message"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Textarea
-                    {...field}
-                    autoFocus
-                    placeholder="从 origin 开始"
-                    className="h-40 resize-none"
-                  ></Textarea>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="agentType"
-            render={({ field }) => (
-              <FormItem className="absolute bottom-3 left-3">
-                <FormControl>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="w-[80px]">
-                        <SelectValue placeholder="角色" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectItem value="normal">通用</SelectItem>
-                        <SelectItem value="apple">编程</SelectItem>
-                        <SelectItem value="banana">翻译</SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <button
-            type="submit"
-            className="absolute right-3 bottom-3 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            fill="currentColor"
+            viewBox="0 0 16 16"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              fill="currentColor"
-              viewBox="0 0 16 16"
-            >
-              <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07Zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493Z" />
-            </svg>
-          </button>
-        </form>
-      </Form>
-    );
+            <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07Zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493Z" />
+          </svg>
+        </button>
+      )}
+    </div>
+  );
 }

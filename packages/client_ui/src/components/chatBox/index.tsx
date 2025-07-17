@@ -39,7 +39,7 @@ export function ChatItem(props: Pick<IChatItem,'role'|'content'>) {
       return (
         <div className="flex justify-end py-2">
           <div className="p-2 rounded-tl-lg rounded-tr-none rounded-br-lg rounded-bl-lg">
-            {content}
+            <pre>{content}</pre>
           </div>
         </div>
       );
