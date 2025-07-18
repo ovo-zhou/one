@@ -76,17 +76,18 @@ export default function Chat() {
   return (
     <SidebarProvider>
       <ChatSidebar />
-      <main className="relative w-full">
-        <div className="w-full h-14 leading-14 text-center bg-amber-800 absolute top-0 left-0">
+      <main className="w-full">
+        <div className="w-full h-14 leading-14 text-center bg-amber-800">
           head
         </div>
         <div
-          className="w-full h-[100vh] overflow-x-scroll pt-14 pb-50 flex justify-center box-border"
+          className="w-full overflow-x-scroll flex justify-center"
+          style={{height:"calc(100vh - 216px)"}}
           ref={chatBoxRef}
         >
           <ChatBox chatList={chatList} className="w-3xl max-w-3xl"/>
         </div>
-        <div className="w-full bg-amber-200 absolute bottom-0 left-0 flex justify-center">
+        <div className="w-full bg-amber-200 flex justify-center">
           <ChatInput
             submit={(values) => {
               sendMessage(values.type, values.message);
