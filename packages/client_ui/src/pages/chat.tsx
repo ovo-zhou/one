@@ -3,13 +3,12 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import ChatInput from "@/components/chatInput";
 import ChatSidebar from "@/components/chatSidebar";
 import ChatBox from "@/components/chatBox";
-import { use, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { IChatItem } from "@/components/chatBox";
 export default function Chat() {
   const location = useLocation();
   const formValues = location.state;
   const [chatList, setChatList] = useState<IChatItem[]>([]);
-  const chatBoxRef = useRef<HTMLDivElement>(null);
   const hasSend = useRef<boolean>(false);
   const sendMessage = (agent: string, message: string) => {
     setChatList([
@@ -23,21 +22,6 @@ export default function Chat() {
     ]);
     window.agent.sendMessage(agent, message);
   };
-  useEffect(() => {
-    const chatBoxElement = chatBoxRef.current;
-    if (chatBoxElement) {
-      const resizeObserver = new ResizeObserver((entries) => {
-        for (const entry of entries) {
-          console.log("新高度:", entry.contentRect.height);
-          // 在这里处理高度变化
-        }
-      });
-      resizeObserver.observe(chatBoxElement);
-      return () => {
-        resizeObserver.unobserve(chatBoxElement);
-      };
-    }
-  }, []);
   // 这里接受其他页面传过来的值，直接发送消息
   useEffect(() => {
     if (formValues && hasSend.current === false) {
@@ -76,18 +60,15 @@ export default function Chat() {
   return (
     <SidebarProvider>
       <ChatSidebar />
-      <main className="w-full">
-        <div className="w-full h-14 leading-14 text-center bg-amber-800">
-          head
-        </div>
+      <main className="w-full bg-amber-300 h-screen flex flex-col">
+        <div className="h-14 leading-14 text-center bg-amber-800">head</div>
         <div
-          className="w-full overflow-x-scroll flex justify-center"
-          style={{height:"calc(100vh - 216px)"}}
-          ref={chatBoxRef}
+          className="overflow-y-auto flex-1 scroll-smooth flex justify-center"
+          style={{scrollbarWidth:'none'}}
         >
-          <ChatBox chatList={chatList} className="w-3xl max-w-3xl"/>
+          <ChatBox chatList={chatList} className="w-3xl bg-white h-fit" />
         </div>
-        <div className="w-full bg-amber-200 flex justify-center">
+        <div className="bg-amber-200 flex justify-center">
           <ChatInput
             submit={(values) => {
               sendMessage(values.type, values.message);

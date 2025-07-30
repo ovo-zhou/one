@@ -1,12 +1,13 @@
-const { app, BrowserWindow, ipcMain } =require("electron");
-const  path =require("path");
-const agentSdk=require('agent-sdk')
+const { app, BrowserWindow, ipcMain, screen } = require("electron");
+const path = require("path");
+const agentSdk = require("agent-sdk");
 
 const isDev = !app.isPackaged;
 const createWindow = () => {
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
   const win = new BrowserWindow({
-    width: 1600,
-    height: 800,
+    width,
+    height,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
@@ -20,14 +21,14 @@ const createWindow = () => {
 };
 
 app.on("ready", () => {
-  ipcMain.on('sendMessage', async (event,agent,message)=>{
-   const completion= await agentSdk.sendMessage(agent, message);
-   for await (let text of completion){
-    event.sender.send('onMessage', JSON.stringify(text));
-   } 
-   // 结束时发送一个空字符串，表示消息结束
-    event.sender.send("onMessage", JSON.stringify(''));
-  })
+  ipcMain.on("sendMessage", async (event, agent, message) => {
+    const completion = await agentSdk.sendMessage(agent, message);
+    for await (let text of completion) {
+      event.sender.send("onMessage", JSON.stringify(text));
+    }
+    // 结束时发送一个空字符串，表示消息结束
+    event.sender.send("onMessage", JSON.stringify(""));
+  });
   createWindow();
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
