@@ -1,6 +1,6 @@
 const { app, BrowserWindow, ipcMain, screen } = require("electron");
 const path = require("path");
-const agentSdk = require("agent-sdk");
+const agentSdk = require("agent");
 
 const isDev = !app.isPackaged;
 const createWindow = () => {

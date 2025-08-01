@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 import { OpenAI } from 'openai';
 import { agentConfig } from '../config/agentConfig.js';
 import { ChatCompletionMessageParam } from 'openai/resources/index.js';
-// 倒入环境变量
+// 导入环境变量
 dotenv.config();
 const apiKey = process.env.api_key;
 export async function* sendMessage(agent: string, message: string) {
@@ -30,6 +30,7 @@ export async function* sendMessage(agent: string, message: string) {
     stream: true,
   });
   let role = ''
+  let allContent = '';
   for await (let part of completion) {
     const id = part.id;
     const _role = part.choices[0].delta.role;
@@ -38,8 +39,10 @@ export async function* sendMessage(agent: string, message: string) {
       role = _role;
     }
     if(content){
+      allContent+=content;
       yield { id, role, content };
     }
   }
   // TODO:对话完成，记录到数据库
+  console.log("对话完成，记录到数据库", allContent);
 }

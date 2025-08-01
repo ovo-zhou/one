@@ -20,7 +20,7 @@ export default function ChatBox(props: IChatBox) {
     if(!anchorNode){
       return;
     }
-    console.log('滚动进入视图')
+    // console.log('滚动进入视图')
     anchorNode.scrollIntoView()
   }
   useEffect(() => {
@@ -30,8 +30,8 @@ export default function ChatBox(props: IChatBox) {
     }
     const resizeObserver = new ResizeObserver((entries) => {
       entries.forEach((entry) => {
-        const { height } = entry.contentRect;
-        console.log(`高度变化为: ${height}px`);
+        // const { height } = entry.contentRect;
+        // console.log(`高度变化为: ${height}px`);
         scrollToBottom();
       });
     });
@@ -49,7 +49,7 @@ export default function ChatBox(props: IChatBox) {
           key={chatItem.id}
         />
       ))}
-      <div ref={anchorRef}>这个div做滚动进入视图</div>
+      <div ref={anchorRef} className="h-5"></div>
     </div>
   );
 }

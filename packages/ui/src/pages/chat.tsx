@@ -1,12 +1,13 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import ChatInput from "@/components/chatInput";
 import ChatSidebar from "@/components/chatSidebar";
 import ChatBox from "@/components/chatBox";
 import { useEffect, useRef, useState } from "react";
-import type { IChatItem } from "@/components/chatBox";
+import type { IChatItem } from "@/components/chatBox/ChatItem";
 export default function Chat() {
   const location = useLocation();
+  const navigate = useNavigate();
   const formValues = location.state;
   const [chatList, setChatList] = useState<IChatItem[]>([]);
   const hasSend = useRef<boolean>(false);
@@ -24,14 +25,15 @@ export default function Chat() {
   };
   // 这里接受其他页面传过来的值，直接发送消息
   useEffect(() => {
-    if (formValues && hasSend.current === false) {
+    if (formValues && hasSend.current===false) {
       setChatList([
         ...chatList,
         { id: "1", role: "user", content: formValues.message },
         { id: "2", role: "assistant", content: "..." },
       ]);
       sendMessage(formValues.agentType, formValues.message);
-      hasSend.current = true;
+      hasSend.current=true
+      navigate(location.pathname, { replace: true, state: null });
     }
   }, []);
   useEffect(() => {
@@ -64,7 +66,7 @@ export default function Chat() {
         <div className="h-14 leading-14 text-center bg-amber-800">head</div>
         <div
           className="overflow-y-auto flex-1 scroll-smooth flex justify-center"
-          style={{scrollbarWidth:'none'}}
+          style={{ scrollbarWidth: "none" }}
         >
           <ChatBox chatList={chatList} className="w-3xl bg-white h-fit" />
         </div>
