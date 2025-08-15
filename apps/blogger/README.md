@@ -18,7 +18,7 @@ wss://www.ryandev.cn/_next/webpack-hmr ws://127.0.0.1:3000/_next/webpack-hmr
 
 ## 部署
 
-- 在生成环境运动`npx prisma generate`，生成 prisma 客户端
+- 在生产环境运动`npx prisma generate`，生成 prisma 客户端
 - 在生产环境运行`npx prisma migrate deploy`，将数据库迁移文件中的更改同步到生产数据库
 - 运行`npm run build`构建项目
 - 运行`npm run start`启动项目

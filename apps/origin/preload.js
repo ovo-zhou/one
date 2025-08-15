@@ -12,6 +12,12 @@ contextBridge.exposeInMainWorld("agent", {
       ipcRenderer.removeListener("onMessage", handler);
     }
   },
+  getAgentPrompt:()=>{
+    return ipcRenderer.invoke("getAgentPrompt");
+  },
+  updateAgentPrompt:(prompt)=>{
+    return ipcRenderer.invoke("updateAgentPrompt", prompt);
+  }
 });
 contextBridge.exposeInMainWorld("bridge", {
   ping: () => {

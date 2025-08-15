@@ -8,7 +8,7 @@ generator client {
 }
 
 model Conversation {
-  id        Int    @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   title     String?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @default(now()) @updatedAt
@@ -16,7 +16,7 @@ model Conversation {
 }
 
 model Message {
-  id             Int            @id @default(autoincrement())
+  id             Int               @id @default(autoincrement())
   conversationId Int
   role           String
   content        String
@@ -28,9 +28,15 @@ model Message {
 }
 
 model MessageMetadata {
-  id              Int  @id @default(autoincrement())
+  id              Int     @id @default(autoincrement())
   messageId       Int
   metadataType    String?
   metadataContent String?
   message         Message @relation(fields: [messageId], references: [id])
+}
+
+model AgentPrompt {
+  id        Int    @id @default(autoincrement())
+  agentName String
+  prompt    String
 }

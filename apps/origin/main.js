@@ -29,6 +29,14 @@ app.on("ready", () => {
     // 结束时发送一个空字符串，表示消息结束
     event.sender.send("onMessage", JSON.stringify(""));
   });
+  ipcMain.handle("getAgentPrompt", async () => {
+    const prompt = await agentSdk.getAgentPrompt();
+    console.log('获取agent',prompt);
+    return prompt;
+  });
+  ipcMain.handle("updateAgentPrompt", async (event, prompt) => {
+    return await agentSdk.updateAgentPrompt(prompt);
+  });
   createWindow();
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
@@ -40,10 +48,3 @@ app.on("window-all-closed", () => {
     app.quit();
   }
 });
-// 这里使用动态倒入，避免在生成环境引入
-// if(isDev){
-//     require("electron-reloader")(module,{
-//       debug:true,
-//       watchRenderer:false
-//     });
-// }
