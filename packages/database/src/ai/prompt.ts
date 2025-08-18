@@ -6,33 +6,23 @@ export async function getAgentPrompt(): Promise<AgentPrompt[]> {
 }
 export async function getAgentPromptByAgentName(agentName: string): Promise<AgentPrompt[]> {
   const agentPrompt = await prismaClient.agentPrompt.findMany({
-    where:{
+    where: {
       agentName
     }
   })
   return agentPrompt
 }
-export async function updateAgentPrompt(prompt:AgentPrompt[]):Promise<number[]>{
-  const updateList=prompt.filter(it=>it.id>=0)
-  const createList=prompt.filter(it=>it.id<0)
-  console.log('update',updateList,createList)
-  const updateResults:number[]=[]
-  const createResults:number[]=[]
-  updateList.forEach( async item=>{
-    const res=await prismaClient.agentPrompt.update({
-      where:{
-        id:item.id
-      },
-      data:item
-    })
-    updateResults.push(res.id)
+export async function createAgentPrompt(prompt: Pick<AgentPrompt, 'agentName' | 'prompt'>): Promise<AgentPrompt> {
+  const res = await prismaClient.agentPrompt.create({
+    data:prompt
   })
-  createList.forEach( async item=>{
-
-    const res=await prismaClient.agentPrompt.create({
-      data:item
-    })
-    createResults.push(res.id)
+  return res;
+}
+export async function deleteAgentPrompt(id: number) {
+  const id_ = await prismaClient.agentPrompt.delete({
+    where: {
+      id
+    }
   })
-  return [...updateResults,...createResults]
+  return id_
 }

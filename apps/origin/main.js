@@ -34,8 +34,12 @@ app.on("ready", () => {
     console.log('获取agent',prompt);
     return prompt;
   });
-  ipcMain.handle("updateAgentPrompt", async (event, prompt) => {
-    return await agentSdk.updateAgentPrompt(prompt);
+  ipcMain.handle("createAgentPrompt", async (event, prompt) => {
+    console.log("创建agent", prompt);
+    return await agentSdk.createAgentPrompt(prompt);
+  });
+  ipcMain.handle("deleteAgentPrompt", async (event, id) => {
+    return await agentSdk.deleteAgentPrompt(id);
   });
   createWindow();
   app.on("activate", () => {

@@ -1,23 +1,26 @@
 const { contextBridge, ipcRenderer } =require("electron");
 contextBridge.exposeInMainWorld("agent", {
-  sendMessage:(agent,messages)=>{
+  sendMessage: (agent, messages) => {
     ipcRenderer.send("sendMessage", agent, messages);
   },
-  onMessage:(callback)=>{
+  onMessage: (callback) => {
     const handler = (event, data) => {
       callback(data);
-    }
+    };
     ipcRenderer.on("onMessage", handler);
-    return ()=>{
+    return () => {
       ipcRenderer.removeListener("onMessage", handler);
-    }
+    };
   },
-  getAgentPrompt:()=>{
+  getAgentPrompt: () => {
     return ipcRenderer.invoke("getAgentPrompt");
   },
-  updateAgentPrompt:(prompt)=>{
-    return ipcRenderer.invoke("updateAgentPrompt", prompt);
-  }
+  createAgentPrompt: (prompt) => {
+    return ipcRenderer.invoke("createAgentPrompt", prompt);
+  },
+  deleteAgentPrompt: (id) => {
+    return ipcRenderer.invoke("deleteAgentPrompt", id);
+  },
 });
 contextBridge.exposeInMainWorld("bridge", {
   ping: () => {

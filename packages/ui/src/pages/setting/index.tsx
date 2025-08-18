@@ -1,27 +1,89 @@
 import { useNavigate } from "react-router-dom";
-import H1 from "@/components/Typography/H1";
-import H2 from "@/components/Typography/H2";
-import { Button } from "@/components/ui/button";
+import { Calendar, Home, Inbox, Search, Settings } from "lucide-react";
 import { Outlet } from "react-router-dom";
-
+import {
+  SidebarProvider,
+  SidebarTrigger,
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarHeader,
+  SidebarGroupLabel,
+  SidebarGroupContent,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+} from "@/components/ui/sidebar";
+const menu = [
+  {
+    group: "agent",
+    items: [
+      {
+        title: "首页",
+        url: "/",
+        icon: Home,
+      },
+      {
+        title: "提示词配置",
+        url: "/setting/agent",
+        icon: Inbox,
+      },
+      {
+        title: "Calendar",
+        url: "#",
+        icon: Calendar,
+      },
+      {
+        title: "Search",
+        url: "#",
+        icon: Search,
+      },
+      {
+        title: "Settings",
+        url: "#",
+        icon: Settings,
+      },
+    ],
+  },
+];
 export default function Setting() {
-  const navigate = useNavigate();
   return (
-    <div className="mt-0 mx-auto w-3xl">
-      <H1>设置</H1>
-      <H2>
-        <div onClick={()=>navigate('/setting/agent')}>提示词配置</div>
-      </H2>
-      <Button
-        className="w-full"
-        variant="secondary"
-        onClick={() => {
-          navigate("/ ");
-        }}
-      >
-        返回
-      </Button>
-      <Outlet/>
-    </div>
+    <SidebarProvider>
+      <Sidebar>
+        <SidebarHeader>
+          <div>管理控制台</div>
+        </SidebarHeader>
+        <SidebarContent>
+          {menu.map(i=>{
+            return (
+              <SidebarGroup key={i.group}>
+                <SidebarGroupLabel>{i.group}</SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarMenu>
+                    {i.items.map((item) => (
+                      <SidebarMenuItem key={item.title}>
+                        <SidebarMenuButton asChild>
+                          <a href={item.url}>
+                            <item.icon />
+                            <span>{item.title}</span>
+                          </a>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    ))}
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              </SidebarGroup>
+            );
+          })}
+
+        </SidebarContent>
+        <SidebarFooter>ryan 出品必属精品</SidebarFooter>
+      </Sidebar>
+      <main className="p-4 flex-1">
+        <SidebarTrigger />
+        <Outlet />
+      </main>
+    </SidebarProvider>
   );
 }
