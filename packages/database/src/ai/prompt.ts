@@ -26,3 +26,12 @@ export async function deleteAgentPrompt(id: number) {
   })
   return id_
 }
+export async function updateAgentPrompt(data: AgentPrompt): Promise<AgentPrompt> {
+  const res = await prismaClient.agentPrompt.update({
+    where: {
+      id: data.id
+    },
+    data
+  })
+  return res;
+}

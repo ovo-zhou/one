@@ -21,6 +21,9 @@ contextBridge.exposeInMainWorld("agent", {
   deleteAgentPrompt: (id) => {
     return ipcRenderer.invoke("deleteAgentPrompt", id);
   },
+  updateAgentPrompt: (data) => {
+    return ipcRenderer.invoke("updateAgentPrompt", data);
+  },
 });
 contextBridge.exposeInMainWorld("bridge", {
   ping: () => {

@@ -55,7 +55,7 @@ export default function Setting() {
           <div>管理控制台</div>
         </SidebarHeader>
         <SidebarContent>
-          {menu.map(i=>{
+          {menu.map((i) => {
             return (
               <SidebarGroup key={i.group}>
                 <SidebarGroupLabel>{i.group}</SidebarGroupLabel>
@@ -76,12 +76,13 @@ export default function Setting() {
               </SidebarGroup>
             );
           })}
-
         </SidebarContent>
         <SidebarFooter>ryan 出品必属精品</SidebarFooter>
       </Sidebar>
       <main className="p-4 flex-1">
-        <SidebarTrigger />
+        <header>
+          <SidebarTrigger />
+        </header>
         <Outlet />
       </main>
     </SidebarProvider>
