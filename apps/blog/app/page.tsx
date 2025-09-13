@@ -1,5 +1,6 @@
 import Image from "next/image";
 import tcb from "@cloudbase/node-sdk";
+import { unstable_cacheLife as cacheLife } from "next/cache";
 const app = tcb.init({
   secretId: process.env.SecretId,
   secretKey: process.env.SecretKey,
@@ -8,6 +9,8 @@ const app = tcb.init({
 const { models } = app;
 const list = async () => {
   try {
+    ("use cache");
+    cacheLife("blog");
     const { data } = await models.blog.list({
       filter: {
         where: {},
