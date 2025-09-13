@@ -13,6 +13,9 @@ RUN yarn
 # 复制项目文件
 COPY . .
 
+ARG SecretId
+ARG SecretKey
+
 # 构建应用
 RUN yarn build
 
