@@ -13,6 +13,10 @@ RUN yarn
 # 复制项目文件
 COPY . .
 
+RUN echo "===== 所有环境变量 =====" && \
+    env && \
+    echo "========================"
+
 ARG SecretId
 ARG SecretKey
 
