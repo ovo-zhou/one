@@ -16,6 +16,9 @@ COPY . .
 ARG SecretId
 ARG SecretKey
 
+RUN echo "SecretId=${SecretId}"
+RUN echo "SecretKey=${SecretKey}"
+
 # 构建应用
 RUN yarn build
 
