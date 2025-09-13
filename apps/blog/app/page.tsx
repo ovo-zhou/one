@@ -24,7 +24,8 @@ const list = async () => {
     return { records: [] };
   }
 };
-
+// 每隔一小时重新生成一次
+export const revalidate = 3600;
 export default async function Home() {
   const data = await list();
   const { records = [] } = data;
