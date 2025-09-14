@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@cloudbase/node-sdk": "^3.10.1",
+    "dayjs": "^1.11.18",
     "next": "15.5.3",
     "react": "19.1.0",
     "react-dom": "19.1.0"
