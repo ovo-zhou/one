@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import Link from "next/link";
 import { getPostList } from "@/tcb/models/post";
+import ThemeToggle from "@/components/ThemeSelect";
 
 // 过期时间
 export const revalidate = 3600;
@@ -11,6 +12,7 @@ export default async function Home() {
   return (
     <main className="w-full">
       <div className="mt-0 mx-auto w-full sm:w-full md:w-8/12 lg:w-xl xl:w-2xl 2xl:w-3xl">
+        <ThemeToggle />
         {records?.map((item) => (
           <Link href={`/blog/${item._id}`} key={item._id}>
             <div className="p-4 cursor-pointer">
