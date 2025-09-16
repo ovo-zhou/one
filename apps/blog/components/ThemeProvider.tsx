@@ -1,5 +1,6 @@
 "use client";
 import { createContext, useContext, useEffect, useState } from "react";
+import { setTheme as setThemeAction } from "@/actions/setTheme";
 export enum Theme {
   Dark = "dark",
   Light = "light",
@@ -9,18 +10,19 @@ type ThemeContextType = {
   setTheme: (theme: Theme) => void;
 };
 const themeContext = createContext<ThemeContextType | null>(null);
-const getInitialTheme = () => {
-  if (typeof window === "undefined") return Theme.Light;
-
-  return (localStorage.getItem("theme") || Theme.Light) as Theme;
-};
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(getInitialTheme());
+export function ThemeProvider({
+  children,
+  initTheme,
+}: {
+  children: React.ReactNode;
+  initTheme: Theme;
+}) {
+  const [theme, setTheme] = useState<Theme>(initTheme);
   useEffect(() => {
     const htmlElement = document.documentElement;
     // 跟随系统
     htmlElement.dataset.theme = theme;
-    localStorage.setItem("theme", theme);
+    setThemeAction(theme);
   }, [theme]);
   return (
     <themeContext.Provider value={{ theme, setTheme }}>

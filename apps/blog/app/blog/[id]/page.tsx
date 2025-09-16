@@ -31,7 +31,7 @@ export default async function Page({
   return (
       <div>
         <h1 className="text-3xl font-bold">{data.title}</h1>
-        <div className="text-xs text-gray-500 mt-0.5 mb-2 flex justify-start gap-2">
+        <div className="text-xs text-gray-500 mt-4 mb-6 flex justify-start gap-2">
           <div>
             创建于：{dayjs(data.createdAt).format("YYYY-MM-DD HH:mm:ss")}
           </div>

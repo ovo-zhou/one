@@ -22,15 +22,13 @@ export default function ThemeSelect() {
   const { theme, setTheme } = useTheme();
   return (
     <div className="flex items-center gap-2">
-      {options.map(option=>{
+      {options.map((option) => {
         return (
           <div
-            className="cursor-pointer p-1 rounded-md"
+            className={`cursor-pointer p-1 rounded-md`}
             key={option.value}
             onClick={() => setTheme(option.value)}
-            style={{
-              backgroundColor: theme === option.value ? option.bg : undefined,
-            }}
+            style={{backgroundColor: theme === option.value ? option.bg : undefined}}
           >
             <option.icon size={16} />
           </div>
