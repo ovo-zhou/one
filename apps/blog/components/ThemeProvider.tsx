@@ -3,7 +3,6 @@ import { createContext, useContext, useEffect, useState } from "react";
 export enum Theme {
   Dark = "dark",
   Light = "light",
-  System = "system",
 }
 type ThemeContextType = {
   theme: Theme;
@@ -11,29 +10,17 @@ type ThemeContextType = {
 };
 const themeContext = createContext<ThemeContextType | null>(null);
 const getInitialTheme = () => {
-  if (typeof window === "undefined") return Theme.System;
+  if (typeof window === "undefined") return Theme.Light;
 
-  return (localStorage.getItem("theme") || Theme.System) as Theme;
+  return (localStorage.getItem("theme") || Theme.Light) as Theme;
 };
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>(getInitialTheme());
   useEffect(() => {
     const htmlElement = document.documentElement;
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     // 跟随系统
-    if (theme === Theme.System) {
-      htmlElement.dataset.theme = mediaQuery.matches ? Theme.Dark : Theme.Light;
-    } else {
-      htmlElement.dataset.theme = theme;
-    }
+    htmlElement.dataset.theme = theme;
     localStorage.setItem("theme", theme);
-    function handleChange(e: MediaQueryListEvent) {
-      document.documentElement.dataset.theme = e.matches ? "dark" : "light";
-    }
-    mediaQuery.addEventListener("change", handleChange);
-    return () => {
-      mediaQuery.removeEventListener("change", handleChange);
-    };
   }, [theme]);
   return (
     <themeContext.Provider value={{ theme, setTheme }}>

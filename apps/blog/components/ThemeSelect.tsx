@@ -1,33 +1,38 @@
 "use client";
 
 import { useTheme, Theme } from "./ThemeProvider";
+import { MoonStar, Sun } from "lucide-react";
+
 const options = [
   {
     label: "light",
     value: Theme.Light,
+    icon: Sun,
+    bg: "#eee",
   },
   {
     label: "dark",
     value: Theme.Dark,
-  },
-  {
-    label: "system",
-    value: Theme.System,
+    icon: MoonStar,
+    bg: "#3d3d3d",
   },
 ];
+
 export default function ThemeSelect() {
   const { theme, setTheme } = useTheme();
   return (
-    <div>
+    <div className="flex items-center gap-2">
       {options.map(option=>{
         return (
           <div
+            className="cursor-pointer p-1 rounded-md"
             key={option.value}
-            onClick={() =>
-              setTheme(option.value)
-            }
+            onClick={() => setTheme(option.value)}
+            style={{
+              backgroundColor: theme === option.value ? option.bg : undefined,
+            }}
           >
-            {option.label}
+            <option.icon size={16} />
           </div>
         );
       })}

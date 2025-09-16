@@ -1,4 +1,3 @@
-
 import { notFound } from "next/navigation";
 import dayjs from "dayjs";
 import { getPostList, getPostDetail } from "@/tcb/models/post";
@@ -30,21 +29,17 @@ export default async function Page({
     return notFound();
   }
   return (
-    <main className="container">
-      <div className="mt-0 mx-auto w-full sm:w-full md:w-8/12 lg:w-xl xl:w-2xl 2xl:w-3xl">
-        <div className="p-4">
-          <h1 className="text-3xl font-bold">{data.title}</h1>
-          <div className="text-xs text-gray-500 mt-0.5 mb-2 flex justify-start gap-2">
-            <div>
-              创建于：{dayjs(data.createdAt).format("YYYY-MM-DD HH:mm:ss")}
-            </div>
-            <div>
-              最近更新：{dayjs(data.updatedAt).format("YYYY-MM-DD HH:mm:ss")}
-            </div>
+      <div>
+        <h1 className="text-3xl font-bold">{data.title}</h1>
+        <div className="text-xs text-gray-500 mt-0.5 mb-2 flex justify-start gap-2">
+          <div>
+            创建于：{dayjs(data.createdAt).format("YYYY-MM-DD HH:mm:ss")}
           </div>
-          <Markdown>{data.content}</Markdown>
+          <div>
+            最近更新：{dayjs(data.updatedAt).format("YYYY-MM-DD HH:mm:ss")}
+          </div>
         </div>
+        <Markdown>{data.content}</Markdown>
       </div>
-    </main>
   );
 }
