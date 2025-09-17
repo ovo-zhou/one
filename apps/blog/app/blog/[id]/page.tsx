@@ -2,6 +2,12 @@ import { notFound } from "next/navigation";
 import dayjs from "dayjs";
 import { getPostDetail } from "@/tcb/models/post";
 import Markdown from "react-markdown";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "详情",
+  description: "ryan 出品, 必属精品",
+};
 
 export default async function Page({
   params,

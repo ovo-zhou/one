@@ -2,18 +2,16 @@
 
 import dayjs from "dayjs";
 import Link from "next/link";
-import { getPostList, Post } from "@/tcb/models/post";
-import { useState, useEffect, useMemo } from "react";
 import { usePost } from "@/components/PostProvider";
 
 export default function Home() {
-  const { loading, records, total, pageNumber, hasMore, loadMore } = usePost();
+  const { loading, records, hasMore, loadMore } = usePost();
   return (
     <>
       {records?.map((item) => (
         <div
           key={item._id}
-          className="cursor-pointer rounded-md p-4 mb-10 group hover:bg-gray-100 dark:hover:bg-slate-700"
+          className="cursor-pointer rounded-md p-4 mb-15 group"
         >
           <Link href={`/blog/${item._id}`}>
             <h1 className="text-3xl font-bold group-hover:underline decoration-pink-500 underline-offset-4">
