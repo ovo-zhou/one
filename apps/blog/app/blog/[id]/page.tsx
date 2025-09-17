@@ -1,19 +1,7 @@
 import { notFound } from "next/navigation";
 import dayjs from "dayjs";
-import { getPostList, getPostDetail } from "@/tcb/models/post";
+import { getPostDetail } from "@/tcb/models/post";
 import Markdown from "react-markdown";
-
-// 静态页面生成参数
-export async function generateStaticParams() {
-  try {
-    const { records = [] } = await getPostList();
-    return records.map((post) => ({
-      id: String(post._id),
-    }));
-  } catch (_) {
-    return [];
-  }
-}
 
 export default async function Page({
   params,

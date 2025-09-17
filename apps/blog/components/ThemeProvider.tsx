@@ -1,15 +1,20 @@
 "use client";
+
 import { createContext, useContext, useEffect, useState } from "react";
 import { setTheme as setThemeAction } from "@/actions/setTheme";
+
 export enum Theme {
   Dark = "dark",
   Light = "light",
 }
+
 type ThemeContextType = {
   theme: Theme;
   setTheme: (theme: Theme) => void;
 };
+
 const themeContext = createContext<ThemeContextType | null>(null);
+
 export function ThemeProvider({
   children,
   initTheme,

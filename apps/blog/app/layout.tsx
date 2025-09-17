@@ -7,6 +7,7 @@ import { Sailboat } from "lucide-react";
 import "./globals.css";
 import Link from "next/link";
 import { cookies } from "next/headers";
+import PostProvider from "@/components/PostProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,20 +38,22 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased dark:bg-gray-800 dark:text-white transition-colors duration-300`}
       >
         <ThemeProvider initTheme={theme}>
-          <header className="sticky top-0 z-10 bg-white dark:bg-slate-800 shadow-md">
-            <nav className="p-4 mx-auto w-full sm:w-full md:w-8/12 lg:w-xl xl:w-2xl 2xl:w-3xl flex justify-between">
-              <div className="flex gap-4 items-center">
-                <Sailboat />
-                <Link className="text-sm" href="/">
-                  首页
-                </Link>
-              </div>
-              <ThemeSelect />
-            </nav>
-          </header>
-          <main className="p-4 mx-auto z-0 w-full sm:w-full md:w-8/12 lg:w-xl xl:w-2xl 2xl:w-3xl">
-            {children}
-          </main>
+          <PostProvider>
+            <header className="sticky top-0 z-10 bg-white dark:bg-slate-800 shadow-md">
+              <nav className="p-4 mx-auto w-full sm:w-full md:w-8/12 lg:w-xl xl:w-2xl 2xl:w-3xl flex justify-between">
+                <div className="flex gap-4 items-center">
+                  <Sailboat />
+                  <Link className="text-sm" href="/">
+                    首页
+                  </Link>
+                </div>
+                <ThemeSelect />
+              </nav>
+            </header>
+            <main className="p-4 mx-auto z-0 w-full sm:w-full md:w-8/12 lg:w-xl xl:w-2xl 2xl:w-3xl">
+              {children}
+            </main>
+          </PostProvider>
         </ThemeProvider>
       </body>
     </html>

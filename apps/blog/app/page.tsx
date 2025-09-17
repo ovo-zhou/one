@@ -4,24 +4,10 @@ import dayjs from "dayjs";
 import Link from "next/link";
 import { getPostList, Post } from "@/tcb/models/post";
 import { useState, useEffect, useMemo } from "react";
+import { usePost } from "@/components/PostProvider";
 
 export default function Home() {
-  const [loading, setLoading] = useState(false);
-  const [records, setRecords] = useState<Post[]>([]);
-  const [total, setTotal] = useState<number | undefined>(0);
-  const [pageNumber, setPageNumber] = useState(1);
-  const hasMore = useMemo(() => records.length < (total || 0), [records, total]);
-  const query = async () => {
-    setLoading(true);
-    const data = await getPostList(pageNumber);
-    const { records : newRecords = [], total: newTotal } = data;
-    setRecords([...records, ...newRecords]);
-    setTotal(newTotal);
-    setLoading(false);
-  }
-  useEffect(() => {
-    query();
-  }, [pageNumber]);
+  const { loading, records, total, pageNumber, hasMore, loadMore } = usePost();
   return (
     <>
       {records?.map((item) => (
@@ -49,11 +35,12 @@ export default function Home() {
       ))}
       {hasMore && (
         <div
+          className="text-center text-pink-500 cursor-pointer text-xs"
           onClick={() => {
-            setPageNumber(pageNumber + 1);
+            loadMore();
           }}
         >
-          {loading ? "加载中" : "加载更多"}
+          {loading ? "加载中..." : "加载更多"}
         </div>
       )}
     </>
