@@ -1,7 +1,6 @@
 'use server';
 
 import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
 
 export async function setTheme(theme:string) {
   // 设置 Cookie，有效期 30 天，路径为根目录
@@ -12,5 +11,6 @@ export async function setTheme(theme:string) {
     httpOnly: false, // 允许客户端读取（如需客户端也访问）
     secure: process.env.NODE_ENV === 'production', // 生产环境使用 HTTPS
   });
-  return 0; // 设置后重定向回首页
+  // 这里的返回值其实没有意义，只是为了播种 cookies
+  return void 0; 
 }

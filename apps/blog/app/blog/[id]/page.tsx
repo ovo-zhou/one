@@ -3,9 +3,6 @@ import dayjs from "dayjs";
 import { getPostList, getPostDetail } from "@/tcb/models/post";
 import Markdown from "react-markdown";
 
-// 过期时间
-export const revalidate = 3600;
-
 // 静态页面生成参数
 export async function generateStaticParams() {
   try {

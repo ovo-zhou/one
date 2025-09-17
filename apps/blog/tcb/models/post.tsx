@@ -1,9 +1,10 @@
+'use server';
 import { app } from "@/tcb";
 import { pageSize } from "@/tcb/models/constants";
 
 const { models } = app;
 
-interface Post {
+export interface Post {
   owner: string;
   createdAt: number;
   createBy: string;
@@ -16,26 +17,30 @@ interface Post {
   updatedAt: number;
 }
 
-interface PostList {
+export interface PostList {
   records: Post[];
   total?: number;
 }
-
-export const getPostList: () => Promise<PostList> = async () => {
+/**
+ * 获取文章列表
+ * @param pageNumber 页码，默认第 1 页
+ * @returns 文章列表
+ */
+export async function getPostList(pageNumber: number = 1): Promise<PostList> {
   try {
     const { data } = await models.blog.list({
       filter: {
         where: {},
       },
       pageSize, // 分页大小，建议指定，如需设置为其它值，需要和 pageNumber 配合使用，两者同时指定才会生效
-      pageNumber: 1, // 第几页
+      pageNumber, // 第几页
       getCount: true, // 开启用来获取总数
     });
     return data;
   } catch {
-    return { records: [],total:0 };
+    return { records: [], total: 0 };
   }
-};
+}
 
 export const getPostDetail: (id: string) => Promise<Post> = async (id) => {
   try {

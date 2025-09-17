@@ -1,14 +1,27 @@
+'use client';
+
 import dayjs from "dayjs";
 import Link from "next/link";
-import { getPostList } from "@/tcb/models/post";
-import ThemeSelect from "@/components/ThemeSelect";
+import { getPostList, Post } from "@/tcb/models/post";
+import { useState, useEffect, useMemo } from "react";
 
-// 过期时间
-export const revalidate = 3600;
-
-export default async function Home() {
-  const data = await getPostList();
-  const { records = []} = data;
+export default function Home() {
+  const [loading, setLoading] = useState(false);
+  const [records, setRecords] = useState<Post[]>([]);
+  const [total, setTotal] = useState<number | undefined>(0);
+  const [pageNumber, setPageNumber] = useState(1);
+  const hasMore = useMemo(() => records.length < (total || 0), [records, total]);
+  const query = async () => {
+    setLoading(true);
+    const data = await getPostList(pageNumber);
+    const { records : newRecords = [], total: newTotal } = data;
+    setRecords([...records, ...newRecords]);
+    setTotal(newTotal);
+    setLoading(false);
+  }
+  useEffect(() => {
+    query();
+  }, [pageNumber]);
   return (
     <>
       {records?.map((item) => (
@@ -34,6 +47,15 @@ export default async function Home() {
           <div className="text-base mt-2">{item.abstract}</div>
         </div>
       ))}
+      {hasMore && (
+        <div
+          onClick={() => {
+            setPageNumber(pageNumber + 1);
+          }}
+        >
+          {loading ? "加载中" : "加载更多"}
+        </div>
+      )}
     </>
   );
 }
