@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import dayjs from "dayjs";
 import { getPostDetail } from "@/tcb/models/post";
-import Markdown from "react-markdown";
+import Markdown from "@/components/markdown";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
