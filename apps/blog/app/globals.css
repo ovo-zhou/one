@@ -3,4 +3,35 @@
 
 html {
   scrollbar-width: none;
+  scroll-padding-top: 56px;
+  scroll-behavior: smooth;
+}
+
+::selection {
+  background-color: var(--color-pink-200);
+}
+
+@layer components {
+  .markdown {
+    @apply leading-8;
+
+    ul {
+      @apply pl-4;  
+      @apply mb-4;
+      @apply list-disc;
+    }
+
+    ol {
+      @apply pl-4;
+      @apply mb-4;
+      @apply list-decimal;
+    }
+
+    p {
+      @apply mb-4;
+    }
+    hr {
+      @apply border-2 border-gray-300 my-4;
+    }
+  }
 }

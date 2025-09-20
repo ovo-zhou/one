@@ -4,10 +4,10 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import ThemeSelect from "@/components/ThemeSelect";
 import { Theme } from "@/components/ThemeProvider";
 import { Sailboat } from "lucide-react";
-import "./globals.css";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import PostProvider from "@/components/PostProvider";
+import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
