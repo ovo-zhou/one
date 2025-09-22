@@ -40,8 +40,9 @@ const H = (props: HProps) => {
     >
       {children}
       <span
-        onClick={() => {
-          console.log("copy");
+        onClick={async (e) => {
+        e.stopPropagation()
+          navigator.clipboard.writeText(window.location.href);
         }}
         className="hidden group-hover:text-blue-300 group-hover:inline-block ml-2 underline"
       >
