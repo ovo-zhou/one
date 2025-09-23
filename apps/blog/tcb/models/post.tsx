@@ -1,4 +1,4 @@
-'use server';
+"use server";
 import { app } from "@/tcb";
 import { pageSize } from "@/tcb/models/constants";
 

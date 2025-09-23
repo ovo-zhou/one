@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   /* config options here */
   experimental: {
     serverActions: {
-      allowedOrigins: ['*'],
+      allowedOrigins: ['ryandev.cn', '*.ap-shanghai.run.wxcloudrun.com'],
     },
   },
 };
