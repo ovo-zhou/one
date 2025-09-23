@@ -33,7 +33,7 @@ export default async function RootLayout({
   // 默认 light 主题
   const theme = (cookie?.get("theme")?.value || Theme.Light) as Theme;
   return (
-    <html lang="en" data-theme={theme}>
+    <html lang="en" data-theme={theme} data-scroll-behavior="smooth">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased dark:bg-gray-800 dark:text-white transition-colors duration-300`}
       >
