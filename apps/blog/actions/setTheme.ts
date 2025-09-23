@@ -1,14 +1,10 @@
 'use server';
 
 import { cookies } from 'next/headers';
-import { headers } from 'next/headers';
 
 export async function setTheme(theme:string) {
   // 设置 Cookie，有效期 30 天，路径为根目录
   const cookie = await cookies();
-  const header=await headers()
-  console.log('x-forwarded-host',header.get('x-forwarded-host'))
-  console.log('origin',header.get('origin'))
   cookie.set('theme', theme, {
     maxAge: 60 * 60 * 24 * 30, // 30 天
     path: '/', // 全站可用

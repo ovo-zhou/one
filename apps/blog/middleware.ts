@@ -4,8 +4,6 @@ export function middleware(request: NextRequest) {
   const requestHeaders = new Headers(request.headers)
   const origin = requestHeaders.get('origin')
   const xForwardedHost = requestHeaders.get('x-forwarded-host')
-  console.log('originxxx', origin)
-  console.log('xForwardedHostxxx', xForwardedHost)
   // 如果两者不一致，统一设置为相同的值
   if (origin && xForwardedHost && origin !== xForwardedHost) {
     requestHeaders.set('x-forwarded-host', new URL(origin).host)
