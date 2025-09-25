@@ -1,6 +1,6 @@
 import { Components } from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { dark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 interface HProps {
   children: React.ReactNode;
   level: number;
@@ -81,17 +81,20 @@ const components: Components = {
     const match = /language-(\w+)/.exec(className || "");
     return match ? (
       <SyntaxHighlighter
-        // {...rest}
         PreTag="div"
         children={String(children).replace(/\n$/, "")}
         language={match[1]}
-        style={dark}
+        style={vscDarkPlus}
       />
     ) : (
       <code {...rest} className={className}>
         {children}
       </code>
     );
+  },
+  blockquote(props) {
+    const { children } = props;
+    return <blockquote className="border-l-4 border-gray-300 pl-4 italic my-4">{children}</blockquote>;
   },
 };
 export default components;
