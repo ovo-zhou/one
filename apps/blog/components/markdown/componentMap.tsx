@@ -1,6 +1,7 @@
 import { Components } from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
+
 interface HProps {
   children: React.ReactNode;
   level: number;
@@ -41,7 +42,7 @@ const H = (props: HProps) => {
       {children}
       <span
         onClick={async (e) => {
-        e.stopPropagation()
+          e.stopPropagation();
           navigator.clipboard.writeText(window.location.href);
         }}
         className="hidden group-hover:text-blue-300 group-hover:inline-block ml-2 underline"
@@ -79,6 +80,7 @@ const components: Components = {
   code(props) {
     const { children, className, node, ...rest } = props;
     const match = /language-(\w+)/.exec(className || "");
+    // 代码块
     return match ? (
       <SyntaxHighlighter
         PreTag="div"
@@ -87,14 +89,27 @@ const components: Components = {
         style={vscDarkPlus}
       />
     ) : (
-      <code {...rest} className={className}>
+      // 普通代码
+      <code {...rest} className="bg-gray-200 dark:bg-black  px-1 rounded">
         {children}
       </code>
     );
   },
   blockquote(props) {
     const { children } = props;
-    return <blockquote className="border-l-4 border-gray-300 pl-4 italic my-4">{children}</blockquote>;
+    return (
+      <blockquote className="border-l-4 border-gray-300 pl-4 italic my-4">
+        {children}
+      </blockquote>
+    );
+  },
+  table(props) {
+    const { children } = props;
+    return (
+      <div className="overflow-x-auto">
+        <table>{children}</table>
+      </div>
+    );
   },
 };
 export default components;

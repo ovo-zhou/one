@@ -20,17 +20,15 @@ export default async function Page({
     return notFound();
   }
   return (
-      <div>
-        <h1 className="text-3xl font-bold">{data.title}</h1>
-        <div className="text-xs text-gray-500 mt-4 mb-6 flex justify-start gap-2">
-          <div>
-            创建于：{dayjs(data.createdAt).format("YYYY-MM-DD HH:mm:ss")}
-          </div>
-          <div>
-            最近更新：{dayjs(data.updatedAt).format("YYYY-MM-DD HH:mm:ss")}
-          </div>
+    <div>
+      <h1 className="text-3xl font-bold">{data.title}</h1>
+      <div className="text-xs text-gray-500 mt-4 mb-6 flex justify-start gap-2">
+        <div>创建于：{dayjs(data.createdAt).format("YYYY-MM-DD HH:mm:ss")}</div>
+        <div>
+          最近更新：{dayjs(data.updatedAt).format("YYYY-MM-DD HH:mm:ss")}
         </div>
-        <Markdown>{data.content}</Markdown>
       </div>
+      <Markdown>{data.content}</Markdown>
+    </div>
   );
 }
