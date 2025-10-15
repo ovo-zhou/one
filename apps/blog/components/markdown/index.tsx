@@ -5,7 +5,6 @@ import { useEffect } from "react";
 import remarkGfm from "remark-gfm";
 export default function Markdown({ children }: { children: string }) {
   const hash = window.location.hash.slice(1);
-  
   useEffect(() => {
     if (hash) {
       document.getElementById(hash)?.scrollIntoView({

@@ -1,6 +1,7 @@
 import { Components } from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
+import Image from "../Image";
 
 interface HProps {
   children: React.ReactNode;
@@ -109,6 +110,19 @@ const components: Components = {
       <div className="overflow-x-auto">
         <table>{children}</table>
       </div>
+    );
+  },
+  a(props) {
+    const { href, children } = props;
+    return (
+      <a
+        href={href}
+        className="text-blue-500 hover:underline"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {children}
+      </a>
     );
   },
 };
