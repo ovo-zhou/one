@@ -7,6 +7,8 @@ import { Sailboat } from "lucide-react";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import PostProvider from "@/components/PostProvider";
+import { Github } from "lucide-react";
+import { UserStar } from "lucide-react";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -47,7 +49,18 @@ export default async function RootLayout({
                     首页
                   </Link>
                 </div>
-                <ThemeSelect />
+                <div className="flex gap-4 items-center">
+                  <ThemeSelect />
+                  <Link href="https://github.com/ovo-zhou/one" target="_blank">
+                    <Github size={16} />
+                  </Link>
+                  <Link
+                    href="https://ryandev.cn/admin"
+                    target="_blank"
+                  >
+                    <UserStar size={16} />
+                  </Link>
+                </div>
               </nav>
             </header>
             <main className="p-4 mx-auto z-0 w-full sm:w-full md:w-8/12 lg:w-xl xl:w-2xl 2xl:w-3xl">
