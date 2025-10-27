@@ -11,7 +11,7 @@ export default function Home() {
       {records?.map((item) => (
         <div
           key={item._id}
-          className="cursor-pointer rounded-md p-4 mb-15 group"
+          className="cursor-pointer rounded-md p-4 mb-20 group"
         >
           <Link href={`/blog/${item._id}`}>
             <h1 className="text-3xl font-bold group-hover:underline decoration-pink-500 underline-offset-4">
@@ -19,7 +19,7 @@ export default function Home() {
             </h1>
           </Link>
 
-          <div className="text-xs text-gray-500 mt-4 mb-6 flex justify-start gap-2">
+          <div className="text-xs text-gray-500 mt-4 mb-4 flex justify-start gap-2">
             <div>
               创建于：{dayjs(item.createdAt).format("YYYY-MM-DD HH:mm:ss")}
             </div>

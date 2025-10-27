@@ -26,18 +26,19 @@ export default function ThemeSelect() {
   }, [theme]);
   const handleSwitchTheme = () => {
     setTheme(selectedOption.value === Theme.Light ? Theme.Dark : Theme.Light);
-  }
+  };
   return (
     <div
       onClick={handleSwitchTheme}
-      className="cursor-pointer relative rounded-[11px] bg-gray-100 dark:bg-gray-700 w-[48px] h-[22px] p-0.5 border-1 border-transparent hover:border-amber-600"
+      className="cursor-pointer relative rounded-[11px] bg-gray-100 dark:bg-gray-700 w-[40px] h-[22px] p-0.5 border-1 border-transparent hover:border-amber-600"
     >
       <div
-        className={`absolute rounded-[8px] w-[16px] h-[16px] bg-white dark:bg-black p-0.5 ${
-          selectedOption.value === Theme.Light
-            ? "top-0.5 left-0.5"
-            : "top-0.5 right-0.5"
-        }`}
+        className={`absolute rounded-[8px] w-[16px] h-[16px] bg-white dark:bg-black p-0.5 transition-left duration-300
+          ${
+            selectedOption.value === Theme.Light
+              ? "top-0.5 left-0.5"
+              : "top-0.5 left-5"
+          }`}
       >
         <selectedOption.icon size={12} />
       </div>
