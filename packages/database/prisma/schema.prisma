@@ -37,6 +37,6 @@ model MessageMetadata {
 
 model AgentPrompt {
   id        Int    @id @default(autoincrement())
-  agentName String
+  agentName String @unique
   prompt    String
 }
