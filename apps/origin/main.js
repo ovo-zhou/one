@@ -1,6 +1,5 @@
-const { app, BrowserWindow, ipcMain, screen } = require("electron");
+const { app, BrowserWindow, screen } = require("electron");
 const path = require("path");
-const agentSdk = require("agent");
 
 const isDev = !app.isPackaged;
 const createWindow = () => {
@@ -21,29 +20,6 @@ const createWindow = () => {
 };
 
 app.on("ready", () => {
-  ipcMain.on("sendMessage", async (event, agent, message) => {
-    const completion = await agentSdk.sendMessage(agent, message);
-    for await (let text of completion) {
-      event.sender.send("onMessage", JSON.stringify(text));
-    }
-    // 结束时发送一个空字符串，表示消息结束
-    event.sender.send("onMessage", JSON.stringify(""));
-  });
-  ipcMain.handle("getAgentPrompt", async () => {
-    const prompt = await agentSdk.getAgentPrompt();
-    console.log("获取agent", prompt);
-    return prompt;
-  });
-  ipcMain.handle("createAgentPrompt", async (event, prompt) => {
-    console.log("创建agent", prompt);
-    return await agentSdk.createAgentPrompt(prompt);
-  });
-  ipcMain.handle("deleteAgentPrompt", async (event, id) => {
-    return await agentSdk.deleteAgentPrompt(id);
-  });
-  ipcMain.handle("updateAgentPrompt", async (event, data) => {
-    return await agentSdk.updateAgentPrompt(data);
-  });
   createWindow();
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();

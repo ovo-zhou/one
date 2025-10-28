@@ -6,6 +6,7 @@ interface HProps {
   children: React.ReactNode;
   level: number;
 }
+
 const classNameOptions: string[] = [
   "text-[clamp(1.8rem,4vw,2.5rem)] font-bold  leading-tight mb-4",
   "text-[clamp(1.5rem,3.5vw,2rem)] font-bold leading-tight mb-3",
@@ -14,6 +15,7 @@ const classNameOptions: string[] = [
   "text-[clamp(1rem,2vw,1.25rem)] font-semibold leading-tight mb-0.5",
   "text-[clamp(0.9rem,1.5vw,1.1rem)] font-semibold leading-tight mb-0.25",
 ];
+
 // h1 到 h6 标题组件
 const H = (props: HProps) => {
   const { children, level } = props;
@@ -52,6 +54,7 @@ const H = (props: HProps) => {
     </div>
   );
 };
+
 const components: Components = {
   h1(props) {
     const { children } = props;
@@ -125,4 +128,5 @@ const components: Components = {
     );
   },
 };
+
 export default components;
