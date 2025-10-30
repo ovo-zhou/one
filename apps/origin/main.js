@@ -1,22 +1,33 @@
-const { app, BrowserWindow, screen } = require("electron");
-const path = require("path");
+import { app, BrowserWindow, screen } from "electron";
+import path from "path";
+import { fileURLToPath } from "url";
 
+console.log(
+  "App starting...",
+  path.join(path.dirname(fileURLToPath(import.meta.url)), "preload.js")
+);
+
+// 是否为开发环境
 const isDev = !app.isPackaged;
+
 const createWindow = () => {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
   const win = new BrowserWindow({
     width,
     height,
     webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
+      preload: path.join(
+        path.dirname(fileURLToPath(import.meta.url)),
+        "preload.js"
+      ),
     },
   });
   if (isDev) {
     win.loadURL("http://localhost:5173/");
     win.webContents.openDevTools();
-    return;
+  } else {
+    win.loadFile("app/dist/index.html");
   }
-  win.loadFile("app/dist/index.html");
 };
 
 app.on("ready", () => {

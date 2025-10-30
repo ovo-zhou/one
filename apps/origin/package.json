@@ -13,10 +13,10 @@
   "author": "ryan",
   "license": "ISC",
   "dependencies": {
-    "agent": "0.0.0"
+    "database": "0.0.0"
   },
   "devDependencies": {
-    "electron": "^36.5.0",
-    "electron-reloader": "^1.2.3"
-  }
+    "electron": "^36.5.0"
+  },
+  "type": "module"
 }
