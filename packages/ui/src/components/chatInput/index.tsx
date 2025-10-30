@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -11,10 +11,12 @@ import { Textarea } from "@/components/ui/textarea";
 interface IProps {
   submit: (value: { message: string; type: string }) => undefined;
 }
+
 export default function ChatInput(props: IProps) {
   const { submit } = props;
   const [message, setMessage] = useState<string>("");
-  const [type, setType] = useState<string>("normal");
+  const [type, setType] = useState<string>("");
+  const [options,setOptions]= useState<{id:number,agentName:string}[]>([])
   const handleSubmit = () => {
     if (message) {
       submit({ message, type });
@@ -46,6 +48,11 @@ export default function ChatInput(props: IProps) {
       }
     }
   };
+  useEffect(()=>{
+    window.agent.getAgentPrompt().then((prompt) => {
+      setOptions(prompt);
+    });
+  },[])
   return (
     <div className="relative max-w-3xl">
       <Textarea
@@ -68,9 +75,11 @@ export default function ChatInput(props: IProps) {
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
-            <SelectItem value="normal">通用</SelectItem>
-            <SelectItem value="code">编程</SelectItem>
-            <SelectItem value="banana">翻译</SelectItem>
+            {
+              options.map(item=>{
+                  return <SelectItem key={item.id} value={String(item.id)}>{item.agentName}</SelectItem>;
+              })
+            }
           </SelectGroup>
         </SelectContent>
       </Select>

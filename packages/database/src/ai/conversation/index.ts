@@ -1,5 +1,5 @@
 import { Conversation } from "@prisma/client";
-import prisma from "../prismaClient";
+import prisma from "../../prismaClient";
 /**
  * 创建会话
  */

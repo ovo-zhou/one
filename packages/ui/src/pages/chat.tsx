@@ -21,44 +21,44 @@ export default function Chat() {
       },
       { id: (+new Date() + 10).toString(), role: "assistant", content: "..." },
     ]);
-    window.agent.sendMessage(agent, message);
+    window.agent.chat({agentId:agent, message});
   };
   // 这里接受其他页面传过来的值，直接发送消息
-  useEffect(() => {
-    if (formValues && hasSend.current===false) {
-      setChatList([
-        ...chatList,
-        { id: "1", role: "user", content: formValues.message },
-        { id: "2", role: "assistant", content: "..." },
-      ]);
-      sendMessage(formValues.agentType, formValues.message);
-      hasSend.current=true
-      navigate(location.pathname, { replace: true, state: null });
-    }
-  }, []);
-  useEffect(() => {
-    let content = "";
-    const off = window.agent.onMessage((data: string) => {
-      const message: IChatItem = JSON.parse(data);
-      // 空字符串意味发送结束
-      if (!message) {
-        content = "";
-        return;
-      }
-      content += message.content;
-      setChatList((pre) => {
-        const newChatList = [...pre];
-        const lastChatItem = newChatList[newChatList.length - 1];
-        lastChatItem.id = message.id;
-        lastChatItem.role = message.role;
-        lastChatItem.content = content;
-        return newChatList;
-      });
-    });
-    return () => {
-      off();
-    };
-  }, []);
+  // useEffect(() => {
+  //   if (formValues && hasSend.current===false) {
+  //     setChatList([
+  //       ...chatList,
+  //       { id: "1", role: "user", content: formValues.message },
+  //       { id: "2", role: "assistant", content: "..." },
+  //     ]);
+  //     sendMessage(formValues.agentType, formValues.message);
+  //     hasSend.current=true
+  //     navigate(location.pathname, { replace: true, state: null });
+  //   }
+  // }, []);
+  // useEffect(() => {
+  //   let content = "";
+  //   const off = window.agent.onMessage((data: string) => {
+  //     const message: IChatItem = JSON.parse(data);
+  //     // 空字符串意味发送结束
+  //     if (!message) {
+  //       content = "";
+  //       return;
+  //     }
+  //     content += message.content;
+  //     setChatList((pre) => {
+  //       const newChatList = [...pre];
+  //       const lastChatItem = newChatList[newChatList.length - 1];
+  //       lastChatItem.id = message.id;
+  //       lastChatItem.role = message.role;
+  //       lastChatItem.content = content;
+  //       return newChatList;
+  //     });
+  //   });
+  //   return () => {
+  //     off();
+  //   };
+  // }, []);
   return (
     <SidebarProvider>
       <ChatSidebar />

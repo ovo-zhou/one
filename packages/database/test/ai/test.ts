@@ -1,5 +1,5 @@
 import { describe, expect, test, afterAll } from "@jest/globals";
-import { createAgentPrompt, deleteAgentPrompt, getAgentPrompt, getAgentPromptByAgentName, updateAgentPrompt } from "../../src/ai/prompt";
+import {  createAgentPrompt,deleteAgentPrompt, getAgentPrompt, getAgentPromptByAgentName, updateAgentPrompt } from "../../src/ai/prompt";
 describe("agent 提示词测试", () => {
   let id: number | null = null
   test("创建一个新的提示词", async () => {

@@ -1,5 +1,5 @@
 import { AgentPrompt } from "@prisma/client"
-import prismaClient from "../prismaClient"
+import prismaClient from "../../prismaClient"
 export async function getAgentPrompt(): Promise<AgentPrompt[]> {
   const agentPrompt = await prismaClient.agentPrompt.findMany()
   return agentPrompt
@@ -34,4 +34,8 @@ export async function updateAgentPrompt(data: AgentPrompt): Promise<AgentPrompt>
     data
   })
   return res;
+}
+
+export function hello() {
+  console.log("Hello, world!");
 }

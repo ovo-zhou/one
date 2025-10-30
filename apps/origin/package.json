@@ -13,7 +13,9 @@
   "author": "ryan",
   "license": "ISC",
   "dependencies": {
-    "database": "0.0.0"
+    "database": "0.0.0",
+    "dotenv": "^17.2.3",
+    "openai": "^6.7.0"
   },
   "devDependencies": {
     "electron": "^36.5.0"
