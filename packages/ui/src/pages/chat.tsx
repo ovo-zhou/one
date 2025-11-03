@@ -27,7 +27,7 @@ export default function Chat() {
   // 从首页条状过来，新创建一个绘画，然后发送消息
   // 第一次对话完成后，更新绘画标题为用户输入的内容
   useEffect(() => {
-    if (formValues && hasSend.current===false) {
+    if (formValues && hasSend.current === false) {
       setChatList((pre) => [
         ...pre,
         {
@@ -35,10 +35,14 @@ export default function Chat() {
           role: "user",
           content: formValues.message,
         },
-        { id: (+new Date() + 10).toString(), role: "assistant", content: "..." },
+        {
+          id: (+new Date() + 10).toString(),
+          role: "assistant",
+          content: "...",
+        },
       ]);
       sendMessage(formValues.agentId, formValues.message);
-      hasSend.current=true
+      hasSend.current = true;
       // 清空导航栏的 state
       navigate(location.pathname, { replace: true, state: null });
     }
