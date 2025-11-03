@@ -53,9 +53,9 @@ app.on("ready", () => {
   ipcMain.handle("agent:createPrompt", handleCreateAgentPrompt);
   ipcMain.handle("agent:deletePrompt", handleDeleteAgentPrompt);
   ipcMain.handle("agent:updatePrompt", handleUpdateAgentPrompt);
-  ipcMain.handle('agent:chat',async (event,data)=>{
-    const {type,message}=data;
-    await chat({agentId:type,message})
+  ipcMain.on('agent:chat',async (event,data)=>{
+    const {agentId,message}=data;
+    await chat({agentId,message},event.sender);
   })
   createWindow();
   app.on("activate", () => {

@@ -4,10 +4,10 @@ export async function getAgentPrompt(): Promise<AgentPrompt[]> {
   const agentPrompt = await prismaClient.agentPrompt.findMany()
   return agentPrompt
 }
-export async function getAgentPromptByAgentName(agentName: string): Promise<AgentPrompt|null> {
+export async function getAgentPromptByAgentID(id: number): Promise<AgentPrompt|null> {
   const agentPrompt = await prismaClient.agentPrompt.findUnique({
     where: {
-      agentName
+      id
     }
   })
   return agentPrompt

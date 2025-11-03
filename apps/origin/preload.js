@@ -17,9 +17,19 @@ contextBridge.exposeInMainWorld("agent", {
     return ipcRenderer.invoke("agent:deletePrompt", id);
   },
   updateAgentPrompt: (data) => {
-    ipcRenderer.invoke("agent:updatePrompt", data);
+    return ipcRenderer.invoke("agent:updatePrompt", data);
   },
-  chat:(data)=>{
-    ipcRenderer.invoke("agent:chat",data);
-  }
+  chat: (data) => {
+    return ipcRenderer.send("agent:chat", data);
+  },
+  onMessage: (callback) => {
+    ipcRenderer.on("agent:chat:message", (event, message) => {
+      callback(message);
+    });
+    // 返回一个取消监听的函数
+    const off = () => {
+      ipcRenderer.removeAllListeners("agent:chat:message");
+    };
+    return off;
+  },
 });

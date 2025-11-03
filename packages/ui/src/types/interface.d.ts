@@ -9,6 +9,8 @@ export interface IAgent{
   })=>Promise<void>;
   deleteAgentPrompt:(id:number)=>Promise<viod>;
   updateAgentPrompt: ({id: number, agentName: string, prompt: string})=>Promise<viod>
+  chat: (data: { agentId: string; message: string }) => void;
+  onMessage: (callback: (data: {id:string,role:string,content:string,finish:boolean}) => void) => () => void;
 }
 
 declare global {

@@ -1,5 +1,5 @@
 import { describe, expect, test, afterAll } from "@jest/globals";
-import {  createAgentPrompt,deleteAgentPrompt, getAgentPrompt, getAgentPromptByAgentName, updateAgentPrompt } from "../../src/ai/prompt";
+import {  createAgentPrompt,deleteAgentPrompt, getAgentPrompt, getAgentPromptByAgentID, updateAgentPrompt } from "../../src/ai/prompt";
 describe("agent 提示词测试", () => {
   let id: number | null = null
   test("创建一个新的提示词", async () => {
@@ -15,7 +15,7 @@ describe("agent 提示词测试", () => {
     expect(Array.isArray(prompts)).toBe(true);
   });
   test("根据agentName获取提示词", async () => {
-    const prompts = await getAgentPromptByAgentName("test");
+    const prompts = await getAgentPromptByAgentID(id!);
     expect(prompts).toHaveProperty('id')
   });
   test("更新提示词", async () => {

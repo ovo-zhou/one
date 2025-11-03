@@ -29,3 +29,12 @@ export async function deleteMessage(id: number): Promise<Message> {
   });
   return message;
 }
+
+export async function getMessagesByConversationID(conversationId: number): Promise<Message[]> {
+  const messages = await prisma.message.findMany({
+    where: {
+      conversationId
+    }
+  });
+  return messages;
+}

@@ -9,17 +9,18 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 interface IProps {
-  submit: (value: { message: string; type: string }) => undefined;
+  initAgentId?: string;
+  submit: (value: { message: string; agentId: string }) => undefined;
 }
 
 export default function ChatInput(props: IProps) {
-  const { submit } = props;
+  const { submit, initAgentId } = props;
   const [message, setMessage] = useState<string>("");
-  const [type, setType] = useState<string>("");
+  const [agentId, setAgentId] = useState<string>(initAgentId||"");
   const [options,setOptions]= useState<{id:number,agentName:string}[]>([])
   const handleSubmit = () => {
     if (message) {
-      submit({ message, type });
+      submit({ message, agentId });
       // 重置一下表单值
       setMessage("");
     }
@@ -65,9 +66,9 @@ export default function ChatInput(props: IProps) {
         onKeyDown={handleKeyDown}
       ></Textarea>
       <Select
-        value={type}
+        value={agentId}
         onValueChange={(value) => {
-          setType(value);
+          setAgentId(value);
         }}
       >
         <SelectTrigger className="absolute left-3 bottom-3 w-[100px]">

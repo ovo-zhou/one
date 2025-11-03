@@ -11,7 +11,7 @@ export default function Chat() {
   const formValues = location.state;
   const [chatList, setChatList] = useState<IChatItem[]>([]);
   const hasSend = useRef<boolean>(false);
-  const sendMessage = (agent: string, message: string) => {
+  const sendMessage = (agentId: string, message: string) => {
     setChatList([
       ...chatList,
       {
@@ -21,44 +21,46 @@ export default function Chat() {
       },
       { id: (+new Date() + 10).toString(), role: "assistant", content: "..." },
     ]);
-    window.agent.chat({agentId:agent, message});
+    window.agent.chat({ agentId, message });
   };
-  // 这里接受其他页面传过来的值，直接发送消息
-  // useEffect(() => {
-  //   if (formValues && hasSend.current===false) {
-  //     setChatList([
-  //       ...chatList,
-  //       { id: "1", role: "user", content: formValues.message },
-  //       { id: "2", role: "assistant", content: "..." },
-  //     ]);
-  //     sendMessage(formValues.agentType, formValues.message);
-  //     hasSend.current=true
-  //     navigate(location.pathname, { replace: true, state: null });
-  //   }
-  // }, []);
-  // useEffect(() => {
-  //   let content = "";
-  //   const off = window.agent.onMessage((data: string) => {
-  //     const message: IChatItem = JSON.parse(data);
-  //     // 空字符串意味发送结束
-  //     if (!message) {
-  //       content = "";
-  //       return;
-  //     }
-  //     content += message.content;
-  //     setChatList((pre) => {
-  //       const newChatList = [...pre];
-  //       const lastChatItem = newChatList[newChatList.length - 1];
-  //       lastChatItem.id = message.id;
-  //       lastChatItem.role = message.role;
-  //       lastChatItem.content = content;
-  //       return newChatList;
-  //     });
-  //   });
-  //   return () => {
-  //     off();
-  //   };
-  // }, []);
+  // 这里接受其他页面传过来的值，直接发送消息，需要加入会话的概念
+  // 从首页条状过来，新创建一个绘画，然后发送消息
+  // 第一次对话完成后，更新绘画标题为用户输入的内容
+  useEffect(() => {
+    if (formValues && hasSend.current===false) {
+      setChatList((pre) => [
+        ...pre,
+        {
+          id: (+new Date() - 10).toString(),
+          role: "user",
+          content: formValues.message,
+        },
+        { id: (+new Date() + 10).toString(), role: "assistant", content: "..." },
+      ]);
+      sendMessage(formValues.agentId, formValues.message);
+      hasSend.current=true
+      // 清空导航栏的 state
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, []);
+  useEffect(() => {
+    const off = window.agent.onMessage((data) => {
+      if (data.finish) {
+        return;
+      }
+      setChatList((pre) => {
+        const newChatList = [...pre];
+        const lastChatItem = newChatList[newChatList.length - 1];
+        lastChatItem.id = data.id;
+        lastChatItem.role = data.role as IChatItem["role"];
+        lastChatItem.content = data.content;
+        return newChatList;
+      });
+    });
+    return () => {
+      off();
+    };
+  }, []);
   return (
     <SidebarProvider>
       <ChatSidebar />
@@ -72,8 +74,9 @@ export default function Chat() {
         </div>
         <div className="bg-amber-200 flex justify-center">
           <ChatInput
+            initAgentId={formValues?.agentId}
             submit={(values) => {
-              sendMessage(values.type, values.message);
+              sendMessage(values.agentId, values.message);
             }}
           />
         </div>
