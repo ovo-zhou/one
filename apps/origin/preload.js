@@ -1,35 +1,47 @@
-const { contextBridge, ipcRenderer } = require("electron");
-contextBridge.exposeInMainWorld("bridge", {
+const { contextBridge, ipcRenderer } = require('electron');
+contextBridge.exposeInMainWorld('bridge', {
   // 测试接口，用于验证preload.js是否加载成功
   ping: () => {
-    console.info("preload.js load success!");
+    console.info('preload.js load success!');
   },
 });
-contextBridge.exposeInMainWorld("agent", {
+contextBridge.exposeInMainWorld('agent', {
   // 测试接口，用于验证preload.js是否加载成功
   getAgentPrompt: () => {
-    return ipcRenderer.invoke("agent:getPrompt");
+    return ipcRenderer.invoke('agent:getPrompt');
   },
   createAgentPrompt: (data) => {
-    return ipcRenderer.invoke("agent:createPrompt", data);
+    return ipcRenderer.invoke('agent:createPrompt', data);
   },
   deleteAgentPrompt: (id) => {
-    return ipcRenderer.invoke("agent:deletePrompt", id);
+    return ipcRenderer.invoke('agent:deletePrompt', id);
   },
   updateAgentPrompt: (data) => {
-    return ipcRenderer.invoke("agent:updatePrompt", data);
+    return ipcRenderer.invoke('agent:updatePrompt', data);
   },
   chat: (data) => {
-    return ipcRenderer.send("agent:chat", data);
+    return ipcRenderer.send('agent:chat', data);
   },
   onMessage: (callback) => {
-    ipcRenderer.on("agent:chat:message", (event, message) => {
+    ipcRenderer.on('agent:chat:message', (event, message) => {
       callback(message);
     });
     // 返回一个取消监听的函数
     const off = () => {
-      ipcRenderer.removeAllListeners("agent:chat:message");
+      ipcRenderer.removeAllListeners('agent:chat:message');
     };
     return off;
+  },
+  createConversation: (data) => {
+    return ipcRenderer.invoke('agent:createConversation', data);
+  },
+  getConversationList: () => {
+    return ipcRenderer.invoke('agent:getConversationList');
+  },
+  getMessagesByConversationID: (id) => {
+    return ipcRenderer.invoke('agent:getMessagesByConversationID', id);
+  },
+  deleteConversation: (id) => {
+    return ipcRenderer.invoke('agent:deleteConversation', id);
   },
 });

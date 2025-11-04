@@ -1,3 +1,3 @@
-export * as conversation from "./conversation";
+export * from "./conversation";
 export * from "./message";
 export * from "./prompt";

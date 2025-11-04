@@ -7,6 +7,10 @@ import {
   createAgentPrompt,
   deleteAgentPrompt,
   updateAgentPrompt,
+  createConversation,
+  getConversations,
+  getMessagesByConversationID,
+  deleteConversation,
 } from 'database';
 import { chat } from './src/ai/index.js';
 
@@ -48,15 +52,38 @@ const handleUpdateAgentPrompt = async (event, data) => {
   const res = await updateAgentPrompt(data);
   return res;
 };
+const handleCreateConversation = async (event, data) => {
+  const { id } = await createConversation(data);
+  return id;
+};
+const handleGetConversationList = async () => {
+  const conversationList = await getConversations();
+  return conversationList;
+};
+const handleGetMessagesByConversationID = async (event, conversationID) => {
+  const messages = await getMessagesByConversationID(conversationID);
+  return messages;
+};
+const handleDeleteConversation = async (event, conversationID) => {
+  const res = await deleteConversation(+conversationID);
+  return res;
+};
 app.on('ready', () => {
   ipcMain.handle('agent:getPrompt', handleGetAgentPrompt);
   ipcMain.handle('agent:createPrompt', handleCreateAgentPrompt);
   ipcMain.handle('agent:deletePrompt', handleDeleteAgentPrompt);
   ipcMain.handle('agent:updatePrompt', handleUpdateAgentPrompt);
+  ipcMain.handle('agent:createConversation', handleCreateConversation);
   ipcMain.on('agent:chat', async (event, data) => {
-    const { agentId, message } = data;
-    await chat({ agentId, message }, event.sender);
+    const { agentId, message, conversationID } = data;
+    await chat({ agentId, message, conversationID }, event.sender);
   });
+  ipcMain.handle('agent:getConversationList', handleGetConversationList);
+  ipcMain.handle(
+    'agent:getMessagesByConversationID',
+    handleGetMessagesByConversationID
+  );
+  ipcMain.handle('agent:deleteConversation', handleDeleteConversation);
   createWindow();
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
