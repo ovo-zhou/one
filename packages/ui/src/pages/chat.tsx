@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { SidebarProvider } from '@/components/ui/sidebar';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import ChatInput from '@/components/chatInput';
 import ChatSidebar from '@/components/chatSidebar';
 import ChatBox from '@/components/chatBox';
@@ -34,21 +34,33 @@ export default function Chat() {
     ]);
     window.agent.chat({ agentId, message, conversationID });
   };
-  const updateConversationList = async () => {
+  const queryConversationList = async () => {
     const list = await window.agent.getConversationList();
     setConversationList(list);
+  };
+  // 切换会话时，刷新聊天列表
+  const queryMessagesByConversationID = async (id: number) => {
+    const list = await window.agent.getMessagesByConversationID(id);
+    setChatList(
+      list.map((item) => ({
+        id: item.id.toString(),
+        role: item.role as IChatItem['role'],
+        content: item.content,
+      }))
+    );
   };
   // 这里接受其他页面传过来的值，直接发送消息，需要加入会话的概念
   // 从首页条状过来，新创建一个绘画，然后发送消息
   // 第一次对话完成后，更新绘画标题为用户输入的内容
   useEffect(() => {
-    const handleUrlState = async () => {
+    const handleSendMessageFromUrlState = async () => {
+      // 避免重复触发调用
       hasSend.current = true;
       // 从首页跳转过来时创建会话
       const id = await window.agent.createConversation('新会话');
       setConversationID(id);
       // 更新会话列表
-      updateConversationList();
+      await queryConversationList();
       // 更新聊天记录
       setChatList((pre) => [
         ...pre,
@@ -69,12 +81,13 @@ export default function Chat() {
       navigate(location.pathname, { replace: true, state: null });
     };
     if (formValues && hasSend.current === false) {
-      handleUrlState();
+      handleSendMessageFromUrlState();
     }
   }, []);
   // 监听流式输出回调
   useEffect(() => {
     const off = window.agent.onMessage((data) => {
+      console.log('data:', data.id);
       if (data.finish) {
         return;
       }
@@ -93,35 +106,22 @@ export default function Chat() {
     };
   }, []);
   useEffect(() => {
-    // 查询会话列表
-    window.agent.getConversationList().then((list) => {
-      setConversationList(list);
-    });
+    queryConversationList();
   }, []);
-  useEffect(() => {
-    if (!conversationID) {
-      return;
-    }
-    // 根据会话id查询聊天记录
-    window.agent.getMessagesByConversationID(conversationID).then((list) => {
-      setChatList(
-        list.map((item) => ({
-          id: item.id.toString(),
-          role: item.role as IChatItem['role'],
-          content: item.content,
-        }))
-      );
-    });
-  }, [conversationID]);
   return (
     <SidebarProvider>
       <ChatSidebar
         conversationList={conversationList}
         conversationID={conversationID}
         setConversationID={setConversationID}
+        queryConversationList={queryConversationList}
+        queryMessagesByConversationID={queryMessagesByConversationID}
       />
       <main className="w-full bg-amber-300 h-screen flex flex-col">
-        <div className="h-14 leading-14 text-center bg-amber-800">head</div>
+        <div className="h-14 leading-14 text-center bg-amber-800 relative">
+          <SidebarTrigger className="absolute left-4 top-1/2 -translate-y-1/2" />
+          head
+        </div>
         <div
           className="overflow-y-auto flex-1 scroll-smooth flex justify-center"
           style={{ scrollbarWidth: 'none' }}

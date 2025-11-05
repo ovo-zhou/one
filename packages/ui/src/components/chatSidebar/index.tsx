@@ -12,7 +12,6 @@ import {
   SidebarFooter,
   SidebarMenuAction,
 } from '@/components/ui/sidebar';
-import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { Ellipsis } from 'lucide-react';
 import {
@@ -31,18 +30,33 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 interface IProps {
   conversationList: { id: number; title: string }[];
   conversationID: number | null;
   setConversationID: (id: number | null) => void;
+  queryConversationList: () => Promise<void>;
+  queryMessagesByConversationID: (id: number) => Promise<void>;
 }
 
 export default function ChatSidebar(props: IProps) {
-  const { conversationList, conversationID, setConversationID } = props;
+  const {
+    conversationList,
+    conversationID,
+    setConversationID,
+    queryConversationList,
+    queryMessagesByConversationID,
+  } = props;
   const [open, setOpen] = useState(false);
-  const handleDelete = () => {
+  const selectedConversation = useRef<number | null>(null);
+  const handleDelete = async () => {
+    if (selectedConversation.current) {
+      await window.agent.deleteConversation(selectedConversation.current);
+      selectedConversation.current = null;
+      // 更新会话列表
+      await queryConversationList();
+    }
     setOpen(false);
   };
   return (
@@ -50,7 +64,6 @@ export default function ChatSidebar(props: IProps) {
       <Sidebar>
         <SidebarHeader>
           <Link to={'/'}>首页</Link>
-          <SidebarTrigger />
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
@@ -61,7 +74,11 @@ export default function ChatSidebar(props: IProps) {
                   <SidebarMenuItem key={item.id}>
                     <SidebarMenuButton asChild>
                       <span
-                        onClick={() => setConversationID(item.id)}
+                        onClick={() => {
+                          setConversationID(item.id);
+                          // 更新聊天记录
+                          queryMessagesByConversationID(item.id);
+                        }}
                         className={`cursor-pointer ${
                           conversationID === item.id ? 'bg-amber-200' : ''
                         }`}
@@ -75,7 +92,12 @@ export default function ChatSidebar(props: IProps) {
                           <Ellipsis className="cursor-pointer" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent className="w-20" align="start">
-                          <DropdownMenuItem onClick={() => setOpen(true)}>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              selectedConversation.current = item.id;
+                              setOpen(true);
+                            }}
+                          >
                             <span className="text-red-500">删除</span>
                           </DropdownMenuItem>
                         </DropdownMenuContent>
