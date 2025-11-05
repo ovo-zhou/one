@@ -38,6 +38,7 @@ interface IProps {
   setConversationID: (id: number | null) => void;
   queryConversationList: () => Promise<void>;
   queryMessagesByConversationID: (id: number) => Promise<void>;
+  clearChatList: () => void;
 }
 
 export default function ChatSidebar(props: IProps) {
@@ -47,17 +48,35 @@ export default function ChatSidebar(props: IProps) {
     setConversationID,
     queryConversationList,
     queryMessagesByConversationID,
+    clearChatList,
   } = props;
   const [open, setOpen] = useState(false);
   const selectedConversation = useRef<number | null>(null);
   const handleDelete = async () => {
-    if (selectedConversation.current) {
+    // 删除的时候，当前选中的会话id为空，直接返回，关闭弹窗
+    if (!selectedConversation.current) {
+      setOpen(false);
+      return;
+    }
+    // 删除的时候，删除的并不是当前选中的会话id，直接返回，关闭弹窗
+    if (selectedConversation.current !== conversationID) {
       await window.agent.deleteConversation(selectedConversation.current);
       selectedConversation.current = null;
       // 更新会话列表
       await queryConversationList();
+      setOpen(false);
+    } else {
+      // 删除的时候，删除的是当前选中的会话id，删除会话并更新会话列表
+      await window.agent.deleteConversation(selectedConversation.current);
+      selectedConversation.current = null;
+      // 清空当前选中的会话id
+      setConversationID(null);
+      // 清空聊天记录
+      clearChatList();
+      // 更新会话列表
+      await queryConversationList();
+      setOpen(false);
     }
-    setOpen(false);
   };
   return (
     <>
@@ -72,16 +91,20 @@ export default function ChatSidebar(props: IProps) {
               <SidebarMenu>
                 {conversationList.map((item) => (
                   <SidebarMenuItem key={item.id}>
-                    <SidebarMenuButton asChild>
+                    <SidebarMenuButton
+                      asChild
+                      className={`cursor-pointer ${
+                        conversationID === item.id
+                          ? 'bg-amber-200 hover:bg-amber-200'
+                          : ''
+                      }`}
+                    >
                       <span
                         onClick={() => {
                           setConversationID(item.id);
                           // 更新聊天记录
                           queryMessagesByConversationID(item.id);
                         }}
-                        className={`cursor-pointer ${
-                          conversationID === item.id ? 'bg-amber-200' : ''
-                        }`}
                       >
                         {item.title}
                       </span>

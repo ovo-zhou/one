@@ -1,12 +1,10 @@
-import { useNavigate } from "react-router-dom";
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react";
-import { Outlet } from "react-router-dom";
+import { Inbox } from 'lucide-react';
+import { Outlet } from 'react-router-dom';
 import {
   SidebarProvider,
   SidebarTrigger,
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarHeader,
   SidebarGroupLabel,
@@ -14,35 +12,15 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-} from "@/components/ui/sidebar";
+} from '@/components/ui/sidebar';
 const menu = [
   {
-    group: "agent",
+    group: 'AI',
     items: [
       {
-        title: "首页",
-        url: "/",
-        icon: Home,
-      },
-      {
-        title: "提示词配置",
-        url: "/setting/agent",
+        title: '提示词配置',
+        url: '/setting/agent',
         icon: Inbox,
-      },
-      {
-        title: "Calendar",
-        url: "#",
-        icon: Calendar,
-      },
-      {
-        title: "Search",
-        url: "#",
-        icon: Search,
-      },
-      {
-        title: "Settings",
-        url: "#",
-        icon: Settings,
       },
     ],
   },
@@ -52,7 +30,21 @@ export default function Setting() {
     <SidebarProvider>
       <Sidebar>
         <SidebarHeader>
-          <div>管理控制台</div>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton size="lg" asChild>
+                <a href="/">
+                  <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                    ryan
+                  </div>
+                  <div className="flex flex-col gap-0.5 leading-none">
+                    <span className="font-medium">助手配置</span>
+                    <span className="">v1.0.0</span>
+                  </div>
+                </a>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
         </SidebarHeader>
         <SidebarContent>
           {menu.map((i) => {
@@ -77,7 +69,6 @@ export default function Setting() {
             );
           })}
         </SidebarContent>
-        <SidebarFooter>ryan 出品必属精品</SidebarFooter>
       </Sidebar>
       <main className="p-4 flex-1">
         <header>

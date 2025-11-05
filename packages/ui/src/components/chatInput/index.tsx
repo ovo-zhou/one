@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 import {
   Select,
   SelectContent,
@@ -6,8 +6,9 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Send } from 'lucide-react';
 interface IProps {
   initAgentId?: string;
   submit: (value: { message: string; agentId: string }) => undefined;
@@ -15,18 +16,20 @@ interface IProps {
 
 export default function ChatInput(props: IProps) {
   const { submit, initAgentId } = props;
-  const [message, setMessage] = useState<string>("");
-  const [agentId, setAgentId] = useState<string>(initAgentId||"");
-  const [options,setOptions]= useState<{id:number,agentName:string}[]>([])
+  const [message, setMessage] = useState<string>('');
+  const [agentId, setAgentId] = useState<string>(initAgentId || '');
+  const [options, setOptions] = useState<{ id: number; agentName: string }[]>(
+    []
+  );
   const handleSubmit = () => {
     if (message) {
       submit({ message, agentId });
       // 重置一下表单值
-      setMessage("");
+      setMessage('');
     }
   };
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       e.preventDefault();
       if (e.metaKey || e.ctrlKey) {
         const textarea = e.target as HTMLTextAreaElement;
@@ -34,7 +37,7 @@ export default function ChatInput(props: IProps) {
         const end = textarea.selectionEnd;
         // 手动插入换行符
         setMessage(
-          (prev) => prev.substring(0, start) + "\n" + prev.substring(end)
+          (prev) => prev.substring(0, start) + '\n' + prev.substring(end)
         );
 
         // 恢复光标位置到换行符后
@@ -49,11 +52,11 @@ export default function ChatInput(props: IProps) {
       }
     }
   };
-  useEffect(()=>{
+  useEffect(() => {
     window.agent.getAgentPrompt().then((prompt) => {
       setOptions(prompt);
     });
-  },[])
+  }, []);
   return (
     <div className="relative max-w-3xl">
       <Textarea
@@ -76,29 +79,21 @@ export default function ChatInput(props: IProps) {
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
-            {
-              options.map(item=>{
-                  return <SelectItem key={item.id} value={String(item.id)}>{item.agentName}</SelectItem>;
-              })
-            }
+            {options.map((item) => {
+              return (
+                <SelectItem key={item.id} value={String(item.id)}>
+                  {item.agentName}
+                </SelectItem>
+              );
+            })}
           </SelectGroup>
         </SelectContent>
       </Select>
-      {!!message && (
-        <button
+      {message && (
+        <Send
           className="absolute right-3 bottom-3 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
           onClick={handleSubmit}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            fill="currentColor"
-            viewBox="0 0 16 16"
-          >
-            <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07Zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493Z" />
-          </svg>
-        </button>
+        />
       )}
     </div>
   );

@@ -50,7 +50,6 @@ export async function chat({ agentId, message, conversationID }, sender) {
   let role = '';
   let content = '';
   for await (let res of completion) {
-    console.log('res:', res);
     const { id, choices } = res;
     // 根据返回的 delta 进行处理，改变角色
     if (choices[0].delta.role) {

@@ -49,6 +49,19 @@ export default function Chat() {
       }))
     );
   };
+  const clearChatList = () => {
+    setChatList([]);
+  };
+  const onSubmit = async (values: { agentId: string; message: string }) => {
+    if (conversationID === null) {
+      const id = await window.agent.createConversation('新会话');
+      setConversationID(id);
+      await queryConversationList();
+      sendMessage(values.agentId, values.message, id);
+    } else {
+      sendMessage(values.agentId, values.message, conversationID);
+    }
+  };
   // 这里接受其他页面传过来的值，直接发送消息，需要加入会话的概念
   // 从首页条状过来，新创建一个绘画，然后发送消息
   // 第一次对话完成后，更新绘画标题为用户输入的内容
@@ -87,7 +100,6 @@ export default function Chat() {
   // 监听流式输出回调
   useEffect(() => {
     const off = window.agent.onMessage((data) => {
-      console.log('data:', data.id);
       if (data.finish) {
         return;
       }
@@ -105,9 +117,6 @@ export default function Chat() {
       off();
     };
   }, []);
-  useEffect(() => {
-    queryConversationList();
-  }, []);
   return (
     <SidebarProvider>
       <ChatSidebar
@@ -116,11 +125,13 @@ export default function Chat() {
         setConversationID={setConversationID}
         queryConversationList={queryConversationList}
         queryMessagesByConversationID={queryMessagesByConversationID}
+        clearChatList={clearChatList}
       />
-      <main className="w-full bg-amber-300 h-screen flex flex-col">
-        <div className="h-14 leading-14 text-center bg-amber-800 relative">
+      <main className="w-full  h-screen flex flex-col">
+        <div className="h-14 leading-14 text-center  relative">
           <SidebarTrigger className="absolute left-4 top-1/2 -translate-y-1/2" />
-          head
+          {conversationList.find((item) => item.id === conversationID)?.title ||
+            '新会话'}
         </div>
         <div
           className="overflow-y-auto flex-1 scroll-smooth flex justify-center"
@@ -128,11 +139,11 @@ export default function Chat() {
         >
           <ChatBox chatList={chatList} className="w-3xl bg-white h-fit" />
         </div>
-        <div className="bg-amber-200 flex justify-center">
+        <div className=" flex justify-center pb-8">
           <ChatInput
             initAgentId={formValues?.agentId}
             submit={(values) => {
-              sendMessage(values.agentId, values.message, conversationID!);
+              onSubmit(values);
             }}
           />
         </div>
