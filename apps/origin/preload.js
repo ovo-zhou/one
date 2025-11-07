@@ -19,9 +19,11 @@ contextBridge.exposeInMainWorld('agent', {
   updateAgentPrompt: (data) => {
     return ipcRenderer.invoke('agent:updatePrompt', data);
   },
+  // 聊天
   chat: (data) => {
     return ipcRenderer.send('agent:chat', data);
   },
+  // 监听聊天消息
   onMessage: (callback) => {
     ipcRenderer.on('agent:chat:message', (event, message) => {
       callback(message);
@@ -32,6 +34,11 @@ contextBridge.exposeInMainWorld('agent', {
     };
     return off;
   },
+  // 中断聊天
+  stopChat: () => {
+    return ipcRenderer.send('agent:stop');
+  },
+  // 创建聊天会话
   createConversation: (data) => {
     return ipcRenderer.invoke('agent:createConversation', data);
   },

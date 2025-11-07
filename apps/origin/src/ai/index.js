@@ -14,7 +14,11 @@ const openai = new OpenAI({
 // 这里要手动插入 agent 对应的prompt
 // 加载历史聊天记录
 // 写入聊天记录
-export async function chat({ agentId, message, conversationID }, sender) {
+export async function chat(
+  event,
+  { agentId, message, conversationID },
+  abortController
+) {
   const messages = [];
   // 先把用户发送的消息保存到数据库
   // 然后直接读取最近的10条消息,作为对话上下文
@@ -41,33 +45,47 @@ export async function chat({ agentId, message, conversationID }, sender) {
   );
   // 打印最终的 messages
   console.log('messages:', messages);
-  const completion = await openai.chat.completions.create({
-    messages,
-    model: 'deepseek-chat',
-    stream: true,
-  });
-  // 记录角色
+  const controller = new AbortController();
+  abortController.current = controller;
+  console.log('controller:', abortController);
   let role = '';
   let content = '';
-  for await (let res of completion) {
-    const { id, choices } = res;
-    // 根据返回的 delta 进行处理，改变角色
-    if (choices[0].delta.role) {
-      role = choices[0].delta.role;
+  try {
+    const completion = await openai.chat.completions.create(
+      {
+        messages,
+        model: 'deepseek-chat',
+        stream: true,
+      },
+      { signal: controller.signal }
+    );
+    // 记录角色
+
+    for await (let res of completion) {
+      const { id, choices } = res;
+      // 根据返回的 delta 进行处理，改变角色
+      if (choices[0].delta.role) {
+        role = choices[0].delta.role;
+      }
+      const finish_reason = choices[0].finish_reason;
+      content += choices[0].delta.content;
+      event.sender.send('agent:chat:message', {
+        id,
+        role,
+        content,
+        finish: finish_reason === 'stop',
+      });
     }
-    const finish_reason = choices[0].finish_reason;
-    content += choices[0].delta.content;
-    sender.send('agent:chat:message', {
-      id,
-      role,
+  } catch (e) {
+    console.log('e:', e);
+  } finally {
+    // 不管是否出错，将结果保存到数据库
+    // 最后把 abortController 清空
+    abortController.current = null;
+    await createMessage({
+      conversationId: +conversationID,
       content,
-      finish: finish_reason === 'stop',
+      role,
     });
   }
-  // 最后把 assistant 的消息保存到数据库
-  await createMessage({
-    conversationId: +conversationID,
-    content,
-    role,
-  });
 }

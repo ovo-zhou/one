@@ -39,6 +39,13 @@ interface IProps {
   queryConversationList: () => Promise<void>;
   queryMessagesByConversationID: (id: number) => Promise<void>;
   clearChatList: () => void;
+  /**
+   * 设置是否流式响应
+   */
+  /**
+   * 手动中断流式输出的回调函数
+   */
+  stopChat?: () => void;
 }
 
 export default function ChatSidebar(props: IProps) {
@@ -49,6 +56,7 @@ export default function ChatSidebar(props: IProps) {
     queryConversationList,
     queryMessagesByConversationID,
     clearChatList,
+    stopChat,
   } = props;
   const [open, setOpen] = useState(false);
   const selectedConversation = useRef<number | null>(null);
@@ -102,6 +110,7 @@ export default function ChatSidebar(props: IProps) {
                       <span
                         onClick={() => {
                           setConversationID(item.id);
+                          stopChat?.();
                           // 更新聊天记录
                           queryMessagesByConversationID(item.id);
                         }}

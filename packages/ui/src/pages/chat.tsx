@@ -6,6 +6,7 @@ import ChatBox from '@/components/chatBox';
 import { useEffect, useRef, useState } from 'react';
 import type { IChatItem } from '@/components/chatBox/ChatItem';
 import { v4 as uuidv4 } from 'uuid';
+
 export default function Chat() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -18,11 +19,21 @@ export default function Chat() {
   >([]);
   const [chatList, setChatList] = useState<IChatItem[]>([]);
   const hasSend = useRef<boolean>(false);
+  // 是否正在流式输出
+  const [isStreamResponse, setIsStreamResponse] = useState<boolean>(false);
+  // 手动中断流式输出
+  const stopChat = () => {
+    window.agent.stopChat();
+    setIsStreamResponse(false);
+  };
   const sendMessage = (
     agentId: string,
     message: string,
     conversationID: number
   ) => {
+    // 开启流式输出
+    // 输出结束或者手动中断，结束流失输出
+    setIsStreamResponse(true);
     setChatList([
       ...chatList,
       {
@@ -101,6 +112,8 @@ export default function Chat() {
   useEffect(() => {
     const off = window.agent.onMessage((data) => {
       if (data.finish) {
+        // 关闭流式输出
+        setIsStreamResponse(false);
         return;
       }
       // 更新最新的一条消息
@@ -120,6 +133,7 @@ export default function Chat() {
   return (
     <SidebarProvider>
       <ChatSidebar
+        stopChat={stopChat}
         conversationList={conversationList}
         conversationID={conversationID}
         setConversationID={setConversationID}
@@ -141,6 +155,8 @@ export default function Chat() {
         </div>
         <div className=" flex justify-center pb-8">
           <ChatInput
+            stopChat={stopChat}
+            isStreamResponse={isStreamResponse}
             initAgentId={formValues?.agentId}
             submit={(values) => {
               onSubmit(values);

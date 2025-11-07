@@ -15,6 +15,7 @@ export interface IAgent {
   getConversationList: () => Promise<{ id: number, title: string }[]>;
   getMessagesByConversationID: (id: number) => Promise<{ id: number, role: string, content: string }[]>;
   deleteConversation: (id: number) => Promise<void>;
+  stopChat: () => void;
 }
 
 declare global {

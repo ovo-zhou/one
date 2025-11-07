@@ -16,6 +16,9 @@ import { chat } from './src/ai/index.js';
 
 // 是否为开发环境
 const isDev = !app.isPackaged;
+let abortController = {
+  current: null,
+};
 
 const createWindow = () => {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
@@ -68,6 +71,13 @@ const handleDeleteConversation = async (event, conversationID) => {
   const res = await deleteConversation(+conversationID);
   return res;
 };
+const handleStopChat = () => {
+  // 如果存在中断控制器，中断聊天，清空控制器
+  if (abortController.current) {
+    abortController.current.abort();
+    abortController.current = null;
+  }
+};
 app.on('ready', () => {
   ipcMain.handle('agent:getPrompt', handleGetAgentPrompt);
   ipcMain.handle('agent:createPrompt', handleCreateAgentPrompt);
@@ -75,9 +85,10 @@ app.on('ready', () => {
   ipcMain.handle('agent:updatePrompt', handleUpdateAgentPrompt);
   ipcMain.handle('agent:createConversation', handleCreateConversation);
   ipcMain.on('agent:chat', async (event, data) => {
-    const { agentId, message, conversationID } = data;
-    await chat({ agentId, message, conversationID }, event.sender);
+    await chat(event, data, abortController);
   });
+  // 监听聊天停止事件
+  ipcMain.on('agent:stop', handleStopChat);
   ipcMain.handle('agent:getConversationList', handleGetConversationList);
   ipcMain.handle(
     'agent:getMessagesByConversationID',
