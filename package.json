@@ -10,7 +10,9 @@
     "apps/*"
   ],
   "scripts": {
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "clean": "rimraf node_modules packages/*/node_modules apps/*/node_modules",
+    "clean:all": "yarn clean && rimraf packages/*/dist packages/*/build apps/*/.next"
   },
   "private": true,
   "devDependencies": {
@@ -18,6 +20,7 @@
     "@eslint/markdown": "^7.5.1",
     "eslint": "^9.39.1",
     "eslint-plugin-json": "^4.0.1",
+    "rimraf": "^6.1.0",
     "typescript-eslint": "^8.46.4"
   },
   "type": "module"
