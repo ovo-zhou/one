@@ -1,5 +1,6 @@
-import { ChatItem, type IChatItem } from "./ChatItem";
-import { useEffect, useRef } from "react";
+import { ChatItem, type IChatItem } from './ChatItem';
+import { useEffect, useRef } from 'react';
+
 interface IChatBox {
   className?: string;
   chatList: IChatItem[];
@@ -8,21 +9,28 @@ interface IChatBox {
 /**
  * 聊天盒子
  * @param props 聊天列表
- * @returns 
+ * @returns
  */
 export default function ChatBox(props: IChatBox) {
   const { className, chatList } = props;
   // 聊天容器
-  const chatBoxRef= useRef<HTMLDivElement>(null)
-  const anchorRef=useRef<HTMLDivElement>(null)
-  const scrollToBottom=()=>{
-    const anchorNode=anchorRef.current;
-    if(!anchorNode){
+  const chatBoxRef = useRef<HTMLDivElement>(null);
+  const anchorRef = useRef<HTMLDivElement>(null);
+  /**
+   * 自动滚动逻辑
+   * 如果用户手动滚动到上面，流式输出时，不滚动
+   * 如果用户手动滚动到下面，流式输出时，滚动到下面
+   * 用户发送消息时，滚动到下面
+   * @returns
+   */
+  const scrollToBottom = () => {
+    const anchorNode = anchorRef.current;
+    if (!anchorNode) {
       return;
     }
-    // console.log('滚动进入视图')
-    anchorNode.scrollIntoView()
-  }
+    anchorNode.scrollIntoView();
+  };
+
   useEffect(() => {
     const chatBoxNode = chatBoxRef.current;
     if (!chatBoxNode) {
@@ -40,6 +48,7 @@ export default function ChatBox(props: IChatBox) {
       resizeObserver.unobserve(chatBoxNode);
     };
   }, []);
+
   return (
     <div className={className} ref={chatBoxRef}>
       {chatList.map((chatItem) => (
@@ -53,4 +62,3 @@ export default function ChatBox(props: IChatBox) {
     </div>
   );
 }
-
