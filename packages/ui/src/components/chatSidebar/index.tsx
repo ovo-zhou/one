@@ -31,6 +31,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useState, useRef } from 'react';
+import { MessageCirclePlus } from 'lucide-react';
 
 interface IProps {
   conversationList: { id: number; title: string }[];
@@ -67,7 +68,7 @@ export default function ChatSidebar(props: IProps) {
       return;
     }
     // 删除的时候，删除的并不是当前选中的会话id，直接返回，关闭弹窗
-    if (selectedConversation.current !== conversationID) {
+    if (selectedConversation.current !== Number(conversationID)) {
       await window.agent.deleteConversation(selectedConversation.current);
       selectedConversation.current = null;
       // 更新会话列表
@@ -86,13 +87,44 @@ export default function ChatSidebar(props: IProps) {
       setOpen(false);
     }
   };
+  const handleOpenNewConversation = async () => {
+    // 开启新会话时，先关闭当前选中的会话id
+    setConversationID(null);
+    // 开启新会话时，先清空聊天记录
+    clearChatList();
+  };
   return (
     <>
       <Sidebar>
         <SidebarHeader>
-          <Link to={'/'}>首页</Link>
+          <Link to={'/'}>
+            <div className="text-xl font-bold text-center">
+              AI 助手{' '}
+              <span className="text-sm text-gray-500 font-light">
+                deepseek驱动
+              </span>
+            </div>
+          </Link>
         </SidebarHeader>
         <SidebarContent>
+          <SidebarGroup>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <div
+                    className="flex cursor-pointer justify-center items-center rounded-4xl bg-blue-300 py-2"
+                    onClick={handleOpenNewConversation}
+                  >
+                    <MessageCirclePlus className="mr-2" />
+                    开启新会话
+                  </div>
+                  {/* <SidebarMenuButton asChild>
+                    <span>开启新会话</span>
+                  </SidebarMenuButton> */}
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
           <SidebarGroup>
             <SidebarGroupLabel>Application</SidebarGroupLabel>
             <SidebarGroupContent>
