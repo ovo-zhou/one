@@ -45,7 +45,7 @@ export default function ChatBox(props: IChatBox) {
       },
       {
         root: scrollContainerNode,
-        threshold: 1,
+        threshold: 0.1,
       }
     );
     const resizeObserver = new ResizeObserver((entries) => {
@@ -77,9 +77,10 @@ export default function ChatBox(props: IChatBox) {
             key={chatItem.id}
           />
         ))}
-        <div ref={anchorRef} className="h-5">
-          123
-        </div>
+        <div
+          ref={anchorRef}
+          style={{ height: '20px', width: '100%', backgroundColor: 'red' }}
+        ></div>
       </div>
     </div>
   );

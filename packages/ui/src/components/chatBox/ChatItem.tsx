@@ -24,9 +24,7 @@ export function ChatItem(props: Pick<IChatItem, 'role' | 'content'>) {
     }
     return (
       <div className="py-2">
-        <div className="p-2 rounded-tl-none rounded-tr-lg rounded-br-lg rounded-bl-lg">
-          <Markdown content={content} />
-        </div>
+        <Markdown content={content} />
       </div>
     );
   };

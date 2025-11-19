@@ -43,11 +43,8 @@ export async function chat(
       content: item.content,
     }))
   );
-  // 打印最终的 messages
-  console.log('messages:', messages);
   const controller = new AbortController();
   abortController.current = controller;
-  console.log('controller:', abortController);
   let role = '';
   let content = '';
   try {
@@ -69,6 +66,7 @@ export async function chat(
       }
       const finish_reason = choices[0].finish_reason;
       content += choices[0].delta.content;
+      console.log('主进程', choices[0].delta.content);
       event.sender.send('agent:chat:message', {
         id,
         role,

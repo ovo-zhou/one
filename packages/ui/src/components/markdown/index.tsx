@@ -1,40 +1,66 @@
-import ReactMarkdown from 'react-markdown';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import type MarkdownIt from 'markdown-it';
+import markdownit from 'markdown-it';
+import hljs from 'highlight.js';
+import { useMemo } from 'react';
+import 'highlight.js/styles/github.css';
+
+// full options list (defaults)
+const md: MarkdownIt = markdownit({
+  // Enable HTML tags in source
+  html: true,
+
+  // Use '/' to close single tags (<br />).
+  // This is only for full CommonMark compatibility.
+  xhtmlOut: false,
+
+  // Convert '\n' in paragraphs into <br>
+  breaks: true,
+
+  // CSS language prefix for fenced blocks. Can be
+  // useful for external highlighters.
+  langPrefix: 'language-',
+
+  // Autoconvert URL-like text to links
+  linkify: false,
+
+  // Enable some language-neutral replacement + quotes beautification
+  // For the full list of replacements, see https://github.com/markdown-it/markdown-it/blob/master/lib/rules_core/replacements.mjs
+  typographer: true,
+
+  // Double + single quotes replacement pairs, when typographer enabled,
+  // and smartquotes on. Could be either a String or an Array.
+  //
+  // For example, you can use '«»„“' for Russian, '„“‚‘' for German,
+  // and ['«\xA0', '\xA0»', '‹\xA0', '\xA0›'] for French (including nbsp).
+  quotes: '“”‘’',
+
+  // Highlighter function. Should return escaped HTML,
+  // or '' if the source string is not changed and should be escaped externally.
+  // If result starts with <pre... internal wrapper is skipped.
+  highlight: function (str, lang) {
+    if (lang && hljs.getLanguage(lang)) {
+      try {
+        return (
+          '<pre style="background-color: #f6f8fa;overflow-x: auto;padding: 16px;border-radius: 10px;font-size:0.9rem;">' +
+          hljs.highlight(str, { language: lang, ignoreIllegals: true }).value +
+          '</code></pre>'
+        );
+      } catch (e) {
+        console.error('Error highlighting code:', e);
+      }
+    }
+
+    return (
+      '<pre><code class="hljs">' + md.utils.escapeHtml(str) + '</code></pre>'
+    );
+  },
+});
 
 interface IMarkdown {
   content: string;
 }
 export default function Markdown(props: IMarkdown) {
   const { content } = props;
-  return (
-    <ReactMarkdown
-      components={{
-        code(props) {
-          const { children, className, ...rest } = props;
-          const match = /language-(\w+)/.exec(className || '');
-          return match ? (
-            <SyntaxHighlighter
-              showLineNumbers
-              wrapLongLines
-              // {...rest}
-              PreTag="div"
-              children={String(children).replace(/\n$/, '')}
-              language={match[1]}
-              style={oneLight}
-              customStyle={{
-                fontSize: '0.8rem',
-              }}
-            />
-          ) : (
-            <code {...rest} className={className}>
-              {children}
-            </code>
-          );
-        },
-      }}
-    >
-      {content}
-    </ReactMarkdown>
-  );
+  const useMarkdown = useMemo(() => md.render(content), [content]);
+  return <div dangerouslySetInnerHTML={{ __html: useMarkdown }} />;
 }

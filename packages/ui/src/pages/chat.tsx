@@ -15,6 +15,7 @@ export default function Chat() {
   const [chatList, setChatList] = useState<IChatItem[]>([]);
   // 是否正在流式输出
   const [isStreamResponse, setIsStreamResponse] = useState<boolean>(false);
+
   // 手动中断流式输出
   const stopChat = () => {
     window.agent.stopChat();
@@ -90,7 +91,9 @@ export default function Chat() {
       });
     });
     return () => {
+      // 组件卸载时,移除监听器，并且手动中断流式输出
       off();
+      stopChat();
     };
   }, []);
   return (
@@ -105,13 +108,13 @@ export default function Chat() {
         clearChatList={clearChatList}
       />
       <main
-        className={`w-full  h-screen flex flex-col ${
+        className={`w-full h-screen flex flex-col ${
           conversationID ? '' : 'justify-center'
         }`}
       >
         {conversationID && (
           <>
-            <div className="h-14 leading-14 text-center  relative">
+            <div className="h-14 leading-14 text-center relative">
               <SidebarTrigger className="absolute left-4 top-1/2 -translate-y-1/2" />
               {conversationList.find(
                 (item) => item.id === Number(conversationID)
@@ -121,7 +124,7 @@ export default function Chat() {
             <ChatBox chatList={chatList} />
           </>
         )}
-        <div className=" flex justify-center pb-8">
+        <div className="flex justify-center pb-8">
           <ChatInput
             stopChat={stopChat}
             isStreamResponse={isStreamResponse}

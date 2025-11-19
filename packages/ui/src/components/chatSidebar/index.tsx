@@ -1,5 +1,4 @@
 import {
-  SidebarTrigger,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -141,6 +140,7 @@ export default function ChatSidebar(props: IProps) {
                     >
                       <span
                         onClick={() => {
+                          console.log('click');
                           setConversationID(item.id);
                           stopChat?.();
                           // 更新聊天记录

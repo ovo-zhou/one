@@ -1,6 +1,6 @@
-import { Components } from "react-markdown";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { Components } from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 interface HProps {
   children: React.ReactNode;
@@ -8,12 +8,12 @@ interface HProps {
 }
 
 const classNameOptions: string[] = [
-  "text-[clamp(1.8rem,4vw,2.5rem)] font-bold  leading-tight mb-4",
-  "text-[clamp(1.5rem,3.5vw,2rem)] font-bold leading-tight mb-3",
-  "text-[clamp(1.3rem,3vw,1.75rem)] font-bold leading-tight mb-2",
-  "text-[clamp(1.15rem,2.5vw,1.5rem)] font-semibold leading-tight mb-1",
-  "text-[clamp(1rem,2vw,1.25rem)] font-semibold leading-tight mb-0.5",
-  "text-[clamp(0.9rem,1.5vw,1.1rem)] font-semibold leading-tight mb-0.25",
+  'text-[clamp(1.8rem,4vw,2.5rem)] font-bold  leading-tight mb-4',
+  'text-[clamp(1.5rem,3.5vw,2rem)] font-bold leading-tight mb-3',
+  'text-[clamp(1.3rem,3vw,1.75rem)] font-bold leading-tight mb-2',
+  'text-[clamp(1.15rem,2.5vw,1.5rem)] font-semibold leading-tight mb-1',
+  'text-[clamp(1rem,2vw,1.25rem)] font-semibold leading-tight mb-0.5',
+  'text-[clamp(0.9rem,1.5vw,1.1rem)] font-semibold leading-tight mb-0.25',
 ];
 
 // h1 到 h6 标题组件
@@ -35,9 +35,9 @@ const H = (props: HProps) => {
   };
   return (
     <div
-      id={encodeTitleToHash(children?.toString() || "")}
+      id={encodeTitleToHash(children?.toString() || '')}
       onClick={() => {
-        window.location.hash = encodeTitleToHash(children?.toString() || "");
+        window.location.hash = encodeTitleToHash(children?.toString() || '');
       }}
       className={`${classNameOptions[level - 1]} group cursor-pointer`}
     >
@@ -81,13 +81,13 @@ const components: Components = {
     return <H level={6}>{children}</H>;
   },
   code(props) {
-    const { children, className, node, ...rest } = props;
-    const match = /language-(\w+)/.exec(className || "");
+    const { children, className, ...rest } = props;
+    const match = /language-(\w+)/.exec(className || '');
     // 代码块
     return match ? (
       <SyntaxHighlighter
         PreTag="div"
-        children={String(children).replace(/\n$/, "")}
+        children={String(children).replace(/\n$/, '')}
         language={match[1]}
         style={vscDarkPlus}
       />
