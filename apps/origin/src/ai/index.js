@@ -66,7 +66,6 @@ export async function chat(
       }
       const finish_reason = choices[0].finish_reason;
       content += choices[0].delta.content;
-      console.log('主进程', choices[0].delta.content);
       event.sender.send('agent:chat:message', {
         id,
         role,

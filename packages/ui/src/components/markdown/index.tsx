@@ -3,6 +3,7 @@ import markdownit from 'markdown-it';
 import hljs from 'highlight.js';
 import { useMemo } from 'react';
 import 'highlight.js/styles/github.css';
+import './index.css';
 
 // full options list (defaults)
 const md: MarkdownIt = markdownit({
@@ -41,7 +42,7 @@ const md: MarkdownIt = markdownit({
     if (lang && hljs.getLanguage(lang)) {
       try {
         return (
-          '<pre style="background-color: #f6f8fa;overflow-x: auto;padding: 16px;border-radius: 10px;font-size:0.9rem;">' +
+          '<pre style="background-color: #f6f8fa;overflow-x: auto;padding: 16px;border-radius: 10px;font-size:0.9em; margin-bottom: 16px;">' +
           hljs.highlight(str, { language: lang, ignoreIllegals: true }).value +
           '</code></pre>'
         );
@@ -62,5 +63,10 @@ interface IMarkdown {
 export default function Markdown(props: IMarkdown) {
   const { content } = props;
   const useMarkdown = useMemo(() => md.render(content), [content]);
-  return <div dangerouslySetInnerHTML={{ __html: useMarkdown }} />;
+  return (
+    <div
+      className="origin-markdown"
+      dangerouslySetInnerHTML={{ __html: useMarkdown }}
+    />
+  );
 }

@@ -77,10 +77,7 @@ export default function ChatBox(props: IChatBox) {
             key={chatItem.id}
           />
         ))}
-        <div
-          ref={anchorRef}
-          style={{ height: '20px', width: '100%', backgroundColor: 'red' }}
-        ></div>
+        <div ref={anchorRef} style={{ height: '20px', width: '100%' }}></div>
       </div>
     </div>
   );
