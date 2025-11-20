@@ -129,7 +129,7 @@ export default function ChatSidebar(props: IProps) {
             <SidebarGroupContent>
               <SidebarMenu>
                 {conversationList.map((item) => (
-                  <SidebarMenuItem key={item.id}>
+                  <SidebarMenuItem className="truncate" key={item.id}>
                     <SidebarMenuButton
                       asChild
                       className={`cursor-pointer ${
@@ -140,7 +140,6 @@ export default function ChatSidebar(props: IProps) {
                     >
                       <span
                         onClick={() => {
-                          console.log('click');
                           setConversationID(item.id);
                           stopChat?.();
                           // 更新聊天记录

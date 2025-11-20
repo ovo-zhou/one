@@ -34,18 +34,21 @@ export default function Chat() {
       },
       { id: uuidv4(), role: 'assistant', content: '...' },
     ]);
-
-    if (conversationID === null) {
-      const id = await window.agent.createConversation('新会话');
+    let id = conversationID;
+    // 没有会话ID，创建新会话
+    if (!id) {
+      id = await window.agent.createConversation('新会话');
       setConversationID(id);
       await queryConversationList();
-      window.agent.chat({ agentId, message, conversationID: id });
-    } else {
-      window.agent.chat({
-        agentId,
-        message,
-        conversationID: Number(conversationID),
-      });
+    }
+    window.agent.chat({
+      agentId,
+      message,
+      conversationID: id,
+    });
+    if (chatList.length === 0) {
+      await window.agent.updateConversationTitle(id, message);
+      await queryConversationList();
     }
   };
   const queryConversationList = async () => {
@@ -74,6 +77,7 @@ export default function Chat() {
     if (conversationID) {
       queryMessagesByConversationID(Number(conversationID));
     }
+    // 监听流式输出回调
     const off = window.agent.onMessage((data) => {
       if (data.finish) {
         // 关闭流式输出

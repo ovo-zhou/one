@@ -5,6 +5,7 @@ import {
   getAgentPromptByAgentID,
   createMessage,
   getMessagesByConversationID,
+  updateConversation,
 } from 'database';
 
 const openai = new OpenAI({
@@ -57,7 +58,6 @@ export async function chat(
       { signal: controller.signal }
     );
     // 记录角色
-
     for await (let res of completion) {
       const { id, choices } = res;
       // 根据返回的 delta 进行处理，改变角色
@@ -85,4 +85,20 @@ export async function chat(
       role,
     });
   }
+}
+export async function updateConversationTitle(event, conversationID, message) {
+  // 第一次对话，更新会话标题
+  const completion = await openai.chat.completions.create({
+    messages: [
+      {
+        role: 'system',
+        content:
+          '总结下面所提问题的主题，用作会话标题，30个字符以内，不要对问题进行解释和回答，仅仅总结话题的主要内容',
+      },
+      { role: 'user', content: message },
+    ],
+    model: 'deepseek-chat',
+  });
+  const title = completion.choices[0].message.content;
+  await updateConversation(+conversationID, title);
 }

@@ -12,7 +12,7 @@ import {
   getMessagesByConversationID,
   deleteConversation,
 } from 'database';
-import { chat } from './src/ai/index.js';
+import { chat, updateConversationTitle } from './src/ai/index.js';
 
 // 是否为开发环境
 const isDev = !app.isPackaged;
@@ -95,6 +95,7 @@ app.on('ready', () => {
     handleGetMessagesByConversationID
   );
   ipcMain.handle('agent:deleteConversation', handleDeleteConversation);
+  ipcMain.handle('agent:updateConversationTitle', updateConversationTitle);
   createWindow();
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
