@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 
 interface IChatBox {
   chatList: IChatItem[];
+  openSandbox: (content: string) => void;
 }
 
 /**
@@ -11,7 +12,7 @@ interface IChatBox {
  * @returns
  */
 export default function ChatBox(props: IChatBox) {
-  const { chatList } = props;
+  const { chatList, openSandbox } = props;
   // 聊天容器
   const chatBoxRef = useRef<HTMLDivElement>(null);
   const anchorRef = useRef<HTMLDivElement>(null);
@@ -45,7 +46,7 @@ export default function ChatBox(props: IChatBox) {
       },
       {
         root: scrollContainerNode,
-        threshold: 0.1,
+        threshold: 1,
       }
     );
     const resizeObserver = new ResizeObserver((entries) => {
@@ -72,12 +73,15 @@ export default function ChatBox(props: IChatBox) {
       <div className="w-3xl bg-white h-fit" ref={chatBoxRef}>
         {chatList.map((chatItem) => (
           <ChatItem
+            openSandbox={openSandbox}
             role={chatItem.role}
             content={chatItem.content}
             key={chatItem.id}
           />
         ))}
-        <div ref={anchorRef} style={{ height: '20px', width: '100%' }}></div>
+        <div ref={anchorRef} className="h-5">
+          123
+        </div>
       </div>
     </div>
   );

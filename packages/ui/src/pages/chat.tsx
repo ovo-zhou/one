@@ -5,6 +5,7 @@ import ChatBox from '@/components/chatBox';
 import { useEffect, useState } from 'react';
 import type { IChatItem } from '@/components/chatBox/ChatItem';
 import { v4 as uuidv4 } from 'uuid';
+import Sandbox from '@/components/sandbox';
 
 export default function Chat() {
   const [conversationID, setConversationID] = useState<number | null>(null);
@@ -15,6 +16,7 @@ export default function Chat() {
   const [chatList, setChatList] = useState<IChatItem[]>([]);
   // 是否正在流式输出
   const [isStreamResponse, setIsStreamResponse] = useState<boolean>(false);
+  const [htmlContent, setHtmlContent] = useState<string>('');
 
   // 手动中断流式输出
   const stopChat = () => {
@@ -69,6 +71,12 @@ export default function Chat() {
   const clearChatList = () => {
     setChatList([]);
   };
+  const openSandbox = (content: string) => {
+    setHtmlContent(content);
+  };
+  const closeSandbox = () => {
+    setHtmlContent('');
+  };
   // 监听流式输出回调
   useEffect(() => {
     // 进页面查询会话列表
@@ -116,26 +124,33 @@ export default function Chat() {
           conversationID ? '' : 'justify-center'
         }`}
       >
-        {conversationID && (
-          <>
-            <div className="h-14 leading-14 text-center relative">
-              <SidebarTrigger className="absolute left-4 top-1/2 -translate-y-1/2" />
-              {conversationList.find(
-                (item) => item.id === Number(conversationID)
-              )?.title || '新会话'}
-            </div>
+        <div className="h-14">
+          {conversationID && (
+            <>
+              <div className="h-14 leading-14 text-center relative">
+                <SidebarTrigger className="absolute left-4 top-1/2 -translate-y-1/2" />
+                {conversationList.find(
+                  (item) => item.id === Number(conversationID)
+                )?.title || '新会话'}
+              </div>
 
-            <ChatBox chatList={chatList} />
-          </>
-        )}
-        <div className="flex justify-center pb-8">
-          <ChatInput
-            stopChat={stopChat}
-            isStreamResponse={isStreamResponse}
-            submit={(values) => {
-              sendMessage(values.agentId, values.message);
-            }}
-          />
+              <ChatBox chatList={chatList} openSandbox={openSandbox} />
+            </>
+          )}
+          <div className="flex justify-center pb-8">
+            <ChatInput
+              stopChat={stopChat}
+              isStreamResponse={isStreamResponse}
+              submit={(values) => {
+                sendMessage(values.agentId, values.message);
+              }}
+            />
+          </div>
+          {htmlContent && (
+            <div className="h-14">
+              <Sandbox htmlContent={htmlContent} />
+            </div>
+          )}
         </div>
       </main>
     </SidebarProvider>

@@ -41,11 +41,18 @@ const md: MarkdownIt = markdownit({
   highlight: function (str, lang) {
     if (lang && hljs.getLanguage(lang)) {
       try {
-        return (
-          '<pre style="background-color: #f6f8fa;overflow-x: auto;padding: 16px;border-radius: 10px;font-size:0.9em; margin-bottom: 16px;">' +
-          hljs.highlight(str, { language: lang, ignoreIllegals: true }).value +
-          '</code></pre>'
-        );
+        // 目前只有html代码只是sandbox运行
+        if (lang === 'html') {
+          return `<pre data-lang="${lang}" style="background-color: #f6f8fa;overflow-x: auto;padding: 16px;border-radius: 10px;font-size:0.9em; margin-bottom: 16px;"><div style="background-color: red;" data-lang="${lang}" data-action="run" data-code="${encodeURIComponent(
+            str
+          )}">运行</div>${
+            hljs.highlight(str, { language: lang, ignoreIllegals: true }).value
+          }</pre>`;
+        } else {
+          return `<pre data-lang="${lang}" style="background-color: #f6f8fa;overflow-x: auto;padding: 16px;border-radius: 10px;font-size:0.9em; margin-bottom: 16px;">${
+            hljs.highlight(str, { language: lang, ignoreIllegals: true }).value
+          }</pre>`;
+        }
       } catch (e) {
         console.error('Error highlighting code:', e);
       }
@@ -59,12 +66,21 @@ const md: MarkdownIt = markdownit({
 
 interface IMarkdown {
   content: string;
+  openSandbox: (content: string) => void;
 }
 export default function Markdown(props: IMarkdown) {
-  const { content } = props;
+  const { content, openSandbox } = props;
   const useMarkdown = useMemo(() => md.render(content), [content]);
+  const handleDelegatedItemClick = (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (target.dataset.action === 'run') {
+      const code = decodeURIComponent(target.dataset.code || '');
+      openSandbox(code);
+    }
+  };
   return (
     <div
+      onClick={handleDelegatedItemClick}
       className="origin-markdown"
       dangerouslySetInnerHTML={{ __html: useMarkdown }}
     />
