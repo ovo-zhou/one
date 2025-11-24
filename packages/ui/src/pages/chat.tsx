@@ -119,12 +119,8 @@ export default function Chat() {
         queryMessagesByConversationID={queryMessagesByConversationID}
         clearChatList={clearChatList}
       />
-      <main
-        className={`w-full h-screen flex flex-col ${
-          conversationID ? '' : 'justify-center'
-        }`}
-      >
-        <div className="h-14">
+      <main className={`w-full h-screen flex flex-row`}>
+        <div className="flex-1 flex flex-col">
           {conversationID && (
             <>
               <div className="h-14 leading-14 text-center relative">
@@ -146,12 +142,12 @@ export default function Chat() {
               }}
             />
           </div>
-          {htmlContent && (
-            <div className="h-14">
-              <Sandbox htmlContent={htmlContent} />
-            </div>
-          )}
         </div>
+        {htmlContent && (
+          <div className="w-1/2 h-screen">
+            <Sandbox htmlContent={htmlContent} />
+          </div>
+        )}
       </main>
     </SidebarProvider>
   );
