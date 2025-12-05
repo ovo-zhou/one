@@ -1,8 +1,6 @@
 .origin-markdown {
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   line-height: 1.6;
   font-size: 16px;
-  color: #333;
 
   & p {
     margin-top: 0px;
@@ -19,7 +17,6 @@
   & h2,
   & h3,
   & h4 {
-    color: #2c3e50;
     font-weight: 600;
     margin-top: 2rem;
     margin-bottom: 0.8rem;
@@ -28,37 +25,26 @@
 
   & h1 {
     font-size: 2.2rem;
-    border-bottom: 3px solid #3498db;
   }
 
   & h2 {
     font-size: 1.8rem;
-    border-bottom: 1px dashed #bdc3c7;
   }
 
   & h3 {
     font-size: 1.4rem;
-    color: #34495e;
   }
 
   & h4 {
     font-size: 1.2rem;
-    color: #7f8c8d;
-  }
-
-  & strong,
-  & b {
-    /* color: #1abc9c; */
   }
 
   & em,
   & i {
     font-style: italic;
-    color: #3498db;
   }
 
   & a {
-    color: #2980b9;
     text-decoration: none;
 
     &:hover {

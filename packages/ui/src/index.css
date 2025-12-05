@@ -113,8 +113,7 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    font-family: "Noto Sans SC", sans-serif;
-    font-optical-sizing: auto;
+    font-family: Geist, "Geist Fallback";
   }
 
   body {
