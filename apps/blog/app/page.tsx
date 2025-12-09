@@ -1,11 +1,33 @@
-'use client';
+import dayjs from 'dayjs';
+import Link from 'next/link';
+import { getPostList } from '@/tcb/models/post';
 
-import dayjs from "dayjs";
-import Link from "next/link";
-import { usePost } from "@/components/PostProvider";
+export const revalidate = 60;
 
-export default function Home() {
-  const { loading, records, hasMore, loadMore } = usePost();
+export async function generateStaticParams() {
+  const posts = await getPostList();
+  // 向下取整数，并且返回对应长度的数组，比如[1,2,3]
+
+  return Array.from(
+    { length: Math.ceil(posts.total! / 10) },
+    (_, i) => i + 1
+  ).map((item) => ({ page: String(item) }));
+}
+
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ page: string | undefined }>;
+}) {
+  // 没有分页参数，默认为第一页
+  const { page = 1 } = await searchParams;
+  const { records, total } = await getPostList(+page);
+  const isMore = () => {
+    if ((+page - 1) * 10 + records.length < total!) {
+      return true;
+    }
+    return false;
+  };
   return (
     <>
       {records?.map((item) => (
@@ -21,27 +43,22 @@ export default function Home() {
 
           <div className="text-xs text-gray-500 mt-4 mb-4 flex justify-start gap-2">
             <div>
-              创建于：{dayjs(item.createdAt).format("YYYY-MM-DD HH:mm:ss")}
+              创建于：{dayjs(item.createdAt).format('YYYY-MM-DD HH:mm:ss')}
             </div>
             <div>
               最近更新：
-              {dayjs(item.updatedAt).format("YYYY-MM-DD HH:mm:ss")}
+              {dayjs(item.updatedAt).format('YYYY-MM-DD HH:mm:ss')}
             </div>
           </div>
           <div className="text-base mt-2">{item.abstract}</div>
         </div>
       ))}
-      {hasMore && (
-        <div
-          className="text-center text-pink-500 cursor-pointer text-xs"
-          onClick={() => {
-            loadMore();
-          }}
-        >
-          {loading ? "加载中..." : "加载更多"}
+      {/* 加载更多 */}
+      {isMore() && (
+        <div>
+          <Link href={`/?page=${+page + 1}`}>加载更多</Link>
         </div>
       )}
     </>
   );
 }
-
