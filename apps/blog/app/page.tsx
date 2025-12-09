@@ -6,12 +6,11 @@ export const revalidate = 60;
 
 export async function generateStaticParams() {
   const posts = await getPostList();
-  // 向下取整数，并且返回对应长度的数组，比如[1,2,3]
-
-  return Array.from(
-    { length: Math.ceil(posts.total! / 10) },
-    (_, i) => i + 1
-  ).map((item) => ({ page: String(item) }));
+  const total = posts?.total ?? 0;
+  const totalPages = Math.ceil(total / 10);
+  return Array.from({ length: totalPages }, (_, i) => ({
+    page: String(i + 1),
+  }));
 }
 
 export default async function Home({
