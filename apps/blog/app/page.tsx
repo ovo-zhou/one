@@ -52,7 +52,7 @@ export default async function Home({
       {/* 加载更多 */}
       {isMore() && (
         <div>
-          <Link href={`/?page=${+page + 1}`}>加载更多</Link>
+          <Link href={`/?page=${+page + 1}`}>加载更多...</Link>
         </div>
       )}
     </>
