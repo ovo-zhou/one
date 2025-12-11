@@ -1,8 +1,11 @@
-name: ci/build-blog-docker-image
+name: Docker Build and Publish - apps/blog
 
 on:
   push:
-    - main
+    branches:
+      - main
+    paths:
+      - 'apps/blog/**'
 
 jobs:
   docker:
