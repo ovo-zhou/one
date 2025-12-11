@@ -1,6 +1,5 @@
 'use server';
 import { app } from '@/tcb';
-import { pageSize } from '@/tcb/models/constants';
 
 const { models } = app;
 
@@ -24,9 +23,13 @@ export interface PostList {
 /**
  * 获取文章列表
  * @param pageNumber 页码，默认第 1 页
+ * @param pageSize 分页大小，默认第 10 条
  * @returns 文章列表
  */
-export async function getPostList(pageNumber: number = 1): Promise<PostList> {
+export async function getPostList(
+  pageNumber: number = 1,
+  pageSize: number = 10
+): Promise<PostList> {
   try {
     const { data } = await models.blog.list({
       filter: {

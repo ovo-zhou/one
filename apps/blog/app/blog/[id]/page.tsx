@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export const revalidate = 60;
 export async function generateStaticParams() {
-  const posts = await getPostList();
+  const posts = await getPostList(1, 100);
   return posts.records.map((post) => ({
     id: String(post._id),
   }));

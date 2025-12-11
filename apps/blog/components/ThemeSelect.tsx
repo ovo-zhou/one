@@ -1,21 +1,21 @@
-"use client";
+'use client';
 
-import { useMemo } from "react";
-import { useTheme, Theme } from "./ThemeProvider";
-import { MoonStar, Sun } from "lucide-react";
+import { useMemo } from 'react';
+import { useTheme, Theme } from './ThemeProvider';
+import { MoonStar, Sun } from 'lucide-react';
 
 const options = [
   {
-    label: "light",
+    label: 'light',
     value: Theme.Light,
     icon: Sun,
-    bg: "#eee",
+    bg: '#eee',
   },
   {
-    label: "dark",
+    label: 'dark',
     value: Theme.Dark,
     icon: MoonStar,
-    bg: "#3d3d3d",
+    bg: '#3d3d3d',
   },
 ];
 
@@ -36,8 +36,8 @@ export default function ThemeSelect() {
         className={`absolute rounded-[8px] w-[16px] h-[16px] bg-white dark:bg-black p-0.5 transition-left duration-300
           ${
             selectedOption.value === Theme.Light
-              ? "top-0.5 left-0.5"
-              : "top-0.5 left-5"
+              ? 'top-0.5 left-0.5'
+              : 'top-0.5 left-5'
           }`}
       >
         <selectedOption.icon size={12} />
