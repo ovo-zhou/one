@@ -6,7 +6,8 @@ on:
       - main
     paths:
       - 'apps/blog/**'
-
+env:
+  CONTEXT_PATH: apps/blog
 jobs:
   docker:
     runs-on: ubuntu-latest
@@ -25,7 +26,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: apps/blog
-          file: apps/blog/Dockerfile
+          context: ${{ env.CONTEXT_PATH }}
+          file: ${{ env.CONTEXT_PATH }}/Dockerfile
           push: true
-          tags: blog:latest
+          tags: ${{ vars.DOCKERHUB_USERNAME }}/blog:latest
