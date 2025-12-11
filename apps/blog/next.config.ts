@@ -7,6 +7,11 @@ const nextConfig: NextConfig = {
       allowedOrigins: ['ryandev.cn', '*.ap-shanghai.run.wxcloudrun.com'],
     },
   },
+  logging: {
+    fetches: {
+      fullUrl: true,
+    }
+  }
 };
 
 export default nextConfig;
