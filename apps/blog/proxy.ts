@@ -4,7 +4,7 @@ import { NextResponse, NextRequest } from 'next/server'
  * @param request NextRequest
  * @returns NextResponse
  */
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const requestHeaders = new Headers(request.headers)
   const origin = requestHeaders.get('origin')
   const xForwardedHost = requestHeaders.get('x-forwarded-host')
