@@ -21,8 +21,6 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
-        with:
-          platforms: all
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Build and push
@@ -30,7 +28,6 @@ jobs:
         with:
           context: ${{ env.CONTEXT_PATH }}
           file: ${{ env.CONTEXT_PATH }}/Dockerfile
-          platforms: linux/amd64,linux/arm64/v8
           push: true
           tags: ${{ vars.DOCKERHUB_USERNAME }}/blog:latest
           # 传递两个环境变量进去

@@ -52,9 +52,6 @@ export default async function RootLayout({
                 <Link href="https://github.com/ovo-zhou/one" target="_blank">
                   <Github size={16} />
                 </Link>
-                <Link href="https://ryandev.cn/admin" target="_blank">
-                  <UserStar size={16} />
-                </Link>
               </div>
             </nav>
           </header>
