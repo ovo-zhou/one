@@ -33,3 +33,7 @@ jobs:
           platforms: linux/amd64,linux/arm64/v8
           push: true
           tags: ${{ vars.DOCKERHUB_USERNAME }}/blog:latest
+          # 传递两个环境变量进去
+          secrets: |
+            SecretId=${{ secrets.TCB_SECRET_ID }}
+            SecretKey=${{ secrets.TCB_SECRET_KEY }}

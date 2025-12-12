@@ -13,8 +13,12 @@ RUN yarn
 # 复制项目文件
 COPY . .
 
-# 构建应用
-RUN yarn build
+# 构建应用，在构建之前挂载环境变量
+RUN --mount=type=secret,id=SecretId,target=/run/secrets/SecretId \
+    --mount=type=secret,id=SecretKey,target=/run/secrets/SecretKey \
+    SecretId=$(cat /run/secrets/SecretId) \
+    SecretKey=$(cat /run/secrets/SecretKey) \
+    yarn build
 
 # 使用更小的基础镜像来运行应用
 FROM node:22-alpine AS runner
