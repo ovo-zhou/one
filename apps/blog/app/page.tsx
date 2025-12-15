@@ -37,7 +37,7 @@ export default async function Home({
             </h1>
           </Link>
 
-          <div className="text-xs text-gray-500 mt-4 mb-4">
+          <div className="text-xs text-gray-500 mt-2 mb-4">
             <div className="mb-2">
               创建于：{dayjs(item.createdAt).format('YYYY-MM-DD HH:mm:ss')}
             </div>

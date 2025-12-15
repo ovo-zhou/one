@@ -29,13 +29,16 @@ export default async function Page({
   }
   return (
     <div>
-      <h1 className="text-4xl font-bold pt-6">{data.title}</h1>
-      <div className="text-xs text-gray-500 mt-4 mb-15 flex justify-start gap-2">
+      <h1 className="text-4xl font-extrabold tracking-tight text-balance">
+        {data.title}
+      </h1>
+      <div className="text-xs text-gray-500 mt-2 mb-4">
         <div>创建于：{dayjs(data.createdAt).format('YYYY-MM-DD HH:mm:ss')}</div>
         <div>
           最近更新：{dayjs(data.updatedAt).format('YYYY-MM-DD HH:mm:ss')}
         </div>
       </div>
+      <div>{data.abstract}</div>
       <Markdown>{data.content}</Markdown>
     </div>
   );
