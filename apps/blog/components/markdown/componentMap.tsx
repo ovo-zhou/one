@@ -17,29 +17,14 @@ const classNameOptions: string[] = [
 // h1 到 h6 标题组件
 const H = (props: HProps) => {
   const { children, level } = props;
-  const encodeTitleToHash = (title: string) => {
-    // 使用一个简单的哈希算法
-    let hash = 0;
-    if (title.length === 0) return `h-${hash}`;
-
-    for (let i = 0; i < title.length; i++) {
-      const char = title.charCodeAt(i);
-      hash = (hash << 5) - hash + char;
-      hash = hash & hash; // 转换为32位整数
-    }
-
-    // 使用绝对值并转换为16进制
-    return `h-${Math.abs(hash).toString(16).substring(0, 8)}`;
-  };
   return (
     <div
-      id={encodeTitleToHash(children?.toString() || '')}
-      onClick={() => {
-        window.location.hash = encodeTitleToHash(children?.toString() || '');
-      }}
+      id={encodeURIComponent(children?.toString() || '')}
       className={`${classNameOptions[level - 1]} group cursor-pointer`}
     >
-      {children}
+      <a href={`#${encodeURIComponent(children?.toString() || '')}`}>
+        {children}
+      </a>
       <span
         onClick={async (e) => {
           e.stopPropagation();
@@ -55,6 +40,7 @@ const H = (props: HProps) => {
 
 const components: Components = {
   h1(props) {
+    console.log('props', props);
     const { children } = props;
     return <H level={1}>{children}</H>;
   },
