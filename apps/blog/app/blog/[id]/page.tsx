@@ -28,15 +28,15 @@ export default async function Page({
     return notFound();
   }
   return (
-    <div>
-      <h1 className="text-4xl font-extrabold tracking-tight text-balance">
-        {data.title}
-      </h1>
-      <div className="text-xs text-gray-500 mt-2 mb-4">
-        <div>创建于：{dayjs(data.createdAt).format('YYYY-MM-DD HH:mm:ss')}</div>
-        <div>
+    <div className="prose prose-neutral max-w-none dark:prose-invert">
+      <h1>{data.title}</h1>
+      <div className="flex gap-10 text-xs mb-10">
+        <span>
+          创建于：{dayjs(data.createdAt).format('YYYY-MM-DD HH:mm:ss')}
+        </span>
+        <span>
           最近更新：{dayjs(data.updatedAt).format('YYYY-MM-DD HH:mm:ss')}
-        </div>
+        </span>
       </div>
       <div>{data.abstract}</div>
       <Markdown>{data.content}</Markdown>

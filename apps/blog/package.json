@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@cloudbase/node-sdk": "^3.10.1",
+    "@tailwindcss/typography": "^0.5.19",
     "@types/react-syntax-highlighter": "^15.5.13",
     "dayjs": "^1.11.18",
     "lucide-react": "^0.544.0",
