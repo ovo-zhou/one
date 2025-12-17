@@ -30,11 +30,11 @@ export default async function Page({
   return (
     <div className="prose prose-neutral max-w-none dark:prose-invert">
       <h1>{data.title}</h1>
-      <div className="flex gap-10 text-xs mb-10">
+      <div className=" text-xs mb-10">
         <span>
           创建于：{dayjs(data.createdAt).format('YYYY-MM-DD HH:mm:ss')}
         </span>
-        <span>
+        <span className="ml-4">
           最近更新：{dayjs(data.updatedAt).format('YYYY-MM-DD HH:mm:ss')}
         </span>
       </div>
