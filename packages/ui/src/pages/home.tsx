@@ -28,14 +28,6 @@ export default function Home() {
           <div>AI 助手</div>
         </div>
       </div>
-      <div
-        className="absolute right-10 bottom-10 cursor-pointer hover:rotate-180 hover:scale-105 transition-transform duration-300"
-        onClick={() => {
-          navigate('/setting');
-        }}
-      >
-        <Settings />
-      </div>
     </div>
   );
 }

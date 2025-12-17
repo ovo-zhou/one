@@ -7,7 +7,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import { Send } from 'lucide-react';
 import { CircleStop } from 'lucide-react';
 interface IProps {
@@ -88,7 +87,7 @@ export default function ChatInput(props: IProps) {
     if (isStreamResponse) {
       return (
         <CircleStop
-          className="absolute right-3 bottom-3 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+          className="cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
           onClick={handleStop}
         />
       );
@@ -97,7 +96,7 @@ export default function ChatInput(props: IProps) {
     if (message) {
       return (
         <Send
-          className="absolute right-3 bottom-3 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+          className="cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
           onClick={handleSubmit}
         />
       );
@@ -105,38 +104,47 @@ export default function ChatInput(props: IProps) {
     return null;
   };
   return (
-    <div className="relative max-w-3xl">
-      <Textarea
-        value={message}
-        onChange={(e) => {
-          setMessage(e.target.value);
-        }}
-        placeholder="从 origin 开始"
-        className="h-40 resize-none w-3xl"
-        onKeyDown={handleKeyDown}
-      ></Textarea>
-      <Select
-        value={agentId}
-        onValueChange={(value) => {
-          setAgentId(value);
-        }}
-      >
-        <SelectTrigger className="absolute left-3 bottom-3 w-[100px]">
-          <SelectValue placeholder="未设定" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            {options.map((item) => {
-              return (
-                <SelectItem key={item.id} value={String(item.id)}>
-                  {item.agentName}
-                </SelectItem>
-              );
-            })}
-          </SelectGroup>
-        </SelectContent>
-      </Select>
-      {renderButton()}
+    <div className="flex justify-center">
+      <div className="w-3xl py-5">
+        <div className="rounded-3xl border-2 border-gray-200 p-3">
+          <textarea
+            value={message}
+            onChange={(e) => {
+              setMessage(e.target.value);
+            }}
+            placeholder="从 origin 开始"
+            className="h-20 resize-none w-full border-none outline-none"
+            onKeyDown={handleKeyDown}
+            style={{ scrollbarWidth: 'none' }}
+          ></textarea>
+          <div className="flex justify-between items-center">
+            <div>
+              <Select
+                value={agentId}
+                onValueChange={(value) => {
+                  setAgentId(value);
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Agent" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {options.map((item) => {
+                      return (
+                        <SelectItem key={item.id} value={String(item.id)}>
+                          {item.agentName}
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+            <div> {renderButton()}</div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

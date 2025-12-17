@@ -117,15 +117,12 @@ export default function ChatSidebar(props: IProps) {
                     <MessageCirclePlus className="mr-2" />
                     开启新会话
                   </div>
-                  {/* <SidebarMenuButton asChild>
-                    <span>开启新会话</span>
-                  </SidebarMenuButton> */}
                 </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
           <SidebarGroup>
-            <SidebarGroupLabel>Application</SidebarGroupLabel>
+            <SidebarGroupLabel>历史记录</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {conversationList.map((item) => (

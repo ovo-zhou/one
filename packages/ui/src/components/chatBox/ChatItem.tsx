@@ -10,12 +10,8 @@ export interface IChatItem {
  * @param props
  * @returns
  */
-export function ChatItem(
-  props: Pick<IChatItem, 'role' | 'content'> & {
-    openSandbox: (content: string) => void;
-  }
-) {
-  const { role, content, openSandbox } = props;
+export function ChatItem(props: Pick<IChatItem, 'role' | 'content'>) {
+  const { role, content } = props;
   const renderMessage = () => {
     if (role === 'user') {
       return (
@@ -28,7 +24,7 @@ export function ChatItem(
     }
     return (
       <div className="py-2">
-        <Markdown content={content} openSandbox={openSandbox} />
+        <Markdown content={content} />
       </div>
     );
   };
