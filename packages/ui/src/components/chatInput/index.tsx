@@ -1,14 +1,13 @@
 import { useEffect, useState } from 'react';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Send } from 'lucide-react';
 import { CircleStop } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Plus } from 'lucide-react';
 interface IProps {
   /**
    * 初始的 agentId
@@ -108,38 +107,37 @@ export default function ChatInput(props: IProps) {
       <div className="w-3xl py-5">
         <div className="rounded-3xl border-2 border-gray-200 p-3">
           <textarea
+            contentEditable
             value={message}
             onChange={(e) => {
               setMessage(e.target.value);
             }}
             placeholder="从 origin 开始"
-            className="h-20 resize-none w-full border-none outline-none"
+            className="h-20 resize-none w-full border-none outline-none p-1"
             onKeyDown={handleKeyDown}
             style={{ scrollbarWidth: 'none' }}
           ></textarea>
           <div className="flex justify-between items-center">
             <div>
-              <Select
-                value={agentId}
-                onValueChange={(value) => {
-                  setAgentId(value);
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Agent" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    {options.map((item) => {
-                      return (
-                        <SelectItem key={item.id} value={String(item.id)}>
-                          {item.agentName}
-                        </SelectItem>
-                      );
-                    })}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Plus />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-30" align="start">
+                  {options.map((item) => {
+                    return (
+                      <DropdownMenuItem
+                        key={item.id}
+                        onClick={() => {
+                          setAgentId(String(item.id));
+                        }}
+                      >
+                        {item.agentName}
+                      </DropdownMenuItem>
+                    );
+                  })}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
             <div> {renderButton()}</div>
           </div>
