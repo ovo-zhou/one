@@ -8,15 +8,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Plus } from 'lucide-react';
+import { useCopilot } from '@/hooks/use-copilot';
 interface IProps {
   /**
    * 初始的 agentId
    */
   initAgentId?: string;
-  /**
-   * 是否流式响应
-   */
-  isStreamResponse?: boolean;
 
   /**
    * 手动中断流式输出的回调函数
@@ -29,7 +26,8 @@ interface IProps {
 }
 
 export default function ChatInput(props: IProps) {
-  const { submit, initAgentId, isStreamResponse, stopChat } = props;
+  const { submit, initAgentId, stopChat } = props;
+  const { isLoading } = useCopilot();
   const [message, setMessage] = useState<string>('');
   const [agentId, setAgentId] = useState<string>(initAgentId || '');
   const [options, setOptions] = useState<{ id: number; agentName: string }[]>(
@@ -37,7 +35,7 @@ export default function ChatInput(props: IProps) {
   );
   const handleSubmit = () => {
     // 有消息，并且不是流式输出，才提交
-    if (message && !isStreamResponse) {
+    if (message && !isLoading) {
       submit({ message, agentId });
       // 重置一下表单值
       setMessage('');
@@ -83,7 +81,7 @@ export default function ChatInput(props: IProps) {
   // 渲染操作按钮
   const renderButton = () => {
     // 正在流式输出，渲染暂停按钮
-    if (isStreamResponse) {
+    if (isLoading) {
       return (
         <CircleStop
           className="cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"

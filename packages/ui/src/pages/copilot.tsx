@@ -5,26 +5,31 @@ import ChatBox from '@/components/chatBox';
 import { useEffect, useState } from 'react';
 import type { IChatItem } from '@/components/chatBox/ChatItem';
 import { v4 as uuidv4 } from 'uuid';
+import CopilotProvider from '@/components/copilotProvider';
+import { useCopilot } from '@/hooks/use-copilot';
 
-export default function Chat() {
-  const [conversationID, setConversationID] = useState<number | null>(null);
+function CopilotComponent() {
+  const {
+    currentConversationId,
+    setCurrentConversationId,
+    chatList,
+    setChatList,
+    setIsLoading,
+  } = useCopilot();
   // 会话列表
   const [conversationList, setConversationList] = useState<
     { id: number; title: string }[]
   >([]);
-  const [chatList, setChatList] = useState<IChatItem[]>([]);
-  // 是否正在流式输出
-  const [isStreamResponse, setIsStreamResponse] = useState<boolean>(false);
 
   // 手动中断流式输出
   const stopChat = () => {
     window.agent.stopChat();
-    setIsStreamResponse(false);
+    setIsLoading(false);
   };
   const sendMessage = async (agentId: string, message: string) => {
     // 开启流式输出
     // 输出结束或者手动中断，结束流失输出
-    setIsStreamResponse(true);
+    setIsLoading(true);
     setChatList([
       ...chatList,
       {
@@ -34,11 +39,11 @@ export default function Chat() {
       },
       { id: uuidv4(), role: 'assistant', content: '...' },
     ]);
-    let id = conversationID;
+    let id = currentConversationId;
     // 没有会话ID，创建新会话
     if (!id) {
       id = await window.agent.createConversation('新会话');
-      setConversationID(id);
+      setCurrentConversationId(id);
       await queryConversationList();
     }
     window.agent.chat({
@@ -73,15 +78,11 @@ export default function Chat() {
   useEffect(() => {
     // 进页面查询会话列表
     queryConversationList();
-    // 进页面查询聊天记录
-    if (conversationID) {
-      queryMessagesByConversationID(Number(conversationID));
-    }
     // 监听流式输出回调
     const off = window.agent.onMessage((data) => {
       if (data.finish) {
         // 关闭流式输出
-        setIsStreamResponse(false);
+        setIsLoading(false);
         return;
       }
       // 更新最新的一条消息
@@ -105,23 +106,23 @@ export default function Chat() {
       <ChatSidebar
         stopChat={stopChat}
         conversationList={conversationList}
-        conversationID={conversationID}
-        setConversationID={setConversationID}
+        conversationID={currentConversationId}
+        setConversationID={setCurrentConversationId}
         queryConversationList={queryConversationList}
         queryMessagesByConversationID={queryMessagesByConversationID}
         clearChatList={clearChatList}
       />
       <main
         className={`w-full h-screen flex flex-col ${
-          conversationID ? '' : 'justify-center'
+          currentConversationId ? '' : 'justify-center'
         }`}
       >
-        {conversationID && (
+        {currentConversationId && (
           <>
             <div className="h-14 leading-14 text-center relative">
               <SidebarTrigger className="absolute left-4 top-1/2 -translate-y-1/2" />
               {conversationList.find(
-                (item) => item.id === Number(conversationID)
+                (item) => item.id === currentConversationId
               )?.title || '新会话'}
             </div>
             <ChatBox chatList={chatList} />
@@ -129,12 +130,18 @@ export default function Chat() {
         )}
         <ChatInput
           stopChat={stopChat}
-          isStreamResponse={isStreamResponse}
           submit={(values) => {
             sendMessage(values.agentId, values.message);
           }}
         />
       </main>
     </SidebarProvider>
+  );
+}
+export default function Copilot() {
+  return (
+    <CopilotProvider>
+      <CopilotComponent />
+    </CopilotProvider>
   );
 }

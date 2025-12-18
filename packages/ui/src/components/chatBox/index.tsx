@@ -77,7 +77,9 @@ export default function ChatBox(props: IChatBox) {
             key={chatItem.id}
           />
         ))}
-        <div ref={anchorRef} className="h-10 w-full"></div>
+        <div ref={anchorRef} className="h-10 w-full">
+          123
+        </div>
       </div>
     </div>
   );
