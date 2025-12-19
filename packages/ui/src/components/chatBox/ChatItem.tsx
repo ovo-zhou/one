@@ -16,7 +16,7 @@ export function ChatItem(props: Pick<IChatItem, 'role' | 'content'>) {
     if (role === 'user') {
       return (
         <div className="flex justify-end py-2">
-          <div className="p-2 rounded-tl-lg rounded-tr-none rounded-br-lg rounded-bl-lg">
+          <div className="p-2 rounded-tl-lg rounded-tr-none rounded-br-lg rounded-bl-lg bg-slate-200">
             <pre>{content}</pre>
           </div>
         </div>
@@ -32,11 +32,9 @@ export function ChatItem(props: Pick<IChatItem, 'role' | 'content'>) {
   return (
     <div className="group">
       {renderMessage()}
-      {/* 按钮组合 */}
       <div
-        className={`flex gap-2 invisible group-hover:visible ${
-          role === 'user' ? 'justify-end' : 'justify-start'
-        }`}
+        className="flex gap-2 invisible group-hover:visible"
+        style={{ justifyContent: role === 'user' ? 'flex-end' : 'flex-start' }}
       >
         <CopyIcon text={content} />
       </div>

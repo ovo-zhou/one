@@ -21,7 +21,7 @@ function CopilotComponent() {
   return (
     <SidebarProvider>
       <ChatSidebar />
-      <main className="w-full h-screen flex flex-col justify-center">
+      <main className="flex-1 w-full h-screen flex flex-col justify-center">
         <Header />
         <ChatBox />
         <ChatInput />

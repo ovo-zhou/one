@@ -6,6 +6,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { Plus } from 'lucide-react';
 import { useCopilot } from '@/hooks/use-copilot';
@@ -106,9 +107,24 @@ export default function ChatInput() {
             <div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Plus />
+                  <div className="flex items-center cursor-pointer">
+                    <Plus size={16} />
+                    <span>
+                      {options.find((item) => item.id === Number(agentId))
+                        ?.agentName || 'auto'}
+                    </span>
+                  </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-30" align="start">
+                  <DropdownMenuItem
+                    key={'auto'}
+                    onClick={() => {
+                      setAgentId('');
+                    }}
+                  >
+                    auto
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
                   {options.map((item) => {
                     return (
                       <DropdownMenuItem

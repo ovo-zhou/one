@@ -12,7 +12,6 @@ import {
   SidebarMenuAction,
 } from '@/components/ui/sidebar';
 import { Link } from 'react-router-dom';
-import { Ellipsis } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,7 +29,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useState, useRef, useEffect } from 'react';
-import { MessageCirclePlus } from 'lucide-react';
+import { MessageCirclePlus, Trash2, Ellipsis } from 'lucide-react';
 import { useCopilot } from '@/hooks/use-copilot';
 
 export default function ChatSidebar() {
@@ -86,8 +85,8 @@ export default function ChatSidebar() {
         <SidebarHeader>
           <Link to={'/'}>
             <div className="text-xl font-bold text-center">
-              AI 助手{' '}
-              <span className="text-sm text-gray-500 font-light">
+              AI 助手 &nbsp;
+              <span className="text-sm text-gray-600 font-light">
                 deepseek驱动
               </span>
             </div>
@@ -99,7 +98,7 @@ export default function ChatSidebar() {
               <SidebarMenu>
                 <SidebarMenuItem>
                   <div
-                    className="flex cursor-pointer justify-center items-center rounded-4xl bg-blue-300 py-2"
+                    className="flex cursor-pointer justify-center items-center rounded-4xl bg-slate-200 hover:bg-slate-300 py-2"
                     onClick={handleOpenNewConversation}
                   >
                     <MessageCirclePlus className="mr-2" />
@@ -119,7 +118,7 @@ export default function ChatSidebar() {
                       asChild
                       className={`cursor-pointer ${
                         currentConversationId === item.id
-                          ? 'bg-amber-200 hover:bg-amber-200'
+                          ? 'bg-slate-300 hover:bg-slate-200'
                           : ''
                       }`}
                     >
@@ -146,6 +145,7 @@ export default function ChatSidebar() {
                               setOpen(true);
                             }}
                           >
+                            <Trash2 className="text-red-500" size={16} />
                             <span className="text-red-500">删除</span>
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -171,7 +171,7 @@ export default function ChatSidebar() {
             <AlertDialogCancel onClick={() => setOpen(false)}>
               取消
             </AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>
+            <AlertDialogAction autoFocus onClick={handleDelete}>
               确认删除
             </AlertDialogAction>
           </AlertDialogFooter>
