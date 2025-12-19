@@ -29,35 +29,20 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { MessageCirclePlus } from 'lucide-react';
+import { useCopilot } from '@/hooks/use-copilot';
 
-interface IProps {
-  conversationList: { id: number; title: string }[];
-  conversationID: number | null;
-  setConversationID: (id: number | null) => void;
-  queryConversationList: () => Promise<void>;
-  queryMessagesByConversationID: (id: number) => Promise<void>;
-  clearChatList: () => void;
-  /**
-   * 设置是否流式响应
-   */
-  /**
-   * 手动中断流式输出的回调函数
-   */
-  stopChat?: () => void;
-}
-
-export default function ChatSidebar(props: IProps) {
+export default function ChatSidebar() {
   const {
-    conversationList,
-    conversationID,
-    setConversationID,
-    queryConversationList,
-    queryMessagesByConversationID,
-    clearChatList,
     stopChat,
-  } = props;
+    currentConversationId,
+    setCurrentConversationId,
+    clearChatList,
+    conversationList,
+    queryConversationList,
+    setMessagesByConversationID,
+  } = useCopilot();
   const [open, setOpen] = useState(false);
   const selectedConversation = useRef<number | null>(null);
   const handleDelete = async () => {
@@ -67,7 +52,7 @@ export default function ChatSidebar(props: IProps) {
       return;
     }
     // 删除的时候，删除的并不是当前选中的会话id，直接返回，关闭弹窗
-    if (selectedConversation.current !== Number(conversationID)) {
+    if (selectedConversation.current !== Number(currentConversationId)) {
       await window.agent.deleteConversation(selectedConversation.current);
       selectedConversation.current = null;
       // 更新会话列表
@@ -78,7 +63,7 @@ export default function ChatSidebar(props: IProps) {
       await window.agent.deleteConversation(selectedConversation.current);
       selectedConversation.current = null;
       // 清空当前选中的会话id
-      setConversationID(null);
+      setCurrentConversationId(null);
       // 清空聊天记录
       clearChatList();
       // 更新会话列表
@@ -88,10 +73,13 @@ export default function ChatSidebar(props: IProps) {
   };
   const handleOpenNewConversation = async () => {
     // 开启新会话时，先关闭当前选中的会话id
-    setConversationID(null);
+    setCurrentConversationId(null);
     // 开启新会话时，先清空聊天记录
     clearChatList();
   };
+  useEffect(() => {
+    queryConversationList();
+  }, []);
   return (
     <>
       <Sidebar>
@@ -130,17 +118,17 @@ export default function ChatSidebar(props: IProps) {
                     <SidebarMenuButton
                       asChild
                       className={`cursor-pointer ${
-                        conversationID === item.id
+                        currentConversationId === item.id
                           ? 'bg-amber-200 hover:bg-amber-200'
                           : ''
                       }`}
                     >
                       <span
                         onClick={() => {
-                          setConversationID(item.id);
+                          setCurrentConversationId(item.id);
                           stopChat?.();
                           // 更新聊天记录
-                          queryMessagesByConversationID(item.id);
+                          setMessagesByConversationID(item.id);
                         }}
                       >
                         {item.title}

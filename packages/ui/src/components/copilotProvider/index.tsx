@@ -8,6 +8,10 @@ export const CopilotContext = createContext<{
   setChatList: React.Dispatch<React.SetStateAction<IChatItem[]>>;
   isLoading: boolean;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  conversationList: { id: number; title: string }[];
+  setConversationList: React.Dispatch<
+    React.SetStateAction<{ id: number; title: string }[]>
+  >;
 }>({
   currentConversationId: null,
   setCurrentConversationId: () => {},
@@ -15,6 +19,8 @@ export const CopilotContext = createContext<{
   setChatList: () => {},
   isLoading: false,
   setIsLoading: () => {},
+  conversationList: [],
+  setConversationList: () => {},
 });
 
 interface ICopilotProviderProps {
@@ -28,6 +34,11 @@ const CopilotProvider = (props: ICopilotProviderProps) => {
   const [currentConversationId, setCurrentConversationId] = useState<
     number | null
   >(null);
+
+  // 会话列表
+  const [conversationList, setConversationList] = useState<
+    { id: number; title: string }[]
+  >([]);
 
   // 聊天列表
   const [chatList, setChatList] = useState<IChatItem[]>([]);
@@ -43,6 +54,8 @@ const CopilotProvider = (props: ICopilotProviderProps) => {
         setChatList,
         isLoading,
         setIsLoading,
+        conversationList,
+        setConversationList,
       }}
     >
       {children}

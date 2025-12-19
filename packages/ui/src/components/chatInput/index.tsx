@@ -9,33 +9,26 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Plus } from 'lucide-react';
 import { useCopilot } from '@/hooks/use-copilot';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupTextarea,
+} from '@/components/ui/input-group';
 interface IProps {
-  /**
-   * 初始的 agentId
-   */
-  initAgentId?: string;
-
-  /**
-   * 手动中断流式输出的回调函数
-   */
-  stopChat?: () => void;
-  /**
-   * 提交表单的回调函数
-   */
   submit: (value: { message: string; agentId: string }) => undefined;
 }
 
 export default function ChatInput(props: IProps) {
-  const { submit, initAgentId, stopChat } = props;
-  const { isLoading } = useCopilot();
+  const { submit } = props;
+  const { isLoading, stopChat } = useCopilot();
   const [message, setMessage] = useState<string>('');
-  const [agentId, setAgentId] = useState<string>(initAgentId || '');
+  const [agentId, setAgentId] = useState<string>('');
   const [options, setOptions] = useState<{ id: number; agentName: string }[]>(
     []
   );
   const handleSubmit = () => {
     // 有消息，并且不是流式输出，才提交
-    if (message && !isLoading) {
+    if (message.trim() && !isLoading) {
       submit({ message, agentId });
       // 重置一下表单值
       setMessage('');
@@ -103,19 +96,17 @@ export default function ChatInput(props: IProps) {
   return (
     <div className="flex justify-center">
       <div className="w-3xl py-5">
-        <div className="rounded-3xl border-2 border-gray-200 p-3">
-          <textarea
-            contentEditable
+        <InputGroup>
+          <InputGroupTextarea
+            placeholder="从 origin 开始"
             value={message}
             onChange={(e) => {
               setMessage(e.target.value);
             }}
-            placeholder="从 origin 开始"
-            className="h-20 resize-none w-full border-none outline-none p-1"
             onKeyDown={handleKeyDown}
             style={{ scrollbarWidth: 'none' }}
-          ></textarea>
-          <div className="flex justify-between items-center">
+          />
+          <InputGroupAddon align="block-end">
             <div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -137,9 +128,9 @@ export default function ChatInput(props: IProps) {
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-            <div> {renderButton()}</div>
-          </div>
-        </div>
+            <div className="ml-auto"> {renderButton()}</div>
+          </InputGroupAddon>
+        </InputGroup>
       </div>
     </div>
   );
