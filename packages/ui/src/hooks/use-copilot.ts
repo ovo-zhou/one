@@ -1,5 +1,5 @@
-import { CopilotContext } from "@/components/copilotProvider";
 import { useContext } from "react";
+import { CopilotContext } from "@/components/copilotProvider";
 import type { IChatItem } from '@/components/chatBox/ChatItem';
 
 export function useCopilot() {
@@ -12,11 +12,11 @@ export function useCopilot() {
   const clearChatList = () => {
     setChatList([]);
   }
-  const queryConversationList = async () => {
+  const updateConversationList = async () => {
     const list = await window.agent.getConversationList();
     setConversationList(list);
   };
-  const setMessagesByConversationID = async (id: number) => {
+  const updateMessagesByConversationID = async (id: number) => {
     const list = await window.agent.getMessagesByConversationID(id);
     setChatList(
       list.map((item) => ({
@@ -37,7 +37,7 @@ export function useCopilot() {
     setIsLoading,
     conversationList,
     setConversationList,
-    queryConversationList,
-    setMessagesByConversationID
+    updateConversationList,
+    updateMessagesByConversationID
   }
 }

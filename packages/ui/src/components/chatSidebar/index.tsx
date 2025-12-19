@@ -40,8 +40,8 @@ export default function ChatSidebar() {
     setCurrentConversationId,
     clearChatList,
     conversationList,
-    queryConversationList,
-    setMessagesByConversationID,
+    updateConversationList,
+    updateMessagesByConversationID,
   } = useCopilot();
   const [open, setOpen] = useState(false);
   const selectedConversation = useRef<number | null>(null);
@@ -56,7 +56,7 @@ export default function ChatSidebar() {
       await window.agent.deleteConversation(selectedConversation.current);
       selectedConversation.current = null;
       // 更新会话列表
-      await queryConversationList();
+      await updateConversationList();
       setOpen(false);
     } else {
       // 删除的时候，删除的是当前选中的会话id，删除会话并更新会话列表
@@ -67,7 +67,7 @@ export default function ChatSidebar() {
       // 清空聊天记录
       clearChatList();
       // 更新会话列表
-      await queryConversationList();
+      await updateConversationList();
       setOpen(false);
     }
   };
@@ -78,7 +78,7 @@ export default function ChatSidebar() {
     clearChatList();
   };
   useEffect(() => {
-    queryConversationList();
+    updateConversationList();
   }, []);
   return (
     <>
@@ -128,7 +128,7 @@ export default function ChatSidebar() {
                           setCurrentConversationId(item.id);
                           stopChat?.();
                           // 更新聊天记录
-                          setMessagesByConversationID(item.id);
+                          updateMessagesByConversationID(item.id);
                         }}
                       >
                         {item.title}

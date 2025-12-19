@@ -1,8 +1,8 @@
+import { useEffect } from 'react';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import ChatInput from '@/components/chatInput';
 import ChatSidebar from '@/components/chatSidebar';
 import ChatBox from '@/components/chatBox';
-import { useEffect } from 'react';
 import type { IChatItem } from '@/components/chatBox/ChatItem';
 import { v4 as uuidv4 } from 'uuid';
 import CopilotProvider from '@/components/copilotProvider';
@@ -16,7 +16,7 @@ function CopilotComponent() {
     setChatList,
     setIsLoading,
     conversationList,
-    queryConversationList,
+    updateConversationList,
     stopChat,
   } = useCopilot();
 
@@ -38,7 +38,7 @@ function CopilotComponent() {
     if (!id) {
       id = await window.agent.createConversation('新会话');
       setCurrentConversationId(id);
-      await queryConversationList();
+      await updateConversationList();
     }
     window.agent.chat({
       agentId,
@@ -47,7 +47,7 @@ function CopilotComponent() {
     });
     if (chatList.length === 0) {
       await window.agent.updateConversationTitle(id, message);
-      await queryConversationList();
+      await updateConversationList();
     }
   };
   // 监听流式输出回调
@@ -70,7 +70,6 @@ function CopilotComponent() {
       });
     });
     return () => {
-      // 组件卸载时,移除监听器，并且手动中断流式输出
       off();
       stopChat();
     };
