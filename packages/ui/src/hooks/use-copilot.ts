@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import { CopilotContext } from "@/components/copilotProvider";
 import type { IChatItem } from '@/components/chatBox/ChatItem';
+import { v4 as uuidv4 } from 'uuid';
 
 export function useCopilot() {
   const context = useContext(CopilotContext);
@@ -26,6 +27,53 @@ export function useCopilot() {
       }))
     );
   };
+  const sendMessage = async (agentId: string, message: string) => {
+    setIsLoading(true);
+    setChatList([
+      ...chatList,
+      {
+        id: uuidv4(),
+        role: 'user',
+        content: message,
+      },
+      { id: uuidv4(), role: 'assistant', content: '...' },
+    ]);
+    let id = currentConversationId;
+    // 没有会话ID，创建新会话
+    if (!id) {
+      id = await window.agent.createConversation('新会话');
+      setCurrentConversationId(id);
+      await updateConversationList();
+    }
+    window.agent.chat({
+      agentId,
+      message,
+      conversationID: id,
+    });
+    if (chatList.length === 0) {
+      await window.agent.updateConversationTitle(id, message);
+      await updateConversationList();
+    }
+  };
+  const onMessage = () => {
+    const off = window.agent.onMessage((data) => {
+      if (data.finish) {
+        // 关闭流式输出
+        setIsLoading(false);
+        return;
+      }
+      // 更新最新的一条消息
+      setChatList((pre) => {
+        const newChatList = [...pre];
+        const lastChatItem = newChatList[newChatList.length - 1];
+        lastChatItem.id = data.id;
+        lastChatItem.role = data.role as IChatItem['role'];
+        lastChatItem.content = data.content;
+        return newChatList;
+      });
+    });
+    return off;
+  }
   return {
     clearChatList,
     stopChat,
@@ -34,10 +82,11 @@ export function useCopilot() {
     currentConversationId,
     setCurrentConversationId,
     isLoading,
-    setIsLoading,
     conversationList,
     setConversationList,
     updateConversationList,
-    updateMessagesByConversationID
+    updateMessagesByConversationID,
+    sendMessage,
+    onMessage
   }
 }

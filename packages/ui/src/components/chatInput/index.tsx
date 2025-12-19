@@ -14,13 +14,9 @@ import {
   InputGroupAddon,
   InputGroupTextarea,
 } from '@/components/ui/input-group';
-interface IProps {
-  submit: (value: { message: string; agentId: string }) => undefined;
-}
 
-export default function ChatInput(props: IProps) {
-  const { submit } = props;
-  const { isLoading, stopChat } = useCopilot();
+export default function ChatInput() {
+  const { isLoading, stopChat, sendMessage } = useCopilot();
   const [message, setMessage] = useState<string>('');
   const [agentId, setAgentId] = useState<string>('');
   const [options, setOptions] = useState<{ id: number; agentName: string }[]>(
@@ -29,7 +25,7 @@ export default function ChatInput(props: IProps) {
   const handleSubmit = () => {
     // 有消息，并且不是流式输出，才提交
     if (message.trim() && !isLoading) {
-      submit({ message, agentId });
+      sendMessage(agentId, message);
       // 重置一下表单值
       setMessage('');
     }
