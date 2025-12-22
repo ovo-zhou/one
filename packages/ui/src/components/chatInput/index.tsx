@@ -15,14 +15,16 @@ import {
   InputGroupAddon,
   InputGroupTextarea,
 } from '@/components/ui/input-group';
+import Agent from '../agent';
 
 export default function ChatInput() {
   const { isLoading, stopChat, sendMessage } = useCopilot();
   const [message, setMessage] = useState<string>('');
   const [agentId, setAgentId] = useState<string>('');
-  const [options, setOptions] = useState<{ id: number; agentName: string }[]>(
-    []
-  );
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [agentList, setAgentList] = useState<
+    { id: number; agentName: string; prompt: string }[]
+  >([]);
   const handleSubmit = () => {
     // 有消息，并且不是流式输出，才提交
     if (message.trim() && !isLoading) {
@@ -63,10 +65,13 @@ export default function ChatInput() {
   const handleStop = () => {
     stopChat?.();
   };
+  const queryAgent = async () => {
+    const agentList = await window.agent.getAgentPrompt();
+    console.log('ryan', agentList);
+    setAgentList(agentList);
+  };
   useEffect(() => {
-    window.agent.getAgentPrompt().then((prompt) => {
-      setOptions(prompt);
-    });
+    queryAgent();
   }, []);
   // 渲染操作按钮
   const renderButton = () => {
@@ -110,7 +115,7 @@ export default function ChatInput() {
                   <div className="flex items-center cursor-pointer">
                     <Plus size={16} />
                     <span>
-                      {options.find((item) => item.id === Number(agentId))
+                      {agentList.find((item) => item.id === Number(agentId))
                         ?.agentName || 'auto'}
                     </span>
                   </div>
@@ -125,7 +130,7 @@ export default function ChatInput() {
                     auto
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  {options.map((item) => {
+                  {agentList.map((item) => {
                     return (
                       <DropdownMenuItem
                         key={item.id}
@@ -137,12 +142,27 @@ export default function ChatInput() {
                       </DropdownMenuItem>
                     );
                   })}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="text-blue-500"
+                    onClick={() => {
+                      setIsOpen(true);
+                    }}
+                  >
+                    自定义
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
             <div className="ml-auto"> {renderButton()}</div>
           </InputGroupAddon>
         </InputGroup>
+        <Agent
+          isOpen={isOpen}
+          onOpenChange={(open: boolean) => setIsOpen(open)}
+          agentList={agentList}
+          queryAgent={queryAgent}
+        />
       </div>
     </div>
   );
