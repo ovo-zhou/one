@@ -67,7 +67,6 @@ export default function ChatInput() {
   };
   const queryAgent = async () => {
     const agentList = await window.agent.getAgentPrompt();
-    console.log('ryan', agentList);
     setAgentList(agentList);
   };
   useEffect(() => {
@@ -154,7 +153,7 @@ export default function ChatInput() {
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-            <div className="ml-auto"> {renderButton()}</div>
+            <div className="ml-auto">{renderButton()}</div>
           </InputGroupAddon>
         </InputGroup>
         <Agent
