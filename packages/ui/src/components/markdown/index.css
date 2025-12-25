@@ -94,4 +94,12 @@
     font-size: 0.95em;
     vertical-align: text-top;
   }
+
+  & pre>code {
+    background-color: transparent;
+    padding: 0px;
+    border-radius: 0px;
+    font-size: 0.9em;
+    vertical-align: text-top;
+  }
 }

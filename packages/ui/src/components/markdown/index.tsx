@@ -2,6 +2,7 @@ import type MarkdownIt from 'markdown-it';
 import markdownit from 'markdown-it';
 import hljs from 'highlight.js';
 import { useMemo } from 'react';
+import { sandboxService } from '@/services/sandbox';
 import 'highlight.js/styles/github.css';
 import './index.css';
 
@@ -41,9 +42,29 @@ const md: MarkdownIt = markdownit({
   highlight: function (str, lang) {
     if (lang && hljs.getLanguage(lang)) {
       try {
-        return `<pre data-lang="${lang}" style="background-color: #f6f8fa;overflow-x: auto;padding: 16px;border-radius: 10px;font-size:0.9em; margin-bottom: 16px;">${
-          hljs.highlight(str, { language: lang, ignoreIllegals: true }).value
-        }</pre>`;
+        // md 渲染出来的字符串
+        const html = hljs.highlight(str, {
+          language: lang,
+          ignoreIllegals: true,
+        }).value;
+        // 顶部的action 按钮区域
+        const actionWarpHtml = actionWarp(
+          '',
+          'margin-bottom: 8px',
+          Button(
+            'data-action="run" data-code="' + encodeURIComponent(str) + '"',
+            'background-color: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.8em;',
+            'Run'
+          )
+        );
+        // 整体 code 包裹区域
+        const codeWarpHtml = codeWarp(
+          '',
+          'background-color: #f6f8fa;overflow-x: auto;padding: 16px;border-radius: 10px;font-size:0.9em; margin-bottom: 16px;',
+          actionWarpHtml + html
+        );
+
+        return codeWarpHtml;
       } catch (e) {
         console.error('Error highlighting code:', e);
       }
@@ -60,19 +81,30 @@ interface IMarkdown {
 }
 export default function Markdown(props: IMarkdown) {
   const { content } = props;
-  const useMarkdown = useMemo(() => md.render(content), [content]);
+  const htmlText = useMemo(() => md.render(content), [content]);
   const handleDelegatedItemClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
     const target = e.target as HTMLElement;
     if (target.dataset.action === 'run') {
       const code = decodeURIComponent(target.dataset.code || '');
       console.log(code);
+      sandboxService.sendCode(code);
     }
   };
   return (
     <div
       onClick={handleDelegatedItemClick}
       className="origin-markdown"
-      dangerouslySetInnerHTML={{ __html: useMarkdown }}
+      dangerouslySetInnerHTML={{ __html: htmlText }}
     />
   );
 }
+const codeWarp = (attr: string, style: string, children: string): string => {
+  return `<div ${attr} style="${style}">${children}</div>`;
+};
+const actionWarp = (attr: string, style: string, children: string): string => {
+  return `<div ${attr} style="${style}">${children}</div>`;
+};
+const Button = (attr: string, style: string, children: string): string => {
+  return `<button ${attr} style="${style}">${children}</button>`;
+};

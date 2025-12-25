@@ -6,6 +6,7 @@ import ChatBox from '@/components/chatBox';
 import CopilotProvider from '@/components/copilotProvider';
 import { useCopilot } from '@/hooks/use-copilot';
 import Header from '@/components/header';
+import Sandbox from '@/components/sandbox';
 
 function CopilotComponent() {
   const { stopChat, onMessage } = useCopilot();
@@ -21,10 +22,13 @@ function CopilotComponent() {
   return (
     <SidebarProvider>
       <ChatSidebar />
-      <main className="flex-1 w-full h-screen flex flex-col justify-center">
-        <Header />
-        <ChatBox />
-        <ChatInput />
+      <main className="flex-1 h-screen flex flex-row">
+        <div className="flex-1 h-screen flex flex-col justify-center">
+          <Header />
+          <ChatBox />
+          <ChatInput />
+        </div>
+        <Sandbox />
       </main>
     </SidebarProvider>
   );
