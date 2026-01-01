@@ -16,9 +16,11 @@ import { chat, updateConversationTitle } from './src/ai/index.js';
 
 // 是否为开发环境
 const isDev = !app.isPackaged;
-let abortController = {
-  current: null,
-};
+
+const userDataPath = app.getPath('userData');
+// 此路径作为数据库文件的存储路径，作为环境变量植入
+const dbPath = path.join(userDataPath, 'database.db');
+process.env.dbPath = dbPath;
 
 const createWindow = () => {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
@@ -73,9 +75,9 @@ const handleDeleteConversation = async (event, conversationID) => {
 };
 const handleStopChat = () => {
   // 如果存在中断控制器，中断聊天，清空控制器
-  if (abortController.current) {
-    abortController.current.abort();
-    abortController.current = null;
+  if (process.chatAbortController) {
+    process.chatAbortController.abort();
+    process.chatAbortController = null;
   }
 };
 app.on('ready', () => {
@@ -85,7 +87,7 @@ app.on('ready', () => {
   ipcMain.handle('agent:updatePrompt', handleUpdateAgentPrompt);
   ipcMain.handle('agent:createConversation', handleCreateConversation);
   ipcMain.on('agent:chat', async (event, data) => {
-    await chat(event, data, abortController);
+    await chat(event, data);
   });
   // 监听聊天停止事件
   ipcMain.on('agent:stop', handleStopChat);

@@ -1,17 +1,9 @@
-import { ChatItem, type IChatItem } from './ChatItem';
+import { ChatItem } from './ChatItem';
 import { useEffect, useRef } from 'react';
+import { useCopilot } from '@/hooks/use-copilot';
 
-interface IChatBox {
-  chatList: IChatItem[];
-}
-
-/**
- * 聊天盒子
- * @param props 聊天列表
- * @returns
- */
-export default function ChatBox(props: IChatBox) {
-  const { chatList } = props;
+export default function ChatBox() {
+  const { chatList } = useCopilot();
   // 聊天容器
   const chatBoxRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);

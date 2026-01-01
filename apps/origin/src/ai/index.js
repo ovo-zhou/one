@@ -15,11 +15,7 @@ const openai = new OpenAI({
 // 这里要手动插入 agent 对应的prompt
 // 加载历史聊天记录
 // 写入聊天记录
-export async function chat(
-  event,
-  { agentId, message, conversationID },
-  abortController
-) {
+export async function chat(event, { agentId, message, conversationID }) {
   const messages = [];
   // 先把用户发送的消息保存到数据库
   // 然后直接读取最近的10条消息,作为对话上下文
@@ -45,7 +41,7 @@ export async function chat(
     }))
   );
   const controller = new AbortController();
-  abortController.current = controller;
+  process.chatAbortController = controller;
   let role = '';
   let content = '';
   try {
@@ -78,7 +74,7 @@ export async function chat(
   } finally {
     // 不管是否出错，将结果保存到数据库
     // 最后把 abortController 清空
-    abortController.current = null;
+    process.chatAbortController = null;
     await createMessage({
       conversationId: +conversationID,
       content,
