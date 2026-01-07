@@ -3,7 +3,7 @@ import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Panel, Group, Separator } from 'react-resizable-panels';
-
+import MonacoEditor from '@/components/monaco';
 export default function JsonParse() {
   const navigate = useNavigate();
   return (
@@ -37,7 +37,9 @@ export default function JsonParse() {
         </Panel>
         <Separator className="w-1 bg-gray-200 hover:bg-blue-400 transition-colors" />
         <Panel defaultSize={300} minSize={300}>
-          <div>主区域内容</div>
+          <div>
+            <MonacoEditor value="123" />
+          </div>
         </Panel>
       </Group>
     </div>
