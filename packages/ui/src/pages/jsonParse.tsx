@@ -3,9 +3,24 @@ import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Panel, Group, Separator } from 'react-resizable-panels';
-import MonacoEditor from '@/components/monaco';
+import MonacoEditor, { type MonacoEditorRef } from '@/components/monaco';
+import { parseJSON } from '@/lib/utils';
+import { Textarea } from '@/components/ui/textarea';
+import { useRef, useState } from 'react';
+
 export default function JsonParse() {
   const navigate = useNavigate();
+  const [jsonString, setJsonString] = useState('');
+  const editorRef = useRef<MonacoEditorRef>(null);
+  const handleParse = (str: string) => {
+    try {
+      const json = parseJSON(str);
+      editorRef.current?.getEditor()?.setValue(JSON.stringify(json, null, 2));
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : String(e);
+      editorRef.current?.getEditor()?.setValue(message);
+    }
+  };
   return (
     <div className="w-screen h-screen flex flex-col">
       <div className="p-4">
@@ -33,12 +48,19 @@ export default function JsonParse() {
       </div>
       <Group orientation="horizontal" className="flex-1 px-4 pb-4 pt-0">
         <Panel defaultSize={300} minSize={300}>
-          <div>侧边栏内容</div>
+          <Textarea
+            placeholder="输入 json 字符串"
+            value={jsonString}
+            onChange={(e) => {
+              setJsonString(e.target.value);
+              handleParse(e.target.value);
+            }}
+          />
         </Panel>
-        <Separator className="w-1 bg-gray-200 hover:bg-blue-400 transition-colors" />
+        <Separator className="w-1 bg-gray-200 hover:bg-blue-400 transition-colors mx-4" />
         <Panel defaultSize={300} minSize={300}>
           <div>
-            <MonacoEditor value="123" />
+            <MonacoEditor readOnly ref={editorRef} />
           </div>
         </Panel>
       </Group>
