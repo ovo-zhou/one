@@ -6,21 +6,29 @@ import { Panel, Group, Separator } from 'react-resizable-panels';
 import MonacoEditor, { type MonacoEditorRef } from '@/components/monaco';
 import { parseJSON } from '@/lib/utils';
 import { Textarea } from '@/components/ui/textarea';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 
 export default function JsonParse() {
   const navigate = useNavigate();
   const [jsonString, setJsonString] = useState('');
+  const [deepParse, setDeepParse] = useState(false);
   const editorRef = useRef<MonacoEditorRef>(null);
   const handleParse = (str: string) => {
     try {
-      const json = parseJSON(str);
+      if (str.trim() === '') {
+        editorRef.current?.getEditor()?.setValue('');
+        return;
+      }
+      const json = parseJSON(str, deepParse);
       editorRef.current?.getEditor()?.setValue(JSON.stringify(json, null, 2));
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : String(e);
       editorRef.current?.getEditor()?.setValue(message);
     }
   };
+  useEffect(() => {
+    handleParse(jsonString);
+  }, [jsonString, deepParse]);
   return (
     <div className="w-screen h-screen flex flex-col">
       <div className="p-4">
@@ -37,10 +45,20 @@ export default function JsonParse() {
             </Button>
           </ButtonGroup>
           <ButtonGroup>
-            <Button variant="outline" size="sm">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setJsonString('');
+              }}
+            >
               清空
             </Button>
-            <Button variant="outline" size="sm">
+            <Button
+              variant={deepParse ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setDeepParse(!deepParse)}
+            >
               深度解析
             </Button>
           </ButtonGroup>
@@ -53,7 +71,6 @@ export default function JsonParse() {
             value={jsonString}
             onChange={(e) => {
               setJsonString(e.target.value);
-              handleParse(e.target.value);
             }}
           />
         </Panel>
