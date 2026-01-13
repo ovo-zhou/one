@@ -12,15 +12,19 @@
   "scripts": {
     "lint": "eslint .",
     "clean": "rimraf node_modules packages/*/node_modules apps/*/node_modules",
-    "clean:all": "yarn clean && rimraf packages/*/dist packages/*/build apps/*/.next"
+    "clean:all": "yarn clean && rimraf packages/*/dist packages/*/build apps/*/.next",
+    "prepare": "husky"
   },
   "private": true,
   "devDependencies": {
+    "@commitlint/cli": "^20.3.1",
+    "@commitlint/config-conventional": "^20.3.1",
     "@eslint/js": "^9.39.1",
     "@eslint/markdown": "^7.5.1",
     "@typescript-eslint/eslint-plugin": "^8.47.0",
     "eslint": "^9.39.1",
     "eslint-plugin-json": "^4.0.1",
+    "husky": "^9.1.7",
     "rimraf": "^6.1.0",
     "typescript-eslint": "^8.46.4"
   },
