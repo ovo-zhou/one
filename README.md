@@ -65,13 +65,3 @@ yarn dev
 cd packages/ui
 yarn dev
 ```
-
-## 部署
-
-### 生产环境数据库迁移
-
-```bash
-cd packages/database
-npx prisma migrate deploy
-npx prisma generate
-```
