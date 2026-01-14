@@ -1,28 +1,42 @@
 {
   "name": "database",
   "version": "0.0.0",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch"
+    "dev": "tsup src/index.ts --format esm --dts --watch",
+    "build": "tsup src/index.ts --format esm --dts --clean",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "本地存储库",
   "devDependencies": {
     "@eslint/js": "^9.39.0",
     "eslint": "^9.39.0",
     "globals": "^16.5.0",
     "jiti": "^2.6.1",
-    "typescript": "^5.8.3",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.2"
   },
   "dependencies": {
     "@prisma/client": "^6.18.0",
     "@types/node": "^24.0.7",
+    "env-paths": "^3.0.0",
     "prisma": "^6.18.0",
     "sqlite3": "^5.1.7"
-  }
+  },
+  "type": "module",
+  "files": [
+    "dist",
+    "prisma"
+  ]
 }

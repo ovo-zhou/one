@@ -13,14 +13,11 @@ import {
   deleteConversation,
 } from 'database';
 import { chat, updateConversationTitle } from './src/ai/index.js';
+import DatabaseClient from 'database';
+const dbClient = new DatabaseClient();
 
 // 是否为开发环境
 const isDev = !app.isPackaged;
-
-const userDataPath = app.getPath('userData');
-// 此路径作为数据库文件的存储路径，作为环境变量植入
-const dbPath = path.join(userDataPath, 'database.db');
-process.env.dbPath = dbPath;
 
 const createWindow = () => {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
