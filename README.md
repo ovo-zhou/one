@@ -74,3 +74,4 @@ yarn dev
 cd packages/database
 npx prisma migrate deploy
 npx prisma generate
+```
