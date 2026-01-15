@@ -1,12 +1,11 @@
 // Please install OpenAI SDK first: `npm install openai`
 
 import OpenAI from 'openai';
-import {
-  getAgentPromptByAgentID,
-  createMessage,
-  getMessagesByConversationID,
-  updateConversation,
-} from 'database';
+import DatabaseClient from 'database';
+const dbClient = DatabaseClient.getInstance();
+const conversation = dbClient.conversation()
+const messageService = dbClient.message()
+const agentConfig = dbClient.agentConfig()
 
 const openai = new OpenAI({
   baseURL: 'https://api.deepseek.com',
@@ -19,18 +18,18 @@ export async function chat(event, { agentId, message, conversationID }) {
   const messages = [];
   // 先把用户发送的消息保存到数据库
   // 然后直接读取最近的10条消息,作为对话上下文
-  await createMessage({
+  await messageService.createMessage({
     conversationId: +conversationID,
     content: message,
     role: 'user',
   });
   // 查询 agent 对应的 prompt，加载提示词
-  const prompt = await getAgentPromptByAgentID(+agentId);
+  const prompt = await agentConfig.getAgentPromptByAgentID(+agentId);
   if (prompt) {
     messages.push({ role: 'system', content: prompt.prompt });
   }
   // 查询聊天记录，加载到 messages 中
-  const messagesByConversationID = await getMessagesByConversationID(
+  const messagesByConversationID = await messageService.getMessagesByConversationID(
     +conversationID
   );
   // 加载最近的20轮对话记录，作为聊天窗口
@@ -75,7 +74,7 @@ export async function chat(event, { agentId, message, conversationID }) {
     // 不管是否出错，将结果保存到数据库
     // 最后把 abortController 清空
     process.chatAbortController = null;
-    await createMessage({
+    await messageService.createMessage({
       conversationId: +conversationID,
       content,
       role,
@@ -96,5 +95,5 @@ export async function updateConversationTitle(event, conversationID, message) {
     model: 'deepseek-chat',
   });
   const title = completion.choices[0].message.content;
-  await updateConversation(+conversationID, title);
+  await conversation.updateConversation(+conversationID, title);
 }

@@ -3,7 +3,8 @@ import { useEffect, useRef } from 'react';
 import { useCopilot } from '@/hooks/use-copilot';
 
 export default function ChatBox() {
-  const { chatList } = useCopilot();
+  const { chatList, currentConversationId } = useCopilot();
+
   // 聊天容器
   const chatBoxRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -37,7 +38,9 @@ export default function ChatBox() {
       resizeObserver.unobserve(chatBoxNode);
     };
   }, []);
-
+  if (!currentConversationId) {
+    return null;
+  }
   return (
     <div
       className="overflow-y-auto flex-1 flex flex-col mx-auto"

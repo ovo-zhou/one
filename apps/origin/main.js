@@ -2,19 +2,13 @@ import { app, BrowserWindow, ipcMain, screen } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import 'dotenv/config';
-import {
-  getAgentPrompt,
-  createAgentPrompt,
-  deleteAgentPrompt,
-  updateAgentPrompt,
-  createConversation,
-  getConversations,
-  getMessagesByConversationID,
-  deleteConversation,
-} from 'database';
 import { chat, updateConversationTitle } from './src/ai/index.js';
 import DatabaseClient from 'database';
-const dbClient = new DatabaseClient();
+const dbClient = DatabaseClient.getInstance();
+const agentConfig = dbClient.agentConfig()
+const message = dbClient.message()
+const conversation = dbClient.conversation()
+
 
 // 是否为开发环境
 const isDev = !app.isPackaged;
@@ -39,35 +33,35 @@ const createWindow = () => {
   }
 };
 const handleGetAgentPrompt = async () => {
-  const prompt = await getAgentPrompt();
+  const prompt = await agentConfig.getAgentPrompt();
   return prompt;
 };
 const handleCreateAgentPrompt = async (event, data) => {
-  const prompt = await createAgentPrompt(data);
+  const prompt = await agentConfig.createAgentPrompt(data);
   return prompt;
 };
 const handleDeleteAgentPrompt = async (event, id) => {
-  const res = await deleteAgentPrompt(id);
+  const res = await agentConfig.deleteAgentPrompt(id);
   return res;
 };
 const handleUpdateAgentPrompt = async (event, data) => {
-  const res = await updateAgentPrompt(data);
+  const res = await agentConfig.updateAgentPrompt(data);
   return res;
 };
 const handleCreateConversation = async (event, data) => {
-  const { id } = await createConversation(data);
+  const { id } = await conversation.createConversation(data);
   return id;
 };
 const handleGetConversationList = async () => {
-  const conversationList = await getConversations();
+  const conversationList = await conversation.getConversations();
   return conversationList;
 };
 const handleGetMessagesByConversationID = async (event, conversationID) => {
-  const messages = await getMessagesByConversationID(conversationID);
+  const messages = await message.getMessagesByConversationID(conversationID);
   return messages;
 };
 const handleDeleteConversation = async (event, conversationID) => {
-  const res = await deleteConversation(+conversationID);
+  const res = await conversation.deleteConversation(+conversationID);
   return res;
 };
 const handleStopChat = () => {
