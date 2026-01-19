@@ -1,10 +1,11 @@
 {
   "name": "origin",
   "version": "0.0.0",
-  "description": "",
+  "description": "个人桌面助手",
   "main": "main.js",
   "scripts": {
-    "dev": "electron ."
+    "dev": "electron .",
+    "dist": "electron-builder"
   },
   "keywords": [
     "桌面助手",
@@ -19,9 +20,16 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.0",
-    "electron": "^36.5.0",
+    "electron": "36.5.0",
+    "electron-builder": "^26.4.0",
     "eslint": "^9.39.0",
     "globals": "^16.5.0"
   },
-  "type": "module"
+  "type": "module",
+  "build": {
+    "appId": "your.id",
+    "mac": {
+      "category": "your.app.category.type"
+    }
+  }
 }

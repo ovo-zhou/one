@@ -6,3 +6,4 @@ build
 *.log
 dist
 *.db
+dist
