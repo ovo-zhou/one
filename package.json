@@ -11,8 +11,7 @@
   ],
   "scripts": {
     "lint": "eslint .",
-    "clean": "rimraf node_modules packages/*/node_modules apps/*/node_modules",
-    "clean:all": "yarn clean && rimraf packages/*/dist packages/*/build apps/*/.next",
+    "clean": "rimraf packages/*/dist apps/*/dist packages/*/build apps/*/.next packages/*/node_modules apps/*/node_modules node_modules",
     "prepare": "husky"
   },
   "private": true,
