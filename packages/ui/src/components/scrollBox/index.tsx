@@ -21,6 +21,7 @@ export default function ScrollBox({ children, messageLength }: Props) {
   useEffect(() => {
     // 创建高度观察
     const resizeObserver = new ResizeObserver((entries) => {
+      console.log(entries);
       // 如果锚点在可见区域,或者没有流式输出但是高度变了，就滚动
       if (contentBoxRef.current && isVisible.current) {
         anchorBoxRef.current?.scrollIntoView();

@@ -11,10 +11,8 @@ import { Button } from '../ui/button';
 import AgentCard from './AgentCard';
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
