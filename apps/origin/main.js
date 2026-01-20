@@ -29,7 +29,7 @@ const createWindow = () => {
     win.loadURL('http://localhost:5173/');
     win.webContents.openDevTools();
   } else {
-    win.loadFile('app/dist/index.html');
+    win.loadFile('client/index.html');
   }
 };
 const handleGetAgentPrompt = async () => {
