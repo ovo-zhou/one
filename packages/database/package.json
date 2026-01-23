@@ -1,5 +1,5 @@
 {
-  "name": "database",
+  "name": "@one/database",
   "version": "0.0.0",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",

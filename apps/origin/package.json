@@ -1,5 +1,5 @@
 {
-  "name": "origin",
+  "name": "@one/origin",
   "version": "0.0.0",
   "description": "个人桌面助手",
   "main": "main.js",
@@ -14,11 +14,12 @@
   "author": "ryan",
   "license": "ISC",
   "dependencies": {
-    "database": "0.0.0",
+    "@one/local-index": "0.0.0",
     "dotenv": "^17.2.3",
     "openai": "^6.7.0"
   },
   "devDependencies": {
+    "@electron/rebuild": "electron/rebuild",
     "@eslint/js": "^9.39.0",
     "electron": "36.5.0",
     "electron-builder": "^26.4.0",
@@ -28,6 +29,7 @@
   "type": "module",
   "build": {
     "appId": "your.id",
+    "productName": "OneOrigin",
     "mac": {
       "category": "your.app.category.type"
     }
