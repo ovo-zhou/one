@@ -10,18 +10,36 @@ datasource db {
   provider = "sqlite"
 }
 
-model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
-  posts Post[]
+model Conversation {
+  id        Int       @id @default(autoincrement())
+  title     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now()) @updatedAt
+  messages  Message[]
 }
 
-model Post {
-  id        Int     @id @default(autoincrement())
-  title     String
-  content   String?
-  published Boolean @default(false)
-  author    User    @relation(fields: [authorId], references: [id])
-  authorId  Int
+model Message {
+  id             Int               @id @default(autoincrement())
+  conversationId Int
+  role           String
+  content        String
+  createdAt      DateTime          @default(now())
+  tokens         Int?
+  model          String?
+  conversation   Conversation      @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  metadata       MessageMetadata[]
+}
+
+model MessageMetadata {
+  id              Int     @id @default(autoincrement())
+  messageId       Int
+  metadataType    String?
+  metadataContent String?
+  message         Message @relation(fields: [messageId], references: [id])
+}
+
+model AgentPrompt {
+  id        Int    @id @default(autoincrement())
+  agentName String @unique
+  prompt    String
 }

@@ -15,7 +15,7 @@ CREATE TABLE "Message" (
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "tokens" INTEGER,
     "model" TEXT,
-    CONSTRAINT "Message_conversationId_fkey" FOREIGN KEY ("conversationId") REFERENCES "Conversation" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    CONSTRAINT "Message_conversationId_fkey" FOREIGN KEY ("conversationId") REFERENCES "Conversation" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- CreateTable
@@ -33,3 +33,6 @@ CREATE TABLE "AgentPrompt" (
     "agentName" TEXT NOT NULL,
     "prompt" TEXT NOT NULL
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "AgentPrompt_agentName_key" ON "AgentPrompt"("agentName");

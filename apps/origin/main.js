@@ -2,30 +2,15 @@ import { app, BrowserWindow, ipcMain, screen } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import 'dotenv/config';
-import { main, runMigrations } from '@one/local-index';
-console.log('Electron version:', app.getVersion());
-console.log('Node version:', process.versions.node);
-console.log('Chrome version:', process.versions.chrome);
-runMigrations().then((res) => {
-  console.log('迁移成功', res);
-  main().then((res) => {
-    console.log('查询到用户', res);
-  }).catch((e) => {
-    console.error('查询用户失败', e);
-  });
-}).catch((e) => {
-  console.error('迁移失败', e);
-});
-// import { chat, updateConversationTitle } from './src/ai/index.js';
-// import DatabaseClient from 'database';
-// const dbClient = DatabaseClient.getInstance();
-// const agentConfig = dbClient.agentConfig()
-// const message = dbClient.message()
-// const conversation = dbClient.conversation()
-
+import DatabaseClient from '@one/local-index';
+import { chat, updateConversationTitle } from './src/ai/index.js';
 
 // 是否为开发环境
-// const isDev = !app.isPackaged;
+const isDev = !app.isPackaged;
+const dbClient = DatabaseClient.getInstance(isDev);
+const agentConfig = dbClient.agentConfig()
+const message = dbClient.message()
+const conversation = dbClient.conversation()
 
 const createWindow = () => {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
@@ -40,70 +25,70 @@ const createWindow = () => {
     },
   });
   win.loadFile('client/index.html');
-  // if (isDev) {
-  //   win.loadURL('http://localhost:5173/');
-  //   win.webContents.openDevTools();
-  // } else {
-  //   win.loadFile('client/index.html');
-  // }
+  if (isDev) {
+    win.loadURL('http://localhost:5173/');
+    win.webContents.openDevTools();
+  } else {
+    win.loadFile('client-ui/index.html');
+  }
 };
-// const handleGetAgentPrompt = async () => {
-//   const prompt = await agentConfig.getAgentPrompt();
-//   return prompt;
-// };
-// const handleCreateAgentPrompt = async (event, data) => {
-//   const prompt = await agentConfig.createAgentPrompt(data);
-//   return prompt;
-// };
-// const handleDeleteAgentPrompt = async (event, id) => {
-//   const res = await agentConfig.deleteAgentPrompt(id);
-//   return res;
-// };
-// const handleUpdateAgentPrompt = async (event, data) => {
-//   const res = await agentConfig.updateAgentPrompt(data);
-//   return res;
-// };
-// const handleCreateConversation = async (event, data) => {
-//   const { id } = await conversation.createConversation(data);
-//   return id;
-// };
-// const handleGetConversationList = async () => {
-//   const conversationList = await conversation.getConversations();
-//   return conversationList;
-// };
-// const handleGetMessagesByConversationID = async (event, conversationID) => {
-//   const messages = await message.getMessagesByConversationID(conversationID);
-//   return messages;
-// };
-// const handleDeleteConversation = async (event, conversationID) => {
-//   const res = await conversation.deleteConversation(+conversationID);
-//   return res;
-// };
-// const handleStopChat = () => {
-//   // 如果存在中断控制器，中断聊天，清空控制器
-//   if (process.chatAbortController) {
-//     process.chatAbortController.abort();
-//     process.chatAbortController = null;
-//   }
-// };
+const handleGetAgentPrompt = async () => {
+  const prompt = await agentConfig.getAgentPrompt();
+  return prompt;
+};
+const handleCreateAgentPrompt = async (event, data) => {
+  const prompt = await agentConfig.createAgentPrompt(data);
+  return prompt;
+};
+const handleDeleteAgentPrompt = async (event, id) => {
+  const res = await agentConfig.deleteAgentPrompt(id);
+  return res;
+};
+const handleUpdateAgentPrompt = async (event, data) => {
+  const res = await agentConfig.updateAgentPrompt(data);
+  return res;
+};
+const handleCreateConversation = async (event, data) => {
+  const { id } = await conversation.createConversation(data);
+  return id;
+};
+const handleGetConversationList = async () => {
+  const conversationList = await conversation.getConversations();
+  return conversationList;
+};
+const handleGetMessagesByConversationID = async (event, conversationID) => {
+  const messages = await message.getMessagesByConversationID(conversationID);
+  return messages;
+};
+const handleDeleteConversation = async (event, conversationID) => {
+  const res = await conversation.deleteConversation(+conversationID);
+  return res;
+};
+const handleStopChat = () => {
+  // 如果存在中断控制器，中断聊天，清空控制器
+  if (process.chatAbortController) {
+    process.chatAbortController.abort();
+    process.chatAbortController = null;
+  }
+};
 app.on('ready', () => {
-  // ipcMain.handle('agent:getPrompt', handleGetAgentPrompt);
-  // ipcMain.handle('agent:createPrompt', handleCreateAgentPrompt);
-  // ipcMain.handle('agent:deletePrompt', handleDeleteAgentPrompt);
-  // ipcMain.handle('agent:updatePrompt', handleUpdateAgentPrompt);
-  // ipcMain.handle('agent:createConversation', handleCreateConversation);
-  // ipcMain.on('agent:chat', async (event, data) => {
-  //   await chat(event, data);
-  // });
+  ipcMain.handle('agent:getPrompt', handleGetAgentPrompt);
+  ipcMain.handle('agent:createPrompt', handleCreateAgentPrompt);
+  ipcMain.handle('agent:deletePrompt', handleDeleteAgentPrompt);
+  ipcMain.handle('agent:updatePrompt', handleUpdateAgentPrompt);
+  ipcMain.handle('agent:createConversation', handleCreateConversation);
+  ipcMain.on('agent:chat', async (event, data) => {
+    await chat(event, data);
+  });
   // 监听聊天停止事件
-  // ipcMain.on('agent:stop', handleStopChat);
-  // ipcMain.handle('agent:getConversationList', handleGetConversationList);
-  // ipcMain.handle(
-  //   'agent:getMessagesByConversationID',
-  //   handleGetMessagesByConversationID
-  // );
-  // ipcMain.handle('agent:deleteConversation', handleDeleteConversation);
-  // ipcMain.handle('agent:updateConversationTitle', updateConversationTitle);
+  ipcMain.on('agent:stop', handleStopChat);
+  ipcMain.handle('agent:getConversationList', handleGetConversationList);
+  ipcMain.handle(
+    'agent:getMessagesByConversationID',
+    handleGetMessagesByConversationID
+  );
+  ipcMain.handle('agent:deleteConversation', handleDeleteConversation);
+  ipcMain.handle('agent:updateConversationTitle', updateConversationTitle);
   createWindow();
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();

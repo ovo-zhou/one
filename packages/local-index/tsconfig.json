@@ -1,11 +1,20 @@
 {
   "compilerOptions": {
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "target": "es2023",
-    "strict": true,
-    "esModuleInterop": true,
-    "outDir": "dist",
-    "declaration": true
-  }
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "bundler", // 配合 tsup/vite 使用的最佳实践
+    "esModuleInterop": true, // 允许混用 CJS/ESM
+    "skipLibCheck": true, // 忽略 node_modules 里的类型错误
+    "strict": true, // 严格模式
+    "noEmit": true, // tsc 不负责输出，只负责检查
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ] // 支持 @/utils 这种路径别名
+    }
+  },
+  "include": [
+    "src"
+  ]
 }

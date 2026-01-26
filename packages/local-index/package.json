@@ -2,14 +2,16 @@
   "name": "@one/local-index",
   "version": "0.0.0",
   "main": "dist/index.js",
+  "private": true,
   "devDependencies": {
     "@types/node": "^25.0.10",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3"
   },
   "scripts": {
-    "build": "tsup index.ts --format esm --dts --clean",
-    "dev": "tsup index.ts --format esm --dts --watch"
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "postinstall": "prisma migrate dev & prisma generate"
   },
   "dependencies": {
     "prisma": "^7.3.0",
@@ -17,9 +19,5 @@
     "@prisma/client": "^7.3.0",
     "dotenv": "^17.2.3"
   },
-  "type": "module",
-  "files": [
-    "prisma/**/*",
-    "dist/**/*"
-  ]
+  "type": "module"
 }

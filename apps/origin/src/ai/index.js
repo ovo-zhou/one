@@ -1,8 +1,11 @@
 // Please install OpenAI SDK first: `npm install openai`
 
 import OpenAI from 'openai';
-import DatabaseClient from 'database';
-const dbClient = DatabaseClient.getInstance();
+import { app } from 'electron';
+import DatabaseClient from '@one/local-index';
+// 是否为开发环境
+const isDev = !app.isPackaged;
+const dbClient = DatabaseClient.getInstance(isDev);
 const conversation = dbClient.conversation()
 const messageService = dbClient.message()
 const agentConfig = dbClient.agentConfig()
