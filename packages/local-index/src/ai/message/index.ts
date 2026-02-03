@@ -1,55 +1,54 @@
-import { Message } from "@prisma/client";
-import { PrismaClient } from "@prisma/client";
+import { LowDbClient, Db } from '../../types'
+
 export default class Messages {
   private static instance: Messages;
-  private client: PrismaClient;
+  private client: LowDbClient;
 
-  private constructor(client: PrismaClient) {
+  private constructor(client: LowDbClient) {
     this.client = client
   }
 
-  public static getInstance(client: PrismaClient): Messages {
+  public static getInstance(client: LowDbClient): Messages {
     if (!Messages.instance) {
       Messages.instance = new Messages(client);
     }
     return Messages.instance;
   }
-  /**
- * 添加消息
- */
+
   async createMessage(message: {
-    conversationId: number;
+    conversationId: string;
     content: string;
     role: 'user' | 'assistant' | 'system';
-  }): Promise<Message> {
-    const { conversationId, content, role } = message;
-    const newMessage = await this.client.message.create({
-      data: {
-        conversationId,
-        content,
-        role
-      }
-    });
-    return newMessage;
-  }
-  /**
-   * 删除消息
-   */
-  async deleteMessage(id: number): Promise<Message> {
-    const message = await this.client.message.delete({
-      where: {
-        id
-      }
-    });
-    return message;
+  }): Promise<Db['messages'][0]> {
+    await this.client.read()
+    if (!this.client.data) {
+      this.client.data = { agent: [], conversation: [], messages: [] }
+    }
+
+    const newMessage = {
+      id: Date.now().toString(),
+      ...message,
+      createdAt: new Date(),
+      tokens: 0,
+      model: ''
+    }
+
+    this.client.data.messages.push(newMessage)
+    await this.client.write()
+    return newMessage
   }
 
-  async getMessagesByConversationID(conversationId: number): Promise<Message[]> {
-    const messages = await this.client.message.findMany({
-      where: {
-        conversationId
-      }
-    });
-    return messages;
+  async deleteMessage(id: string): Promise<void> {
+    await this.client.read()
+    if (this.client.data?.messages) {
+      this.client.data.messages = this.client.data.messages.filter((m: Db['messages'][0]) => m.id !== id)
+      await this.client.write()
+    }
+  }
+
+  async getMessagesByConversationID(conversationId: string): Promise<Db['messages']> {
+    await this.client.read()
+    const messages = this.client.data?.messages.filter((m: Db['messages'][0]) => m.conversationId === conversationId) || []
+    return messages
   }
 }

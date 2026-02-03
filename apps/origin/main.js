@@ -7,7 +7,9 @@ import { chat, updateConversationTitle } from './src/ai/index.js';
 
 // 是否为开发环境
 const isDev = !app.isPackaged;
-const dbClient = DatabaseClient.getInstance(isDev);
+// 获取数据存储目录
+const dbFilePath = path.join(app.getPath('userData'), 'db.json');
+const dbClient = DatabaseClient.getInstance(dbFilePath);
 const agentConfig = dbClient.agentConfig()
 const message = dbClient.message()
 const conversation = dbClient.conversation()
@@ -29,6 +31,7 @@ const createWindow = () => {
     win.loadURL('http://localhost:5173/');
     win.webContents.openDevTools();
   } else {
+    // 使用绝对路径加载打包后的文件
     win.loadFile('client-ui/index.html');
   }
 };

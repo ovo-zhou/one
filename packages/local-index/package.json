@@ -10,14 +10,10 @@
   },
   "scripts": {
     "build": "tsup",
-    "dev": "tsup --watch",
-    "postinstall": "prisma migrate dev & prisma generate"
+    "dev": "tsup --watch"
   },
   "dependencies": {
-    "prisma": "^7.3.0",
-    "@prisma/adapter-better-sqlite3": "^7.3.0",
-    "@prisma/client": "^7.3.0",
-    "dotenv": "^17.2.3"
+    "lowdb": "^7.0.1"
   },
   "type": "module"
 }

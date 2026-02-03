@@ -3,16 +3,16 @@
 import OpenAI from 'openai';
 import { app } from 'electron';
 import DatabaseClient from '@one/local-index';
-// 是否为开发环境
-const isDev = !app.isPackaged;
-const dbClient = DatabaseClient.getInstance(isDev);
+import path from 'path';
+const dbFilePath = path.join(app.getPath('userData'), 'db.json');
+const dbClient = DatabaseClient.getInstance(dbFilePath);
 const conversation = dbClient.conversation()
 const messageService = dbClient.message()
 const agentConfig = dbClient.agentConfig()
 
 const openai = new OpenAI({
   baseURL: 'https://api.deepseek.com',
-  apiKey: process.env.api_key,
+  apiKey: process.env.api_key || 'sk-81f3498968d84ecd8005a35a222b4431',
 });
 // 这里要手动插入 agent 对应的prompt
 // 加载历史聊天记录
