@@ -12,7 +12,7 @@ const agentConfig = dbClient.agentConfig()
 
 const openai = new OpenAI({
   baseURL: 'https://api.deepseek.com',
-  apiKey: process.env.api_key || 'sk-81f3498968d84ecd8005a35a222b4431',
+  apiKey: process.env.api_key,
 });
 // 这里要手动插入 agent 对应的prompt
 // 加载历史聊天记录
