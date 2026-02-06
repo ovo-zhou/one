@@ -26,7 +26,6 @@ const createWindow = () => {
       ),
     },
   });
-  win.loadFile('client/index.html');
   if (isDev) {
     win.loadURL('http://localhost:5173/');
     win.webContents.openDevTools();
