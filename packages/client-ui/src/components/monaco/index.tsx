@@ -7,6 +7,16 @@ interface MonacoEditorProps {
   readOnly?: boolean;
   className?: string;
   style?: React.CSSProperties;
+  language:
+    | 'html'
+    | 'typescript'
+    | 'javascript'
+    | 'shell'
+    | 'json'
+    | 'css'
+    | 'less'
+    | 'scss'
+    | 'plaintext';
 }
 
 export interface MonacoEditorRef {
@@ -18,7 +28,13 @@ export interface MonacoEditorRef {
  */
 const MonacoEditor = forwardRef<MonacoEditorRef, MonacoEditorProps>(
   (props, ref) => {
-    const { className, style, defaultValue, readOnly = false } = props;
+    const {
+      className = '',
+      style = {},
+      defaultValue,
+      readOnly = false,
+      language,
+    } = props;
 
     const monacoEl = useRef<HTMLDivElement>(null);
     const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
@@ -32,7 +48,7 @@ const MonacoEditor = forwardRef<MonacoEditorRef, MonacoEditorProps>(
       if (monacoEl.current && !editorRef.current) {
         editorRef.current = monaco.editor.create(monacoEl.current, {
           value: defaultValue || '',
-          language: 'typescript',
+          language,
           theme: 'vs-dark',
           automaticLayout: true,
           minimap: { enabled: false },
@@ -49,7 +65,7 @@ const MonacoEditor = forwardRef<MonacoEditorRef, MonacoEditorProps>(
 
     return (
       <div
-        className={`w-full h-200 ${className}`}
+        className={`w-full ${className}`}
         style={{ ...style }}
         ref={monacoEl}
       ></div>

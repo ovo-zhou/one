@@ -52,3 +52,8 @@ contextBridge.exposeInMainWorld('agent', {
     return ipcRenderer.invoke('agent:deleteConversation', id);
   },
 });
+contextBridge.exposeInMainWorld('hosts', {
+  read: () => {
+    return ipcRenderer.invoke('hosts:read');
+  },
+});

@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import 'dotenv/config';
 import DatabaseClient from '@one/local-index';
 import { chat } from './src/ai/index.js';
+import { readHosts } from './src/hosts/index.js';
 
 // 是否为开发环境
 const isDev = !app.isPackaged;
@@ -91,6 +92,7 @@ app.on('ready', () => {
     handleGetMessagesByConversationID
   );
   ipcMain.handle('agent:deleteConversation', handleDeleteConversation);
+  ipcMain.handle('hosts:read', readHosts);
   createWindow();
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();

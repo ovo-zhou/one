@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import { getTimeGreeting } from '@/lib/utils';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BotMessageSquare, Braces } from 'lucide-react';
+import { BotMessageSquare, Braces, FileTerminal } from 'lucide-react';
 
 const [word1, word2] = getTimeGreeting();
 export default function Home() {
@@ -34,6 +34,15 @@ export default function Home() {
         >
           <Braces size={30} />
           <div>JSON 解析</div>
+        </div>
+        <div
+          className="flex items-center flex-col gap-2 cursor-pointer"
+          onClick={() => {
+            navigate('/hosts');
+          }}
+        >
+          <FileTerminal size={30} />
+          <div>Hosts 管理</div>
         </div>
       </div>
     </div>

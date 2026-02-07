@@ -17,10 +17,15 @@ export interface IAgent {
   deleteConversation: (id: string) => Promise<void>;
   stopChat: () => void;
 }
+export interface IHosts {
+  read: () => Promise<string>;
+  // write: (data: string) => void;
+}
 
 declare global {
   interface Window {
     bridge: IBridge
     agent: IAgent
+    hosts: IHosts
   }
 }
