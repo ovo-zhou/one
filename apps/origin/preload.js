@@ -51,7 +51,4 @@ contextBridge.exposeInMainWorld('agent', {
   deleteConversation: (id) => {
     return ipcRenderer.invoke('agent:deleteConversation', id);
   },
-  updateConversationTitle: (id, title) => {
-    return ipcRenderer.invoke('agent:updateConversationTitle', id, title);
-  },
 });
