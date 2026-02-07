@@ -1,5 +1,5 @@
 import { LowDbClient, Db } from '../../types'
-
+import { v4 as uuidv4 } from 'uuid'
 export default class Conversations {
   private static instance: Conversations;
   private client: LowDbClient;
@@ -17,15 +17,12 @@ export default class Conversations {
 
   async createConversation(title: string): Promise<Db['conversation'][0]> {
     await this.client.read()
-    if (!this.client.data) {
-      this.client.data = { agent: [], conversation: [], messages: [] }
-    }
 
     const conversation = {
-      id: Date.now().toString(),
+      id: uuidv4(),
       title,
-      createdAt: new Date(),
-      updatedAt: new Date()
+      createdAt: +new Date(),
+      updatedAt: +new Date()
     }
 
     this.client.data.conversation.push(conversation)
@@ -45,22 +42,6 @@ export default class Conversations {
     console.log('得到会话')
     await this.client.read()
     const conversations = this.client.data?.conversation || []
-    return conversations.sort((a: Db['conversation'][0], b: Db['conversation'][0]) => b.createdAt.getTime() - a.createdAt.getTime())
-  }
-
-  async updateConversation(id: string, title: string): Promise<Db['conversation'][0] | undefined> {
-    await this.client.read()
-    if (this.client.data?.conversation) {
-      const index = this.client.data.conversation.findIndex((c: Db['conversation'][0]) => c.id === id)
-      if (index !== -1) {
-        this.client.data.conversation[index] = {
-          ...this.client.data.conversation[index],
-          title,
-          updatedAt: new Date()
-        }
-        await this.client.write()
-      }
-    }
-    return this.client.data?.conversation.find((c: Db['conversation'][0]) => c.id === id)
+    return conversations.sort((a: Db['conversation'][0], b: Db['conversation'][0]) => b.createdAt - a.createdAt)
   }
 }

@@ -17,7 +17,7 @@ export function useCopilot() {
     const list = await window.agent.getConversationList();
     setConversationList(list);
   };
-  const updateMessagesByConversationID = async (id: number) => {
+  const updateMessagesByConversationID = async (id: string) => {
     const list = await window.agent.getMessagesByConversationID(id);
     setChatList(
       list.map((item) => ({
@@ -41,7 +41,7 @@ export function useCopilot() {
     let id = currentConversationId;
     // 没有会话ID，创建新会话
     if (!id) {
-      id = await window.agent.createConversation('新会话');
+      id = await window.agent.createConversation(message.slice(0, 40));
       setCurrentConversationId(id);
       await updateConversationList();
     }
@@ -50,10 +50,6 @@ export function useCopilot() {
       message,
       conversationID: id,
     });
-    if (chatList.length === 0) {
-      await window.agent.updateConversationTitle(id, message);
-      await updateConversationList();
-    }
   };
   const onMessage = () => {
     const off = window.agent.onMessage((data) => {

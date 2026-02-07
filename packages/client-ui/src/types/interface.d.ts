@@ -2,21 +2,20 @@ export interface IBridge {
   ping: () => void,
 }
 export interface IAgent {
-  getAgentPrompt: () => Promise<{ id: number, agentName: string, prompt: string }[]>;
+  getAgentPrompt: () => Promise<{ id: string, agentName: string, prompt: string }[]>;
   createAgentPrompt: (data: {
     agentName: string;
     prompt: string;
   }) => Promise<void>;
-  deleteAgentPrompt: (id: number) => Promise<viod>;
-  updateAgentPrompt: ({ id: number, agentName: string, prompt: string }) => Promise<viod>
-  chat: (data: { agentId: string; message: string, conversationID: number }) => void;
+  deleteAgentPrompt: (id: string) => Promise<void>;
+  updateAgentPrompt: ({ id: string, agentName: string, prompt: string }) => Promise<void>
+  chat: (data: { agentId: string; message: string, conversationID: string }) => void;
   onMessage: (callback: (data: { id: string, role: string, content: string, finish: boolean }) => void) => () => void;
-  createConversation: (title: string) => Promise<number>;
-  getConversationList: () => Promise<{ id: number, title: string }[]>;
-  getMessagesByConversationID: (id: number) => Promise<{ id: number, role: string, content: string }[]>;
-  deleteConversation: (id: number) => Promise<void>;
+  createConversation: (title: string) => Promise<string>;
+  getConversationList: () => Promise<{ id: string, title: string }[]>;
+  getMessagesByConversationID: (id: string) => Promise<{ id: string, role: string, content: string }[]>;
+  deleteConversation: (id: string) => Promise<void>;
   stopChat: () => void;
-  updateConversationTitle: (id: number, title: string) => Promise<void>;
 }
 
 declare global {

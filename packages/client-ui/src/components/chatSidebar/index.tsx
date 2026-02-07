@@ -43,7 +43,7 @@ export default function ChatSidebar() {
     updateMessagesByConversationID,
   } = useCopilot();
   const [open, setOpen] = useState(false);
-  const selectedConversation = useRef<number | null>(null);
+  const selectedConversation = useRef<string | null>(null);
   const handleDelete = async () => {
     // 删除的时候，当前选中的会话id为空，直接返回，关闭弹窗
     if (!selectedConversation.current) {
@@ -51,7 +51,7 @@ export default function ChatSidebar() {
       return;
     }
     // 删除的时候，删除的并不是当前选中的会话id，直接返回，关闭弹窗
-    if (selectedConversation.current !== Number(currentConversationId)) {
+    if (selectedConversation.current !== currentConversationId) {
       await window.agent.deleteConversation(selectedConversation.current);
       selectedConversation.current = null;
       // 更新会话列表

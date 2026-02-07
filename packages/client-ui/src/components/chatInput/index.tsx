@@ -23,7 +23,7 @@ export default function ChatInput() {
   const [agentId, setAgentId] = useState<string>('');
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [agentList, setAgentList] = useState<
-    { id: number; agentName: string; prompt: string }[]
+    { id: string; agentName: string; prompt: string }[]
   >([]);
   const handleSubmit = () => {
     // 有消息，并且不是流式输出，才提交
@@ -114,7 +114,7 @@ export default function ChatInput() {
                   <div className="flex items-center cursor-pointer">
                     <Plus size={16} />
                     <span>
-                      {agentList.find((item) => item.id === Number(agentId))
+                      {agentList.find((item) => item.id === agentId)
                         ?.agentName || 'auto'}
                     </span>
                   </div>

@@ -2,15 +2,15 @@ import { createContext, useState } from 'react';
 import type { IChatItem } from '@/components/chatBox/ChatItem';
 
 export const CopilotContext = createContext<{
-  currentConversationId: number | null;
-  setCurrentConversationId: React.Dispatch<React.SetStateAction<number | null>>;
+  currentConversationId: string | null;
+  setCurrentConversationId: React.Dispatch<React.SetStateAction<string | null>>;
   chatList: IChatItem[];
   setChatList: React.Dispatch<React.SetStateAction<IChatItem[]>>;
   isLoading: boolean;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  conversationList: { id: number; title: string }[];
+  conversationList: { id: string; title: string }[];
   setConversationList: React.Dispatch<
-    React.SetStateAction<{ id: number; title: string }[]>
+    React.SetStateAction<{ id: string; title: string }[]>
   >;
 }>({
   currentConversationId: null,
@@ -32,12 +32,12 @@ const CopilotProvider = (props: ICopilotProviderProps) => {
 
   // 当前会话
   const [currentConversationId, setCurrentConversationId] = useState<
-    number | null
+    string | null
   >(null);
 
   // 会话列表
   const [conversationList, setConversationList] = useState<
-    { id: number; title: string }[]
+    { id: string; title: string }[]
   >([]);
 
   // 聊天列表

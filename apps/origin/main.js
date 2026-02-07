@@ -50,6 +50,7 @@ const handleUpdateAgentPrompt = async (event, data) => {
   const res = await agentConfig.updateAgentPrompt(data);
   return res;
 };
+// 创建新的对话
 const handleCreateConversation = async (event, data) => {
   const { id } = await conversation.createConversation(data);
   return id;
@@ -63,7 +64,7 @@ const handleGetMessagesByConversationID = async (event, conversationID) => {
   return messages;
 };
 const handleDeleteConversation = async (event, conversationID) => {
-  const res = await conversation.deleteConversation(+conversationID);
+  const res = await conversation.deleteConversation(conversationID);
   return res;
 };
 const handleStopChat = () => {

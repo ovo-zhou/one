@@ -9,15 +9,15 @@ export type Db = {
   conversation: {
     id: string
     title: string
-    createdAt: Date
-    updatedAt: Date
+    createdAt: number
+    updatedAt: number
   }[],
   messages: {
     id: string
     conversationId: string
     role: string
     content: string
-    createdAt: Date
+    createdAt: number
     tokens: number
     model: string
   }[]
