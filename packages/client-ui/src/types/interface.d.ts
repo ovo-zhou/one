@@ -19,7 +19,7 @@ export interface IAgent {
 }
 export interface IHosts {
   read: () => Promise<string>;
-  // write: (data: string) => void;
+  write: (content: string) => Promise<boolean>;
 }
 
 declare global {

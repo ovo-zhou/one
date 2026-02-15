@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import 'dotenv/config';
 import DatabaseClient from '@one/local-index';
 import { chat } from './src/ai/index.js';
-import { readHosts } from './src/hosts/index.js';
+import Hosts from './src/hosts/index.js';
 
 // 是否为开发环境
 const isDev = !app.isPackaged;
@@ -14,6 +14,8 @@ const dbClient = DatabaseClient.getInstance(dbFilePath);
 const agentConfig = dbClient.agentConfig()
 const message = dbClient.message()
 const conversation = dbClient.conversation()
+
+const hosts = new Hosts();
 
 const createWindow = () => {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
@@ -92,7 +94,10 @@ app.on('ready', () => {
     handleGetMessagesByConversationID
   );
   ipcMain.handle('agent:deleteConversation', handleDeleteConversation);
-  ipcMain.handle('hosts:read', readHosts);
+  ipcMain.handle('hosts:read', hosts.readHostsFile);
+  ipcMain.handle('hosts:write', async (event, content) => {
+    return hosts.writeHostsFile(content);
+  });
   createWindow();
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();

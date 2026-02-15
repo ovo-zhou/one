@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Panel, Group, Separator } from 'react-resizable-panels';
 import MonacoEditor, { type MonacoEditorRef } from '@/components/monaco';
 import { Textarea } from '@/components/ui/textarea';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState } from 'react';
 
 export default function JsonParse() {
   const navigate = useNavigate();
@@ -24,9 +24,6 @@ export default function JsonParse() {
       editorRef.current?.getEditor()?.setValue(message);
     }
   };
-  useEffect(() => {
-    handleParse(jsonString);
-  }, [jsonString]);
   return (
     <div className="w-screen h-screen flex flex-col">
       <div className="p-4">
@@ -63,6 +60,7 @@ export default function JsonParse() {
             value={jsonString}
             onChange={(e) => {
               setJsonString(e.target.value);
+              handleParse(e.target.value);
             }}
           />
         </Panel>

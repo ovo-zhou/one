@@ -16,7 +16,8 @@
   "dependencies": {
     "@one/local-index": "0.0.0",
     "dotenv": "^17.2.3",
-    "openai": "^6.7.0"
+    "openai": "^6.7.0",
+    "sudo-prompt": "^9.2.1"
   },
   "devDependencies": {
     "@electron/rebuild": "electron/rebuild",

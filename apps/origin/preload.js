@@ -56,4 +56,7 @@ contextBridge.exposeInMainWorld('hosts', {
   read: () => {
     return ipcRenderer.invoke('hosts:read');
   },
+  write: (content) => {
+    return ipcRenderer.invoke('hosts:write', content);
+  },
 });
