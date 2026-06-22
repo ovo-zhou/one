@@ -1,32 +1,27 @@
 {
   "name": "one",
-  "version": "1.0.0",
-  "main": "index.js",
-  "repository": "https://github.com/ovo-zhou/one.git",
-  "author": "ryan <ryanhhuang@tencent.com>",
-  "license": "MIT",
-  "workspaces": [
-    "packages/*",
-    "apps/*"
-  ],
-  "scripts": {
-    "lint": "eslint .",
-    "clean": "rimraf packages/*/dist apps/*/dist packages/*/build apps/*/.next packages/*/node_modules apps/*/node_modules node_modules",
-    "prepare": "husky"
-  },
   "private": true,
-  "devDependencies": {
-    "@commitlint/cli": "^20.3.1",
-    "@commitlint/config-conventional": "^20.3.1",
-    "@eslint/js": "^9.39.1",
-    "@eslint/markdown": "^7.5.1",
-    "@typescript-eslint/eslint-plugin": "^8.47.0",
-    "chalk": "^5.6.2",
-    "eslint": "^9.39.1",
-    "eslint-plugin-json": "^4.0.1",
-    "husky": "^9.1.7",
-    "rimraf": "^6.1.0",
-    "typescript-eslint": "^8.46.4"
+  "type": "module",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "test": "turbo test",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,mjs,cjs,json,md}\"",
+    "clean": "turbo clean"
   },
-  "type": "module"
+  "devDependencies": {
+    "@eslint/js": "^9.20.0",
+    "@types/node": "^22.0.0",
+    "eslint": "^9.20.0",
+    "prettier": "^3.5.0",
+    "turbo": "^2.5.0",
+    "typescript": "^5.7.0",
+    "typescript-eslint": "^8.25.0"
+  },
+  "packageManager": "pnpm@11.5.0",
+  "engines": {
+    "node": ">=22"
+  }
 }
