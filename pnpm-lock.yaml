@@ -30,7 +30,7 @@ importers:
         specifier: ^8.25.0
         version: 8.61.1(eslint@9.39.4)(typescript@5.7.2)
 
-  apps/nextjs:
+  apps/blogger:
     dependencies:
       next:
         specifier: ^16.2.9

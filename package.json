@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "turbo dev",
-    "dev:nextjs": "turbo dev --filter=@one/nextjs",
+    "dev:blogger": "turbo dev --filter=@one/blogger",
     "dev:vite-react": "turbo dev --filter=@one/vite-react",
     "dev:node-service": "turbo dev --filter=@one/node-service",
     "build": "turbo build",
