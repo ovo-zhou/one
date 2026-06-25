@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --port 3000",
+    "dev": "next dev --port 1008",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
@@ -12,6 +12,9 @@
   "dependencies": {
     "@mantine/core": "^9.4.0",
     "@mantine/hooks": "^9.4.0",
+    "dayjs": "^1.11.21",
+    "googleapis": "^173.0.0",
+    "jose": "^6.2.3",
     "next": "^16.2.9",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
