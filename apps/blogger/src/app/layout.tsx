@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import "./globals.css";
 import "@mantine/core/styles.css";
 
-import { ColorSchemeScript, MantineProvider, mantineHtmlProps, Container, Flex } from "@mantine/core";
-import { getSession } from "../lib/session";
-import UserMenu from "../components/UserMenu";
+import { MantineProvider, Container } from "@mantine/core";
+import ThemeToggle from "../components/ThemeToggle";
 
 export const metadata: Metadata = {
   title: "Next.js App",
@@ -12,21 +12,18 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const session = await getSession();
-  const user = session ? { name: session.name, email: session.email, picture: session.picture } : null;
+  const cookieStore = await cookies();
+  const stored = cookieStore.get("mantine-color-scheme")?.value;
+  const colorScheme = stored === "dark" || stored === "light" ? stored : "light";
+
   return (
-    <html lang="en" {...mantineHtmlProps}>
-      <head>
-        <ColorSchemeScript />
-      </head>
+    <html lang="en" data-mantine-color-scheme={colorScheme} suppressHydrationWarning>
       <body>
-        <MantineProvider>
+        <MantineProvider defaultColorScheme={colorScheme}>
           <Container fluid p={0}>
-            <Flex justify="flex-end" p="sm">
-              <UserMenu user={user} />
-            </Flex>
             {children}
           </Container>
+          <ThemeToggle />
         </MantineProvider>
       </body>
     </html>

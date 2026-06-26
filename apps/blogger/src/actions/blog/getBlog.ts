@@ -1,3 +1,6 @@
+import { google } from "googleapis";
+import { unstable_cache } from "next/cache";
+
 interface Blog {
   kind: string;
   id: string;
@@ -6,7 +9,7 @@ interface Blog {
   published: string;
   updated: string;
   url: string;
-  selfLink: string,
+  selfLink: string;
   posts: {
     totalItems: number;
     selfLink: string;
@@ -16,15 +19,21 @@ interface Blog {
     selfLink: string;
   };
   locale: {
-    language: string,
+    language: string;
     country: string;
     variant: string;
-  }
+  };
 }
+
+async function fetchBlog(): Promise<Blog> {
+  const blogger = google.blogger({ version: "v3", auth: process.env.api_key });
+  const res = await blogger.blogs.get({ blogId: process.env.blog_id });
+  return res.data as Blog;
+}
+
 export default async function getBlog(): Promise<Blog> {
-  const result = await fetch(`https://www.googleapis.com/blogger/v3/blogs/${process.env.blog_id}?key=${process.env.api_key}`, {
-    next: { revalidate: 60 * 60 * 12 }
-  })
-  const blog: Blog = await result.json()
-  return blog
+  return unstable_cache(fetchBlog, ["blog"], {
+    revalidate: 60 * 60 * 12,
+    tags: ["blog"],
+  })();
 }

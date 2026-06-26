@@ -12,12 +12,22 @@
   "dependencies": {
     "@mantine/core": "^9.4.0",
     "@mantine/hooks": "^9.4.0",
+    "@tiptap/extension-code-block-lowlight": "^3.27.1",
+    "@tiptap/extension-image": "^3.27.1",
+    "@tiptap/extension-link": "^3.27.1",
+    "@tiptap/react": "^3.27.1",
+    "@tiptap/starter-kit": "^3.27.1",
     "dayjs": "^1.11.21",
     "googleapis": "^173.0.0",
     "jose": "^6.2.3",
+    "lowlight": "^3.3.0",
     "next": "^16.2.9",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "rehype-highlight": "^7.0.2",
+    "rehype-parse": "^9.0.1",
+    "rehype-stringify": "^10.0.1",
+    "unified": "^11.0.5"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

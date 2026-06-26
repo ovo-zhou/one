@@ -29,3 +29,17 @@ export function getAuthUrl(state?: string): string {
     state,
   });
 }
+
+export function createAuthClient(
+  accessToken: string,
+  refreshToken?: string,
+  expiryDate?: number
+): OAuth2ClientType {
+  const client = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
+  client.setCredentials({
+    access_token: accessToken,
+    refresh_token: refreshToken,
+    expiry_date: expiryDate,
+  });
+  return client;
+}

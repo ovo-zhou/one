@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
 
-const COOKIE_NAME = "google_session";
+const COOKIE_NAME = process.env.session_cookie_name || "google_session";
 const secret = new TextEncoder().encode(process.env.jwt_secret!);
 
 export interface SessionPayload {

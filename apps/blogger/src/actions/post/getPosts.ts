@@ -1,6 +1,12 @@
 import { google } from "googleapis";
 import { unstable_cache } from "next/cache";
 
+interface BloggerPostList {
+  kind: "blogger#postList";
+  nextPageToken?: string;
+  items: BloggerPost[];
+}
+
 interface BloggerPost {
   kind: "blogger#post";
   id: string;
@@ -27,16 +33,15 @@ interface BloggerPost {
   };
 }
 
-async function fetchPostById(postId: string): Promise<BloggerPost> {
+async function fetchPosts(): Promise<BloggerPostList> {
   const blogger = google.blogger({ version: "v3", auth: process.env.api_key });
-  const res = await blogger.posts.get({ blogId: process.env.blog_id, postId });
-  return res.data as BloggerPost;
+  const res = await blogger.posts.list({ blogId: process.env.blog_id });
+  return res.data as BloggerPostList;
 }
 
-export default async function getPostById(postId: string): Promise<BloggerPost> {
-  return unstable_cache(
-    () => fetchPostById(postId),
-    ["post", postId],
-    { revalidate: 60 * 60 * 12, tags: [`post:${postId}`] }
-  )();
+export default async function getPosts(): Promise<BloggerPostList> {
+  return unstable_cache(fetchPosts, ["posts"], {
+    revalidate: 60 * 60 * 12,
+    tags: ["posts"],
+  })();
 }
