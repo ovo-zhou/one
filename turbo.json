@@ -4,7 +4,7 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "env": ["client_id", "client_secret", "api_key", "blog_id", "jwt_secret"],
+      "env": ["client_id", "client_secret", "api_key", "blog_id", "jwt_secret", "session_cookie_name", "admin_email"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
