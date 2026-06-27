@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useTransition } from "react";
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import {
   Table,
   Button,
@@ -71,7 +72,7 @@ export default function PageTable({ initialData }: { initialData: PageListData }
   return (
     <div>
       <Group justify="flex-end" mb="md">
-        <Button onClick={() => router.push("/admin/pages/new")}>+ 新建页面</Button>
+        <Button leftSection={<Plus size={16} />} onClick={() => router.push("/admin/pages/new")}>新建页面</Button>
       </Group>
 
       <Box style={{ overflowX: "auto" }}>
@@ -147,19 +148,21 @@ export default function PageTable({ initialData }: { initialData: PageListData }
         <Button
           variant="default"
           size="sm"
+          leftSection={<ChevronLeft size={16} />}
           disabled={currentPage === 0}
           onClick={() => handlePage("prev")}
         >
-          ← 上一页
+          上一页
         </Button>
         <Text size="sm" c="dimmed">第 {currentPage + 1} 页</Text>
         <Button
           variant="default"
           size="sm"
+          rightSection={<ChevronRight size={16} />}
           disabled={!data.nextPageToken}
           onClick={() => handlePage("next")}
         >
-          下一页 →
+          下一页
         </Button>
       </Group>
 

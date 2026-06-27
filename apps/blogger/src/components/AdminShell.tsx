@@ -18,6 +18,17 @@ import {
   em,
 } from "@mantine/core";
 import { usePathname, useRouter } from "next/navigation";
+import {
+  Newspaper,
+  FileText,
+  MessagesSquare,
+  Menu as MenuIcon,
+  CircleUser,
+  ChevronDown,
+  PanelLeftClose,
+  Home,
+  LogOut,
+} from "lucide-react";
 
 function SidebarContent({ collapsed, onNavigate }: { collapsed: boolean; onNavigate: () => void }) {
   const pathname = usePathname();
@@ -32,21 +43,21 @@ function SidebarContent({ collapsed, onNavigate }: { collapsed: boolean; onNavig
     <Stack gap={0}>
       <NavLink
         label={collapsed ? undefined : "文章管理"}
-        leftSection={<span style={{ fontSize: "1.1em" }}>📝</span>}
+        leftSection={<Newspaper size={18} />}
         active={pathname.startsWith("/admin/posts") || pathname === "/admin"}
         onClick={() => handleClick("/admin/posts")}
         styles={{ root: { borderRadius: 0 } }}
       />
       <NavLink
         label={collapsed ? undefined : "页面管理"}
-        leftSection={<span style={{ fontSize: "1.1em" }}>📄</span>}
+        leftSection={<FileText size={18} />}
         active={pathname.startsWith("/admin/pages")}
         onClick={() => handleClick("/admin/pages")}
         styles={{ root: { borderRadius: 0 } }}
       />
       <NavLink
         label={collapsed ? undefined : "评论管理"}
-        leftSection={<span style={{ fontSize: "1.1em" }}>💬</span>}
+        leftSection={<MessagesSquare size={18} />}
         active={pathname.startsWith("/admin/comments")}
         onClick={() => handleClick("/admin/comments")}
         styles={{ root: { borderRadius: 0 } }}
@@ -79,11 +90,11 @@ function TopBar({
         <Group gap="xs">
           {isMobile ? (
             <ActionIcon variant="subtle" onClick={onMobileToggle}>
-              <span style={{ fontSize: "1.2em" }}>☰</span>
+              <MenuIcon size={20} />
             </ActionIcon>
           ) : (
             <ActionIcon variant="subtle" onClick={onDesktopToggle}>
-              <span style={{ fontSize: "1.2em" }}>☰</span>
+              <MenuIcon size={20} />
             </ActionIcon>
           )}
           <Anchor href="/admin" underline="never" c="inherit" fw={700} size="lg">
@@ -93,13 +104,21 @@ function TopBar({
 
         <Menu trigger="click" position="bottom-end">
           <Menu.Target>
-            <Text component="span" style={{ cursor: "pointer" }} size="sm">
-              {userName} ▼
+            <Text
+              component="span"
+              size="sm"
+              style={{ cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}
+            >
+              <CircleUser size={18} />
+              {userName}
+              <ChevronDown size={14} />
             </Text>
           </Menu.Target>
           <Menu.Dropdown>
-            <Menu.Item onClick={() => router.push("/")}>返回首页</Menu.Item>
-            <Menu.Item color="red" onClick={() => setLogoutModalOpened(true)}>
+            <Menu.Item leftSection={<Home size={16} />} onClick={() => router.push("/")}>
+              返回首页
+            </Menu.Item>
+            <Menu.Item color="red" leftSection={<LogOut size={16} />} onClick={() => setLogoutModalOpened(true)}>
               退出登陆
             </Menu.Item>
           </Menu.Dropdown>
@@ -176,9 +195,10 @@ export default function AdminShell({
                 variant="subtle"
                 size="compact-sm"
                 fullWidth
+                leftSection={<PanelLeftClose size={16} />}
                 onClick={() => setDesktopCollapsed(true)}
               >
-                ← 收起
+                收起
               </Button>
             )}
           </AppShell.Section>

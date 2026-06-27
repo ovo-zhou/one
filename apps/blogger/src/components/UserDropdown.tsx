@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Menu, Modal, Text, Button, Group } from "@mantine/core";
+import { LogOut } from "lucide-react";
 
 interface UserDropdownProps {
   name: string;
@@ -22,7 +23,7 @@ export default function UserDropdown({ name }: UserDropdownProps) {
           </Text>
         </Menu.Target>
         <Menu.Dropdown>
-          <Menu.Item color="red" onClick={() => setOpened(true)}>
+          <Menu.Item color="red" leftSection={<LogOut size={16} />} onClick={() => setOpened(true)}>
             退出登陆
           </Menu.Item>
         </Menu.Dropdown>

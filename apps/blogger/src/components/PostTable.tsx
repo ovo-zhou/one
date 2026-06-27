@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect, useTransition } from "react";
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import {
   Table,
   TextInput,
@@ -117,7 +118,7 @@ export default function PostTable({ initialData }: { initialData: PostListData }
             搜索
           </Button>
         </Group>
-        <Button onClick={() => router.push("/admin/posts/new")}>+ 新建文章</Button>
+        <Button leftSection={<Plus size={16} />} onClick={() => router.push("/admin/posts/new")}>新建文章</Button>
       </Group>
 
       <Box style={{ overflowX: "auto" }}>
@@ -220,10 +221,11 @@ export default function PostTable({ initialData }: { initialData: PostListData }
         <Button
           variant="default"
           size="sm"
+          leftSection={<ChevronLeft size={16} />}
           disabled={currentPage === 0 && !data.prevPageToken}
           onClick={() => handlePage("prev")}
         >
-          ← 上一页
+          上一页
         </Button>
         <Text size="sm" c="dimmed">
           第 {currentPage + 1} 页
@@ -231,10 +233,11 @@ export default function PostTable({ initialData }: { initialData: PostListData }
         <Button
           variant="default"
           size="sm"
+          rightSection={<ChevronRight size={16} />}
           disabled={!data.nextPageToken}
           onClick={() => handlePage("next")}
         >
-          下一页 →
+          下一页
         </Button>
       </Group>
 
