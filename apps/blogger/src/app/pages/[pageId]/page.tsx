@@ -1,7 +1,7 @@
 import getPublicPageById from "../../../actions/page/getPublicPageById";
-import { highlightHtml } from "../../../lib/highlightHtml";
+import MarkdownRenderer from "../../../components/MarkdownRenderer";
 import dayjs from "dayjs";
-import { Flex, Typography, Title, Text, Stack, Container } from "@mantine/core";
+import { Flex, Title, Text, Stack, Container } from "@mantine/core";
 import { notFound } from "next/navigation";
 
 export default async function PublicPageDetail({ params }: { params: Promise<{ pageId: string }> }) {
@@ -11,8 +11,6 @@ export default async function PublicPageDetail({ params }: { params: Promise<{ p
   if (!page || !page.title) {
     notFound();
   }
-
-  const content = page.content ? await highlightHtml(page.content) : "";
 
   return (
     <main>
@@ -25,14 +23,7 @@ export default async function PublicPageDetail({ params }: { params: Promise<{ p
                 {dayjs(page.published).format("YYYY年MM月DD日 HH时mm分ss秒")}
               </Text>
             )}
-            {content && (
-              <Typography
-                component="article"
-                className="prose-content"
-                dangerouslySetInnerHTML={{ __html: content }}
-                style={{ lineHeight: 1.8 }}
-              />
-            )}
+            {page.content && <MarkdownRenderer content={page.content} />}
           </Stack>
         </Container>
       </Flex>

@@ -1,12 +1,11 @@
 import getPostById from "../../actions/post/getPostById";
-import { highlightHtml } from "../../lib/highlightHtml";
+import MarkdownRenderer from "../../components/MarkdownRenderer";
 import dayjs from "dayjs";
-import { Flex, Typography, Title, Text, Stack, Container } from "@mantine/core";
+import { Flex, Title, Text, Stack, Container } from "@mantine/core";
 
 export default async function PostPage({ params }: { params: Promise<{ postId: string }> }) {
   const { postId } = await params;
   const post = await getPostById(postId);
-  const content = await highlightHtml(post.content);
 
   return (
     <main>
@@ -17,12 +16,7 @@ export default async function PostPage({ params }: { params: Promise<{ postId: s
             <Text size="sm" c="dimmed">
               {post.author.displayName} · {dayjs(post.published).format("YYYY年MM月DD日 HH时mm分ss秒")}
             </Text>
-            <Typography
-              component="article"
-              className="prose-content"
-              dangerouslySetInnerHTML={{ __html: content }}
-              style={{ lineHeight: 1.8 }}
-            />
+            <MarkdownRenderer content={post.content} />
           </Stack>
         </Container>
       </Flex>

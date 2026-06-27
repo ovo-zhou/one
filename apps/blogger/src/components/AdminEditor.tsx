@@ -5,14 +5,15 @@ import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
-import { createLowlight, common } from "lowlight";
-import { Typography } from "@mantine/core";
-
-const lowlight = createLowlight(common);
+import { Table, TableRow, TableHeader, TableCell } from "@tiptap/extension-table";
+import TaskList from "@tiptap/extension-task-list";
+import TaskItem from "@tiptap/extension-task-item";
+import { Markdown } from "tiptap-markdown";
+import { lowlight } from "../lib/highlight";
 
 interface AdminEditorProps {
   content?: string;
-  onChange?: (html: string) => void;
+  onChange?: (markdown: string) => void;
 }
 
 export default function AdminEditor({ content, onChange }: AdminEditorProps) {
@@ -22,14 +23,24 @@ export default function AdminEditor({ content, onChange }: AdminEditorProps) {
       CodeBlockLowlight.configure({ lowlight }),
       Image.configure({ inline: false, allowBase64: false }),
       Link.configure({ openOnClick: false }),
+      Table.configure({ resizable: true }),
+      TableRow,
+      TableHeader,
+      TableCell,
+      TaskList,
+      TaskItem.configure({ nested: true }),
+      Markdown.configure({
+        html: false,
+        breaks: false,
+        transformPastedText: true,
+        transformCopiedText: true,
+      }),
     ],
     content: content || "",
     immediatelyRender: false,
-    editorProps: {
-      attributes: { class: Typography.classes.root ?? "" },
-    },
     onUpdate: ({ editor }) => {
-      onChange?.(editor.getHTML());
+      const storage = editor.storage as unknown as { markdown: { getMarkdown: () => string } };
+      onChange?.(storage.markdown.getMarkdown());
     },
   });
 

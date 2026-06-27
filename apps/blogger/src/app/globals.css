@@ -7,6 +7,7 @@ body {
   font-family: system-ui, -apple-system, sans-serif;
 }
 
+/* ===== 编辑器专属 ===== */
 .ProseMirror {
   min-height: 300px;
   padding: 8px;
@@ -25,88 +26,233 @@ body {
   pointer-events: none;
 }
 
-:root,
-[data-mantine-color-scheme="light"] {
-  --code-bg: #f6f8fa;
-  --code-text: #24292f;
-  --code-comment: #6e7781;
-  --code-keyword: #cf222e;
-  --code-string: #0a3069;
-  --code-number: #0550ae;
-  --code-fn: #8250df;
-  --code-type: #953800;
-  --code-tag: #116329;
+/* 表格编辑：列宽调整、单元格选中 */
+.ProseMirror .tableWrapper {
+  overflow-x: auto;
 }
 
-[data-mantine-color-scheme="dark"] {
-  --code-bg: #2e2e2e;
-  --code-text: #c9d1d9;
-  --code-comment: #8b949e;
-  --code-keyword: #ff7b72;
-  --code-string: #a5d6ff;
-  --code-number: #79c0ff;
-  --code-fn: #d2a8ff;
-  --code-type: #ffa657;
-  --code-tag: #7ee787;
+.ProseMirror table {
+  table-layout: fixed;
+  border-collapse: collapse;
+  overflow: hidden;
+  width: 100%;
+  margin: 1em 0;
 }
 
-.hljs {
-  color: var(--code-text);
+.ProseMirror th,
+.ProseMirror td {
+  position: relative;
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--mantine-color-default-border);
+  padding: 0.5em 0.75em;
+  text-align: left;
+  vertical-align: top;
 }
 
-.ProseMirror pre,
-.prose-content pre {
-  background: var(--code-bg);
+.ProseMirror .selectedCell:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, #228be6 18%, transparent);
+  pointer-events: none;
 }
 
-.hljs-comment,
-.hljs-quote {
-  color: var(--code-comment);
-  font-style: italic;
+.ProseMirror .column-resize-handle {
+  position: absolute;
+  right: -2px;
+  top: 0;
+  bottom: -2px;
+  width: 4px;
+  background: var(--mantine-color-default-border);
+  pointer-events: none;
 }
 
-.hljs-keyword,
-.hljs-literal,
-.hljs-type {
-  color: var(--code-keyword);
+/* ===== 共享排版：编辑器与渲染页一致 ===== */
+.prose-content,
+.ProseMirror {
+  line-height: 1.8;
+  font-size: 16px;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
 }
 
-.hljs-string,
-.hljs-regexp,
-.hljs-addition {
-  color: var(--code-string);
+.prose-content > :first-child,
+.ProseMirror > :first-child {
+  margin-top: 0;
 }
 
-.hljs-number,
-.hljs-symbol {
-  color: var(--code-number);
+.prose-content > :last-child,
+.ProseMirror > :last-child {
+  margin-bottom: 0;
 }
 
-.hljs-title,
-.hljs-name,
-.hljs-section,
-.hljs-built_in {
-  color: var(--code-fn);
+.prose-content p,
+.ProseMirror p {
+  margin: 0.75em 0;
 }
 
-.hljs-attr,
-.hljs-variable,
-.hljs-template-variable,
-.hljs-selector-class,
-.hljs-selector-id {
-  color: var(--code-type);
+.prose-content h1,
+.prose-content h2,
+.prose-content h3,
+.prose-content h4,
+.ProseMirror h1,
+.ProseMirror h2,
+.ProseMirror h3,
+.ProseMirror h4 {
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 1.4em 0 0.6em;
 }
 
-.hljs-tag,
-.hljs-meta,
-.hljs-deletion {
-  color: var(--code-tag);
+.prose-content h1,
+.ProseMirror h1 {
+  font-size: 1.8em;
 }
 
-.hljs-emphasis {
-  font-style: italic;
+.prose-content h2,
+.ProseMirror h2 {
+  font-size: 1.5em;
 }
 
-.hljs-strong {
-  font-weight: 700;
+.prose-content h3,
+.ProseMirror h3 {
+  font-size: 1.25em;
+}
+
+.prose-content h4,
+.ProseMirror h4 {
+  font-size: 1.1em;
+}
+
+.prose-content ul,
+.prose-content ol,
+.ProseMirror ul,
+.ProseMirror ol {
+  padding-left: 1.5em;
+  margin: 0.75em 0;
+}
+
+.prose-content ul,
+.ProseMirror ul {
+  list-style: disc;
+}
+
+.prose-content ol,
+.ProseMirror ol {
+  list-style: decimal;
+}
+
+.prose-content li,
+.ProseMirror li {
+  margin: 0.3em 0;
+}
+
+.prose-content li > p,
+.ProseMirror li > p {
+  margin: 0;
+}
+
+/* 任务列表：tiptap 用 data-type，react-markdown 用 GitHub class */
+.prose-content ul[data-type="taskList"],
+.prose-content ul.contains-task-list,
+.ProseMirror ul[data-type="taskList"] {
+  list-style: none;
+  padding-left: 0;
+}
+
+.prose-content ul[data-type="taskList"] > li,
+.prose-content ul.contains-task-list > li,
+.ProseMirror ul[data-type="taskList"] > li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4em;
+}
+
+.prose-content ul[data-type="taskList"] input,
+.prose-content ul.contains-task-list input,
+.ProseMirror ul[data-type="taskList"] input {
+  margin: 0.5em 0.3em 0 0;
+}
+
+.prose-content blockquote,
+.ProseMirror blockquote {
+  border-left: 3px solid var(--mantine-color-default-border);
+  padding-left: 1em;
+  margin: 1em 0;
+  color: var(--mantine-color-dimmed);
+}
+
+.prose-content a,
+.ProseMirror a {
+  color: var(--mantine-color-anchor);
+  text-decoration: none;
+}
+
+.prose-content a:hover,
+.ProseMirror a:hover {
+  text-decoration: underline;
+}
+
+.prose-content img,
+.ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+.prose-content hr,
+.ProseMirror hr {
+  border: none;
+  border-top: 1px solid var(--mantine-color-default-border);
+  margin: 1.5em 0;
+}
+
+/* 行内代码（块级代码的 .hljs 由导入的 github-dark 主题负责） */
+.prose-content :not(pre) > code,
+.ProseMirror :not(pre) > code {
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 0.9em;
+  background: color-mix(in srgb, var(--mantine-color-text) 8%, transparent);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+}
+
+/* pre 仅作容器，背景/内边距/滚动条交给 .hljs（github-dark 主题） */
+.prose-content pre,
+.ProseMirror pre {
+  margin: 1em 0;
+  padding: 0;
+  background: transparent;
+  font-family: var(--mantine-font-family-monospace);
+}
+
+.ProseMirror pre code {
+  display: block;
+  overflow-x: auto;
+  padding: 1em;
+  background: #0d1117;
+  color: #c9d1d9;
+}
+
+/* 渲染页表格：宽表横向滚动（编辑器走上面的 .tableWrapper） */
+.prose-content table {
+  display: block;
+  overflow-x: auto;
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+  font-size: 0.95em;
+}
+
+.prose-content th,
+.prose-content td {
+  border: 1px solid var(--mantine-color-default-border);
+  padding: 0.5em 0.75em;
+  text-align: left;
+}
+
+.prose-content th {
+  background: color-mix(in srgb, var(--mantine-color-text) 5%, transparent);
+  font-weight: 600;
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import "./globals.css";
 import "@mantine/core/styles.css";
+import "highlight.js/styles/github-dark.css";
 
 import { MantineProvider, Container } from "@mantine/core";
 import ThemeToggle from "../components/ThemeToggle";
