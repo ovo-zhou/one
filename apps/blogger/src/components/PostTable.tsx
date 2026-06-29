@@ -157,7 +157,7 @@ export default function PostTable({ initialData }: { initialData: PostListData }
                   </Text>
                 </Table.Td>
                 <Table.Td>
-                  {post.status === "LIVE" || post.url ? (
+                  {post.status === "LIVE" ? (
                     <Badge color="green" variant="light">
                       已发布
                     </Badge>
@@ -189,7 +189,7 @@ export default function PostTable({ initialData }: { initialData: PostListData }
                     >
                       删除
                     </Button>
-                    {post.status === "LIVE" || post.url ? (
+                    {post.status === "LIVE" ? (
                       <Button
                         variant="subtle"
                         size="compact-sm"

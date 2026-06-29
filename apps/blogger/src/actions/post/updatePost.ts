@@ -8,11 +8,14 @@ export async function updatePost(params: {
   title: string;
   content: string;
   labels?: string[];
+  isDraft: boolean;
 }) {
   const blogger = await getAuthBlogger();
   const res = await blogger.posts.update({
     blogId: process.env.blog_id,
     postId: params.postId,
+    publish: !params.isDraft,
+    revert: params.isDraft,
     requestBody: {
       title: params.title,
       content: params.content,

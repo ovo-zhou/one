@@ -11,6 +11,7 @@ interface EditPostFormProps {
   initialTitle: string;
   initialContent: string;
   initialLabels: string[];
+  initialStatus?: string;
 }
 
 export default function EditPostForm({
@@ -18,6 +19,7 @@ export default function EditPostForm({
   initialTitle,
   initialContent,
   initialLabels,
+  initialStatus,
 }: EditPostFormProps) {
   const router = useRouter();
   const [title, setTitle] = useState(initialTitle);
@@ -34,7 +36,13 @@ export default function EditPostForm({
     setSaving(true);
     setError("");
     try {
-      await updatePost({ postId, title, content, labels });
+      await updatePost({
+        postId,
+        title,
+        content,
+        labels,
+        isDraft: initialStatus === "DRAFT",
+      });
       router.push("/admin/posts");
     } catch (e) {
       setError(e instanceof Error ? e.message : "保存失败");

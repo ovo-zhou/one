@@ -16,6 +16,8 @@ import {
 import { useRouter } from "next/navigation";
 import { getPages } from "../actions/page/getPages";
 import { deletePage } from "../actions/page/deletePage";
+import { publishPage } from "../actions/page/publishPage";
+import { revertPage } from "../actions/page/revertPage";
 import dayjs from "dayjs";
 
 interface PageItem {
@@ -69,6 +71,22 @@ export default function PageTable({ initialData }: { initialData: PageListData }
     fetchData(tokens[currentPage] || undefined);
   }, [deleteTarget, fetchData, tokens, currentPage]);
 
+  const handlePublish = useCallback(
+    async (pageId: string) => {
+      await publishPage(pageId);
+      fetchData(tokens[currentPage] || undefined);
+    },
+    [fetchData, tokens, currentPage]
+  );
+
+  const handleRevert = useCallback(
+    async (pageId: string) => {
+      await revertPage(pageId);
+      fetchData(tokens[currentPage] || undefined);
+    },
+    [fetchData, tokens, currentPage]
+  );
+  console.log("data.items", data.items);
   return (
     <div>
       <Group justify="flex-end" mb="md">
@@ -82,7 +100,7 @@ export default function PageTable({ initialData }: { initialData: PageListData }
               <Table.Th>标题</Table.Th>
               <Table.Th w={100}>状态</Table.Th>
               <Table.Th w={140}>发布时间</Table.Th>
-              <Table.Th w={140}>操作</Table.Th>
+              <Table.Th w={200}>操作</Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
@@ -135,6 +153,25 @@ export default function PageTable({ initialData }: { initialData: PageListData }
                       >
                         删除
                       </Button>
+                      {page.status === "LIVE" ? (
+                        <Button
+                          variant="subtle"
+                          size="compact-sm"
+                          color="orange"
+                          onClick={() => page.id && handleRevert(page.id)}
+                        >
+                          退回
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="subtle"
+                          size="compact-sm"
+                          color="green"
+                          onClick={() => page.id && handlePublish(page.id)}
+                        >
+                          发布
+                        </Button>
+                      )}
                     </Group>
                   </Table.Td>
                 </Table.Tr>

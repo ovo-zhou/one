@@ -5,6 +5,7 @@ export async function getAdminPostById(postId: string) {
   const res = await blogger.posts.get({
     blogId: process.env.blog_id,
     postId,
+    view: "AUTHOR",
   });
   return res.data;
 }

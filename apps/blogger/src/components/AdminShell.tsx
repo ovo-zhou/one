@@ -21,7 +21,6 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   Newspaper,
   FileText,
-  MessagesSquare,
   Menu as MenuIcon,
   CircleUser,
   ChevronDown,
@@ -53,13 +52,6 @@ function SidebarContent({ collapsed, onNavigate }: { collapsed: boolean; onNavig
         leftSection={<FileText size={18} />}
         active={pathname.startsWith("/admin/pages")}
         onClick={() => handleClick("/admin/pages")}
-        styles={{ root: { borderRadius: 0 } }}
-      />
-      <NavLink
-        label={collapsed ? undefined : "评论管理"}
-        leftSection={<MessagesSquare size={18} />}
-        active={pathname.startsWith("/admin/comments")}
-        onClick={() => handleClick("/admin/comments")}
         styles={{ root: { borderRadius: 0 } }}
       />
     </Stack>

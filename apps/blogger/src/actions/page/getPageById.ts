@@ -5,6 +5,7 @@ export async function getPageById(pageId: string) {
   const res = await blogger.pages.get({
     blogId: process.env.blog_id,
     pageId,
+    view: "AUTHOR",
   });
   return res.data;
 }

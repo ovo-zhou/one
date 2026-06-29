@@ -13,6 +13,7 @@ export default async function EditPagePage({ params }: { params: Promise<{ pageI
         pageId={pageId}
         initialTitle={page.title || ""}
         initialContent={page.content || ""}
+        initialStatus={page.status || "LIVE"}
       />
     </div>
   );

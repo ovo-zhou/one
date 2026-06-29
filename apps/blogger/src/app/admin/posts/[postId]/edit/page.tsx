@@ -14,6 +14,7 @@ export default async function EditPostPage({ params }: { params: Promise<{ postI
         initialTitle={post.title || ""}
         initialContent={post.content || ""}
         initialLabels={post.labels || []}
+        initialStatus={post.status ?? undefined}
       />
     </div>
   );

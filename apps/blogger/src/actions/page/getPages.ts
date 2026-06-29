@@ -8,6 +8,7 @@ export async function getPages(params?: { maxResults?: number; pageToken?: strin
     blogId: process.env.blog_id,
     maxResults: params?.maxResults ?? 10,
     pageToken: params?.pageToken,
+    status: ["live", "draft"],
   });
   return res.data;
 }

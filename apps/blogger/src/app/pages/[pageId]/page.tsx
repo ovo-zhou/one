@@ -1,8 +1,21 @@
+import type { Metadata } from "next";
 import getPublicPageById from "../../../actions/page/getPublicPageById";
 import MarkdownRenderer from "../../../components/MarkdownRenderer";
 import dayjs from "dayjs";
 import { Flex, Title, Text, Stack, Container } from "@mantine/core";
 import { notFound } from "next/navigation";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ pageId: string }>;
+}): Promise<Metadata> {
+  const { pageId } = await params;
+  const page = await getPublicPageById(pageId);
+  return {
+    title: page?.title,
+  };
+}
 
 export default async function PublicPageDetail({ params }: { params: Promise<{ pageId: string }> }) {
   const { pageId } = await params;
@@ -15,7 +28,7 @@ export default async function PublicPageDetail({ params }: { params: Promise<{ p
   return (
     <main>
       <Flex justify="center">
-        <Container w={{ base: "100%", sm: 600, lg: 900 }} p={0}>
+        <Container w={{ base: "100%", sm: 600, lg: 900 }} px={{ base: "md", sm: 0 }} py={{ base: "lg", sm: "xl" }}>
           <Stack gap="md">
             <Title order={1}>{page.title}</Title>
             {page.published && (

@@ -10,12 +10,19 @@ interface EditPageFormProps {
   pageId: string;
   initialTitle: string;
   initialContent: string;
+  initialStatus?: string;
 }
 
-export default function EditPageForm({ pageId, initialTitle, initialContent }: EditPageFormProps) {
+export default function EditPageForm({
+  pageId,
+  initialTitle,
+  initialContent,
+  initialStatus,
+}: EditPageFormProps) {
   const router = useRouter();
   const [title, setTitle] = useState(initialTitle);
   const [content, setContent] = useState(initialContent);
+  const isDraft = initialStatus === "DRAFT";
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -27,7 +34,7 @@ export default function EditPageForm({ pageId, initialTitle, initialContent }: E
     setSaving(true);
     setError("");
     try {
-      await updatePage({ pageId, title, content });
+      await updatePage({ pageId, title, content, isDraft });
       router.push("/admin/pages");
     } catch (e) {
       setError(e instanceof Error ? e.message : "保存失败");

@@ -20,9 +20,9 @@ export default function ThemeToggle() {
 
   return (
     <ActionIcon
-      variant="filled"
+      variant="subtle"
       color="gray"
-      size="xl"
+      size="lg"
       radius="xl"
       aria-label="切换主题"
       onClick={handleToggle}
@@ -31,10 +31,9 @@ export default function ThemeToggle() {
         right: 20,
         bottom: 20,
         zIndex: 999,
-        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
       }}
     >
-      {isDark ? <Sun size={24} /> : <Moon size={24} />}
+      {isDark ? <Sun size={20} /> : <Moon size={20} />}
     </ActionIcon>
   );
 }

@@ -231,7 +231,7 @@ body {
   display: block;
   overflow-x: auto;
   padding: 1em;
-  background: #0d1117;
+  background: #0a0a0a;
   color: #c9d1d9;
 }
 
@@ -255,4 +255,23 @@ body {
 .prose-content th {
   background: color-mix(in srgb, var(--mantine-color-text) 5%, transparent);
   font-weight: 600;
+}
+
+/* ===== highlight.js 代码块背景(与暗色底色统一) ===== */
+.hljs {
+  background: #0a0a0a;
+}
+
+/* ===== 主题调色板覆盖(Vercel 风格:纯黑暗色) ===== */
+:root[data-mantine-color-scheme='light'] {
+  --mantine-color-default-hover: #fafafa;
+}
+
+:root[data-mantine-color-scheme='dark'] {
+  --mantine-color-body: #000000;
+  --mantine-color-default: #0a0a0a;
+  --mantine-color-default-hover: #111111;
+  --mantine-color-default-border: #333333;
+  --mantine-color-text: #ededed;
+  --mantine-color-dimmed: #a1a1a1;
 }

@@ -23,6 +23,7 @@ export async function getAdminPosts(params: {
     maxResults: params.maxResults ?? 10,
     pageToken: params.pageToken,
     fetchBodies: false,
+    status: ["live", "draft"],
   });
   return res.data;
 }
