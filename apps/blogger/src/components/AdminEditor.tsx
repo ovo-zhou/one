@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
@@ -21,6 +21,7 @@ interface AdminEditorProps {
 
 export default function AdminEditor({ content, onChange }: AdminEditorProps) {
   const [imageModalOpen, setImageModalOpen] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const editor = useEditor({
     extensions: [
       StarterKit.configure({ codeBlock: false }),
@@ -52,9 +53,28 @@ export default function AdminEditor({ content, onChange }: AdminEditorProps) {
     editor?.chain().focus().setImage({ src: url, alt }).run();
   };
 
-  return (
+  const toggleFullscreen = () => setIsFullscreen((v) => !v);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isFullscreen) {
+        setIsFullscreen(false);
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isFullscreen]);
+
+  const editorContent = (
     <div style={{ border: "1px solid var(--mantine-color-default-border)", borderRadius: "4px" }}>
-      {editor && <EditorToolbar editor={editor} onUploadImage={() => setImageModalOpen(true)} />}
+      {editor && (
+        <EditorToolbar
+          editor={editor}
+          onUploadImage={() => setImageModalOpen(true)}
+          isFullscreen={isFullscreen}
+          onToggleFullscreen={toggleFullscreen}
+        />
+      )}
       <div style={{ minHeight: "300px" }}>
         <EditorContent editor={editor} />
       </div>
@@ -65,4 +85,10 @@ export default function AdminEditor({ content, onChange }: AdminEditorProps) {
       />
     </div>
   );
+
+  if (isFullscreen) {
+    return <div className="editor-fullscreen">{editorContent}</div>;
+  }
+
+  return editorContent;
 }

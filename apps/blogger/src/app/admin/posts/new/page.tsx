@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { TextInput, Button, Group, Stack, Switch, TagsInput, Title, Text } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import AdminEditor from "../../../../components/AdminEditor";
 import { createPost } from "../../../../actions/post/createPost";
 
@@ -24,9 +25,11 @@ export default function NewPostPage() {
     setError("");
     try {
       await createPost({ title, content, labels, isDraft });
+      notifications.show({ title: "创建成功", message: isDraft ? "文章已保存为草稿" : "文章已发布", color: "green" });
       router.push("/admin/posts");
     } catch (e) {
       setError(e instanceof Error ? e.message : "保存失败");
+      notifications.show({ title: "保存失败", message: e instanceof Error ? e.message : "请稍后重试", color: "red" });
       setSaving(false);
     }
   };

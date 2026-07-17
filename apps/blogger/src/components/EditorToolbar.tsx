@@ -23,11 +23,15 @@ import {
   Link as LinkIcon,
   ImagePlus,
   Table2,
+  Maximize,
+  Minimize,
 } from "lucide-react";
 
 interface EditorToolbarProps {
   editor: Editor;
   onUploadImage: () => void;
+  isFullscreen?: boolean;
+  onToggleFullscreen?: () => void;
 }
 
 function ToolButton({
@@ -58,7 +62,7 @@ function ToolButton({
   );
 }
 
-export default function EditorToolbar({ editor, onUploadImage }: EditorToolbarProps) {
+export default function EditorToolbar({ editor, onUploadImage, isFullscreen, onToggleFullscreen }: EditorToolbarProps) {
   const [linkOpened, setLinkOpened] = useState(false);
   const [linkUrl, setLinkUrl] = useState("");
 
@@ -106,7 +110,16 @@ export default function EditorToolbar({ editor, onUploadImage }: EditorToolbarPr
   };
 
   return (
-    <Group gap="xs" wrap="wrap" p="6px 8px" style={{ borderBottom: "1px solid var(--mantine-color-default-border)" }}>
+    <Group
+      gap="xs"
+      wrap="wrap"
+      p="6px 8px"
+      className="editor-toolbar"
+      style={{
+        borderBottom: "1px solid var(--mantine-color-default-border)",
+        top: isFullscreen ? 0 : 56,
+      }}
+    >
       <ToolButton icon={Undo2} label="撤销" disabled={!s.canUndo} onClick={() => run(() => editor.chain().focus().undo().run())} />
       <ToolButton icon={Redo2} label="重做" disabled={!s.canRedo} onClick={() => run(() => editor.chain().focus().redo().run())} />
 
@@ -167,6 +180,16 @@ export default function EditorToolbar({ editor, onUploadImage }: EditorToolbarPr
 
       <ToolButton icon={ImagePlus} label="上传图片" onClick={onUploadImage} />
       <ToolButton icon={Table2} label="插入表格" onClick={() => run(() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run())} />
+
+      <Divider orientation="vertical" />
+
+      {onToggleFullscreen && (
+        <ToolButton
+          icon={isFullscreen ? Minimize : Maximize}
+          label={isFullscreen ? "退出全屏" : "全屏编辑"}
+          onClick={onToggleFullscreen}
+        />
+      )}
     </Group>
   );
 }

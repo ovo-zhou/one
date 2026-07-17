@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { TextInput, Button, Group, Stack, Switch, Title, Text } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import AdminEditor from "../../../../components/AdminEditor";
 import { createPage } from "../../../../actions/page/createPage";
 
@@ -23,9 +24,11 @@ export default function NewPagePage() {
     setError("");
     try {
       await createPage({ title, content, isDraft });
+      notifications.show({ title: "创建成功", message: isDraft ? "页面已保存为草稿" : "页面已发布", color: "green" });
       router.push("/admin/pages");
     } catch (e) {
       setError(e instanceof Error ? e.message : "保存失败");
+      notifications.show({ title: "保存失败", message: e instanceof Error ? e.message : "请稍后重试", color: "red" });
       setSaving(false);
     }
   };

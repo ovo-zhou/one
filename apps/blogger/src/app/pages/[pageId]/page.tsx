@@ -33,7 +33,7 @@ export default async function PublicPageDetail({ params }: { params: Promise<{ p
             <Title order={1}>{page.title}</Title>
             {page.published && (
               <Text size="sm" c="dimmed">
-                {dayjs(page.published).format("YYYY年MM月DD日 HH时mm分ss秒")}
+                {dayjs(page.published).format("YYYY/MM/DD HH:mm:ss")}
               </Text>
             )}
             {page.content && <MarkdownRenderer content={page.content} />}

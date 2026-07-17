@@ -14,6 +14,7 @@ import {
   Box,
 } from "@mantine/core";
 import { useRouter } from "next/navigation";
+import { notifications } from "@mantine/notifications";
 import { getPages } from "../actions/page/getPages";
 import { deletePage } from "../actions/page/deletePage";
 import { publishPage } from "../actions/page/publishPage";
@@ -66,23 +67,38 @@ export default function PageTable({ initialData }: { initialData: PageListData }
 
   const handleDelete = useCallback(async () => {
     if (!deleteTarget?.id) return;
-    await deletePage(deleteTarget.id);
-    setDeleteTarget(null);
-    fetchData(tokens[currentPage] || undefined);
+    try {
+      await deletePage(deleteTarget.id);
+      notifications.show({ title: "已删除", message: `页面「${deleteTarget.title}」已删除`, color: "green" });
+      setDeleteTarget(null);
+      fetchData(tokens[currentPage] || undefined);
+    } catch (e) {
+      notifications.show({ title: "删除失败", message: e instanceof Error ? e.message : "请稍后重试", color: "red" });
+    }
   }, [deleteTarget, fetchData, tokens, currentPage]);
 
   const handlePublish = useCallback(
     async (pageId: string) => {
-      await publishPage(pageId);
-      fetchData(tokens[currentPage] || undefined);
+      try {
+        await publishPage(pageId);
+        notifications.show({ title: "已发布", message: "页面已发布", color: "green" });
+        fetchData(tokens[currentPage] || undefined);
+      } catch (e) {
+        notifications.show({ title: "发布失败", message: e instanceof Error ? e.message : "请稍后重试", color: "red" });
+      }
     },
     [fetchData, tokens, currentPage]
   );
 
   const handleRevert = useCallback(
     async (pageId: string) => {
-      await revertPage(pageId);
-      fetchData(tokens[currentPage] || undefined);
+      try {
+        await revertPage(pageId);
+        notifications.show({ title: "已退回", message: "页面已退回草稿", color: "green" });
+        fetchData(tokens[currentPage] || undefined);
+      } catch (e) {
+        notifications.show({ title: "操作失败", message: e instanceof Error ? e.message : "请稍后重试", color: "red" });
+      }
     },
     [fetchData, tokens, currentPage]
   );

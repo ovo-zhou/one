@@ -78,7 +78,7 @@ export default async function Home() {
               </Anchor>
               <Text size="sm" c="dimmed" mt={4}>
                 {post.author.displayName} ·{" "}
-                {dayjs(post.published).format("YYYY年MM月DD日 HH:mm:ss")}
+                {dayjs(post.published).format("YYYY/MM/DD HH:mm:ss")}
               </Text>
               <Text size="sm" mt="xs" lineClamp={3}>
                 {post.content.replace(/<[^>]*>/g, "").substring(0, 200)}

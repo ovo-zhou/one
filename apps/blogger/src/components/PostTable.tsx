@@ -15,6 +15,7 @@ import {
   Box,
 } from "@mantine/core";
 import { useRouter } from "next/navigation";
+import { notifications } from "@mantine/notifications";
 import { getAdminPosts } from "../actions/post/getAdminPosts";
 import { deletePost } from "../actions/post/deletePost";
 import { publishPost } from "../actions/post/publishPost";
@@ -83,23 +84,38 @@ export default function PostTable({ initialData }: { initialData: PostListData }
 
   const handleDelete = useCallback(async () => {
     if (!deleteTarget?.id) return;
-    await deletePost(deleteTarget.id);
-    setDeleteTarget(null);
-    fetchData(tokens[currentPage] || undefined, search || undefined);
+    try {
+      await deletePost(deleteTarget.id);
+      notifications.show({ title: "已删除", message: `文章「${deleteTarget.title}」已删除`, color: "green" });
+      setDeleteTarget(null);
+      fetchData(tokens[currentPage] || undefined, search || undefined);
+    } catch (e) {
+      notifications.show({ title: "删除失败", message: e instanceof Error ? e.message : "请稍后重试", color: "red" });
+    }
   }, [deleteTarget, fetchData, tokens, currentPage, search]);
 
   const handlePublish = useCallback(
     async (postId: string) => {
-      await publishPost(postId);
-      fetchData(tokens[currentPage] || undefined, search || undefined);
+      try {
+        await publishPost(postId);
+        notifications.show({ title: "已发布", message: "文章已发布", color: "green" });
+        fetchData(tokens[currentPage] || undefined, search || undefined);
+      } catch (e) {
+        notifications.show({ title: "发布失败", message: e instanceof Error ? e.message : "请稍后重试", color: "red" });
+      }
     },
     [fetchData, tokens, currentPage, search]
   );
 
   const handleRevert = useCallback(
     async (postId: string) => {
-      await revertPost(postId);
-      fetchData(tokens[currentPage] || undefined, search || undefined);
+      try {
+        await revertPost(postId);
+        notifications.show({ title: "已退回", message: "文章已退回草稿", color: "green" });
+        fetchData(tokens[currentPage] || undefined, search || undefined);
+      } catch (e) {
+        notifications.show({ title: "操作失败", message: e instanceof Error ? e.message : "请稍后重试", color: "red" });
+      }
     },
     [fetchData, tokens, currentPage, search]
   );

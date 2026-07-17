@@ -27,7 +27,7 @@ export default async function PostPage({ params }: { params: Promise<{ postId: s
           <Stack gap="md">
             <Title order={1}>{post.title}</Title>
             <Text size="sm" c="dimmed">
-              {post.author.displayName} · {dayjs(post.published).format("YYYY年MM月DD日 HH:mm:ss")}
+              {post.author.displayName} · {dayjs(post.published).format("YYYY/MM/DD HH:mm:ss")}
             </Text>
             <MarkdownRenderer content={post.content} />
           </Stack>
