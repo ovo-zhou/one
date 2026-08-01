@@ -60,15 +60,15 @@ function SidebarContent({ collapsed, onNavigate }: { collapsed: boolean; onNavig
 
 function TopBar({
   userName,
-  mobileOpened,
-  desktopCollapsed,
+  _mobileOpened,
+  _desktopCollapsed,
   onMobileToggle,
   onDesktopToggle,
   isMobile,
 }: {
   userName: string;
-  mobileOpened: boolean;
-  desktopCollapsed: boolean;
+  _mobileOpened: boolean;
+  _desktopCollapsed: boolean;
   onMobileToggle: () => void;
   onDesktopToggle: () => void;
   isMobile: boolean | undefined;
@@ -168,8 +168,8 @@ export default function AdminShell({
       <AppShell.Header>
         <TopBar
           userName={userName}
-          mobileOpened={mobileOpened}
-          desktopCollapsed={desktopCollapsed}
+          _mobileOpened={mobileOpened}
+          _desktopCollapsed={desktopCollapsed}
           onMobileToggle={() => setMobileOpened((o) => !o)}
           onDesktopToggle={() => setDesktopCollapsed((o) => !o)}
           isMobile={isMobile}

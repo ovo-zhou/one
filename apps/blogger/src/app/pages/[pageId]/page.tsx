@@ -1,9 +1,17 @@
 import type { Metadata } from "next";
 import getPublicPageById from "../../../actions/page/getPublicPageById";
+import getPublicPages from "../../../actions/page/getPublicPages";
 import MarkdownRenderer from "../../../components/MarkdownRenderer";
 import dayjs from "dayjs";
 import { Flex, Title, Text, Stack, Container } from "@mantine/core";
 import { notFound } from "next/navigation";
+
+export const revalidate = 60 * 60 * 12;
+
+export async function generateStaticParams() {
+  const { items } = await getPublicPages();
+  return (items ?? []).map((page) => ({ pageId: page.id }));
+}
 
 export async function generateMetadata({
   params,

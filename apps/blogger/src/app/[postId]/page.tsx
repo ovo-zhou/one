@@ -1,8 +1,16 @@
 import type { Metadata } from "next";
 import getPostById from "../../actions/post/getPostById";
+import getPosts from "../../actions/post/getPosts";
 import MarkdownRenderer from "../../components/MarkdownRenderer";
 import dayjs from "dayjs";
 import { Flex, Title, Text, Stack, Container } from "@mantine/core";
+
+export const revalidate = 60 * 60 * 12;
+
+export async function generateStaticParams() {
+  const { items } = await getPosts();
+  return (items ?? []).map((post) => ({ postId: post.id }));
+}
 
 export async function generateMetadata({
   params,

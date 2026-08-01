@@ -12,5 +12,7 @@ export async function deletePage(pageId: string) {
   revalidateTag(`public-page:${pageId}`, "default");
   revalidateTag("public-pages", "default");
   revalidateTag("blog", "default");
+  revalidatePath("/");
+  revalidatePath(`/pages/${pageId}`);
   revalidatePath("/admin/pages");
 }

@@ -12,5 +12,7 @@ export async function deletePost(postId: string) {
   revalidateTag(`post:${postId}`, "default");
   revalidateTag("posts", "default");
   revalidateTag("blog", "default");
+  revalidatePath("/");
+  revalidatePath(`/${postId}`);
   revalidatePath("/admin/posts");
 }

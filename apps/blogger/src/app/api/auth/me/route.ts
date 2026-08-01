@@ -11,6 +11,7 @@ export async function GET() {
       name: session.name,
       email: session.email,
       picture: session.picture,
+      isAdmin: session.email === process.env.admin_email,
     },
   });
 }

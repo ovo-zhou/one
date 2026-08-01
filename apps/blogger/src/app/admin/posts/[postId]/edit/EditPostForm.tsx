@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { TextInput, Button, Group, Stack, TagsInput, Title, Text } from "@mantine/core";
+import { TextInput, Button, Group, Stack, TagsInput, Text } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import AdminEditor from "../../../../../components/AdminEditor";
 import { updatePost } from "../../../../../actions/post/updatePost";

@@ -21,6 +21,10 @@ export async function createPost(params: {
   });
   revalidateTag("posts", "default");
   revalidateTag("blog", "default");
+  revalidatePath("/");
+  if (res.data?.id) {
+    revalidatePath(`/${res.data.id}`);
+  }
   revalidatePath("/admin/posts");
   return res.data;
 }

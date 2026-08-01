@@ -5,9 +5,9 @@ import getPublicPages from "../actions/page/getPublicPages";
 import dayjs from "dayjs";
 import { Flex, Box, Title, Stack, Anchor, Text, Divider, Group } from "@mantine/core";
 import { Copyright } from "lucide-react";
-import { getSession } from "../lib/session";
-import UserDropdown from "../components/UserDropdown";
-import BlogNameLogin from "../components/BlogNameLogin";
+import Greeting from "../components/Greeting";
+
+export const revalidate = 60 * 60 * 12;
 
 export async function generateMetadata(): Promise<Metadata> {
   const blog = await getBlog();
@@ -18,39 +18,18 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Home() {
-  const [blog, posts, pages, session] = await Promise.all([
+  const [blog, posts, pages] = await Promise.all([
     getBlog(),
     getPosts(),
     getPublicPages(),
-    getSession(),
   ]);
-  const isAdmin = session?.email === process.env.admin_email;
 
   return (
     <main>
       <Flex justify="center">
         <Box w={{ base: "100%", sm: 600, lg: 900 }} px={{ base: "md", sm: 0 }}>
           <Stack align="stretch" justify="center" gap="xl" h={{ base: 300, sm: 350, lg: 400 }}>
-            {session ? (
-              isAdmin ? (
-                <Title order={1}>
-                  你好，我是{" "}
-                  <a href="/admin" style={{ color: "inherit", textDecoration: "none" }}>
-                    {blog.name}
-                  </a>
-                </Title>
-              ) : (
-                <Title order={1}>
-                  你好
-                  <UserDropdown name={session.name || session.email || ""} />
-                  ，我是 {blog.name}
-                </Title>
-              )
-            ) : (
-              <Title order={1}>
-                你好，我是 <BlogNameLogin name={blog.name} />
-              </Title>
-            )}
+            <Greeting blogName={blog.name} />
             <Title order={4}>{blog.description}</Title>
             {pages.items && pages.items.length > 0 && (
               <Flex justify="center" mt="lg">

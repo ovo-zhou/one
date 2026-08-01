@@ -22,6 +22,8 @@ export async function updatePage(params: {
   });
   revalidateTag(`public-page:${params.pageId}`, "default");
   revalidateTag("public-pages", "default");
+  revalidatePath("/");
+  revalidatePath(`/pages/${params.pageId}`);
   revalidatePath("/admin/pages");
   return res.data;
 }

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
 import "./globals.css";
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
@@ -14,15 +13,16 @@ export const metadata: Metadata = {
   description: "A Next.js app in the monorepo",
 };
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const cookieStore = await cookies();
-  const stored = cookieStore.get("mantine-color-scheme")?.value;
-  const colorScheme = stored === "dark" || stored === "light" ? stored : "light";
+const themeInitScript = `(function(){try{var c=document.cookie.match(/(?:^|; )mantine-color-scheme=([^;]*)/);var s=c?decodeURIComponent(c[1]):'';if(s!=='dark'&&s!=='light')s='light';document.documentElement.setAttribute('data-mantine-color-scheme',s);}catch(e){}})();`;
 
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" data-mantine-color-scheme={colorScheme} suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body>
-        <MantineProvider defaultColorScheme={colorScheme}>
+        <MantineProvider defaultColorScheme="light">
           <Notifications position="top-right" />
           <Container fluid p={0}>
             {children}

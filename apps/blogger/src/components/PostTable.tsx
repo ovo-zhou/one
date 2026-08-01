@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useTransition } from "react";
+import { useState, useCallback, useTransition } from "react";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import {
   Table,

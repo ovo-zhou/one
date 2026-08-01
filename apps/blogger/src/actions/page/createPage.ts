@@ -19,6 +19,10 @@ export async function createPage(params: {
   });
   revalidateTag("public-pages", "default");
   revalidateTag("blog", "default");
+  revalidatePath("/");
+  if (res.data?.id) {
+    revalidatePath(`/pages/${res.data.id}`);
+  }
   revalidatePath("/admin/pages");
   return res.data;
 }

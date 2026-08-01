@@ -24,6 +24,8 @@ export async function updatePost(params: {
   });
   revalidateTag(`post:${params.postId}`, "default");
   revalidateTag("posts", "default");
+  revalidatePath("/");
+  revalidatePath(`/${params.postId}`);
   revalidatePath("/admin/posts");
   return res.data;
 }

@@ -11,6 +11,8 @@ export async function publishPage(pageId: string) {
   });
   revalidateTag(`public-page:${pageId}`, "default");
   revalidateTag("public-pages", "default");
+  revalidatePath("/");
+  revalidatePath(`/pages/${pageId}`);
   revalidatePath("/admin/pages");
   return res.data;
 }

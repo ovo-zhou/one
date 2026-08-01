@@ -11,6 +11,8 @@ export async function revertPost(postId: string) {
   });
   revalidateTag(`post:${postId}`, "default");
   revalidateTag("posts", "default");
+  revalidatePath("/");
+  revalidatePath(`/${postId}`);
   revalidatePath("/admin/posts");
   return res.data;
 }
