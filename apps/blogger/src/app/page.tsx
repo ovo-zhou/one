@@ -7,7 +7,7 @@ import { Flex, Box, Title, Stack, Anchor, Text, Divider, Group } from "@mantine/
 import { Copyright } from "lucide-react";
 import Greeting from "../components/Greeting";
 
-export const revalidate = 60 * 60 * 12;
+export const revalidate = 43200;
 
 export async function generateMetadata(): Promise<Metadata> {
   const blog = await getBlog();
@@ -35,7 +35,20 @@ export default async function Home() {
               <Flex justify="center" mt="lg">
                 <Group w={{ base: "100%", sm: 600, lg: 900 }} gap="md">
                   {pages.items.map((page) => (
-                    <Anchor key={page.id} href={`/pages/${page.id}`} underline="never" c="inherit">
+                    <Anchor
+                      key={page.id}
+                      href={`/pages/${page.id}`}
+                      underline="never"
+                      c="inherit"
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 6,
+                        padding: "6px 14px",
+                        borderRadius: 999,
+                        border: "1px solid var(--mantine-color-default-border)",
+                      }}
+                    >
                       <Text size="sm" fw={500}>
                         {page.title}
                       </Text>
@@ -52,7 +65,7 @@ export default async function Home() {
         <Stack w={{ base: "100%", sm: 600, lg: 900 }} gap="lg" px={{ base: "md", sm: 0 }}>
           {posts.items.map((post) => (
             <Box key={post.id}>
-              <Anchor href={`/${post.id}`} underline="never" c="inherit">
+              <Anchor href={`/${post.id}`} underline="hover" c="inherit">
                 <Title order={3}>{post.title}</Title>
               </Anchor>
               <Text size="sm" c="dimmed" mt={4}>

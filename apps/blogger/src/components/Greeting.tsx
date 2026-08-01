@@ -37,7 +37,16 @@ export default function Greeting({ blogName }: { blogName: string }) {
     return (
       <Title order={1}>
         你好，我是{" "}
-        <a href="/admin" style={{ color: "inherit", textDecoration: "none" }}>
+        <a
+          href="/admin"
+          style={{
+            textDecoration: "none",
+            backgroundImage: "linear-gradient(90deg, #228be6, #7950f2)",
+            WebkitBackgroundClip: "text",
+            backgroundClip: "text",
+            color: "transparent",
+          }}
+        >
           {blogName}
         </a>
       </Title>

@@ -27,9 +27,12 @@ export default function BlogNameLogin({ name }: { name: string }) {
         border: "none",
         padding: 0,
         font: "inherit",
-        color: "inherit",
         cursor: "pointer",
         textDecoration: "none",
+        backgroundImage: "linear-gradient(90deg, #228be6, #7950f2)",
+        WebkitBackgroundClip: "text",
+        backgroundClip: "text",
+        color: "transparent",
       }}
     >
       {name}

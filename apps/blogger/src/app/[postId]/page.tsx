@@ -5,7 +5,7 @@ import MarkdownRenderer from "../../components/MarkdownRenderer";
 import dayjs from "dayjs";
 import { Flex, Title, Text, Stack, Container } from "@mantine/core";
 
-export const revalidate = 60 * 60 * 12;
+export const revalidate = 43200;
 
 export async function generateStaticParams() {
   const { items } = await getPosts();

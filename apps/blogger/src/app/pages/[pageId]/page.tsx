@@ -6,7 +6,7 @@ import dayjs from "dayjs";
 import { Flex, Title, Text, Stack, Container } from "@mantine/core";
 import { notFound } from "next/navigation";
 
-export const revalidate = 60 * 60 * 12;
+export const revalidate = 43200;
 
 export async function generateStaticParams() {
   const { items } = await getPublicPages();
