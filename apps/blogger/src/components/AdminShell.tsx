@@ -25,6 +25,7 @@ import {
   CircleUser,
   ChevronDown,
   PanelLeftClose,
+  PanelLeftOpen,
   Home,
   LogOut,
 } from "lucide-react";
@@ -32,6 +33,7 @@ import {
 function SidebarContent({ collapsed, onNavigate }: { collapsed: boolean; onNavigate: () => void }) {
   const pathname = usePathname();
   const router = useRouter();
+  const navClass = `admin-nav-link${collapsed ? " nav-collapsed" : ""}`;
 
   const handleClick = (path: string) => {
     router.push(path);
@@ -41,20 +43,18 @@ function SidebarContent({ collapsed, onNavigate }: { collapsed: boolean; onNavig
   return (
     <Stack gap={2} px="xs">
       <NavLink
-        className="admin-nav-link"
+        className={navClass}
         label={collapsed ? undefined : "文章管理"}
         leftSection={<Newspaper size={18} />}
         active={pathname.startsWith("/admin/posts") || pathname === "/admin"}
         onClick={() => handleClick("/admin/posts")}
-        styles={{ root: { borderRadius: 0 } }}
       />
       <NavLink
-        className="admin-nav-link"
+        className={navClass}
         label={collapsed ? undefined : "页面管理"}
         leftSection={<FileText size={18} />}
         active={pathname.startsWith("/admin/pages")}
         onClick={() => handleClick("/admin/pages")}
-        styles={{ root: { borderRadius: 0 } }}
       />
     </Stack>
   );
@@ -63,14 +63,14 @@ function SidebarContent({ collapsed, onNavigate }: { collapsed: boolean; onNavig
 function TopBar({
   userName,
   _mobileOpened,
-  _desktopCollapsed,
+  desktopCollapsed,
   onMobileToggle,
   onDesktopToggle,
   isMobile,
 }: {
   userName: string;
   _mobileOpened: boolean;
-  _desktopCollapsed: boolean;
+  desktopCollapsed: boolean;
   onMobileToggle: () => void;
   onDesktopToggle: () => void;
   isMobile: boolean | undefined;
@@ -83,24 +83,27 @@ function TopBar({
       <Group justify="space-between" px="md" h="100%">
         <Group gap="xs">
           {isMobile ? (
-            <ActionIcon variant="subtle" onClick={onMobileToggle}>
+            <ActionIcon variant="subtle" onClick={onMobileToggle} aria-label="打开导航菜单">
               <MenuIcon size={20} />
             </ActionIcon>
           ) : (
-            <ActionIcon variant="subtle" onClick={onDesktopToggle}>
-              <MenuIcon size={20} />
+            <ActionIcon
+              variant="subtle"
+              onClick={onDesktopToggle}
+              aria-label={desktopCollapsed ? "展开侧边栏" : "折叠侧边栏"}
+            >
+              {desktopCollapsed ? <PanelLeftOpen size={20} /> : <PanelLeftClose size={20} />}
             </ActionIcon>
           )}
           <Anchor
             href="/admin"
             underline="never"
             c="inherit"
-            fw={700}
+            fw={800}
             size="lg"
             className="flex-center"
           >
-            <Box w={8} h={8} bdrs="xl" bg="var(--brand-gradient)" flex="0 0 auto" />
-            博客后台
+            <Text className="brand-text">博客后台</Text>
           </Anchor>
         </Group>
 
@@ -169,13 +172,13 @@ export default function AdminShell({
         breakpoint: "sm",
         collapsed: { desktop: false, mobile: true },
       }}
-      padding="md"
+      padding={0}
     >
-      <AppShell.Header>
+      <AppShell.Header className="app-header">
         <TopBar
           userName={userName}
           _mobileOpened={mobileOpened}
-          _desktopCollapsed={desktopCollapsed}
+          desktopCollapsed={desktopCollapsed}
           onMobileToggle={() => setMobileOpened((o) => !o)}
           onDesktopToggle={() => setDesktopCollapsed((o) => !o)}
           isMobile={isMobile}
@@ -183,28 +186,15 @@ export default function AdminShell({
       </AppShell.Header>
 
       {isMobile ? null : (
-        <AppShell.Navbar p="xs">
-          <AppShell.Section grow>
+        <AppShell.Navbar p={0} className="app-navbar">
+          <AppShell.Section grow mt="sm">
             <SidebarContent collapsed={desktopCollapsed} onNavigate={() => {}} />
-          </AppShell.Section>
-          <AppShell.Section>
-            {!desktopCollapsed && (
-              <Button
-                variant="subtle"
-                size="compact-sm"
-                fullWidth
-                leftSection={<PanelLeftClose size={16} />}
-                onClick={() => setDesktopCollapsed(true)}
-              >
-                收起
-              </Button>
-            )}
           </AppShell.Section>
         </AppShell.Navbar>
       )}
 
       <AppShell.Main>
-        <Box px={{ base: 0, sm: "md" }}>
+        <Box px={{ base: "sm", sm: "md" }} py="md">
           {children}
         </Box>
       </AppShell.Main>
@@ -213,7 +203,6 @@ export default function AdminShell({
         opened={mobileOpened}
         onClose={() => setMobileOpened(false)}
         size="xs"
-        title="导航菜单"
         padding={0}
       >
         <SidebarContent collapsed={false} onNavigate={() => setMobileOpened(false)} />

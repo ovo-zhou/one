@@ -141,7 +141,7 @@ export default function ImageUploadModal({ opened, onClose, onInsert }: ImageUpl
                 <Button variant="default" loading={uploading} onClick={() => upload(false)}>
                   直接上传
                 </Button>
-                <Button loading={uploading} onClick={() => upload(true)}>
+                <Button className="btn-glow" loading={uploading} onClick={() => upload(true)}>
                   裁剪并上传
                 </Button>
               </Group>

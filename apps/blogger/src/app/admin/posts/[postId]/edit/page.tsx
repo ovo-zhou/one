@@ -8,7 +8,7 @@ export default async function EditPostPage({ params }: { params: Promise<{ postI
 
   return (
     <Box>
-      <Title order={2} mb="lg">编辑文章</Title>
+      <Title order={2} mb="lg" className="brand-text">编辑文章</Title>
       <EditPostForm
         postId={postId}
         initialTitle={post.title || ""}

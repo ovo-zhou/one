@@ -24,6 +24,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <MantineProvider theme={theme} defaultColorScheme="light">
+          <div className="aurora-bg" aria-hidden="true">
+            <div className="aurora-blob aurora-blob-1" />
+            <div className="aurora-blob aurora-blob-2" />
+            <div className="aurora-blob aurora-blob-3" />
+          </div>
           <Notifications position="top-right" />
           <Container fluid p={0}>
             {children}

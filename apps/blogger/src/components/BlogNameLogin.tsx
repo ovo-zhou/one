@@ -20,8 +20,7 @@ export default function BlogNameLogin({ name }: { name: string }) {
   };
 
   return (
-    <UnstyledButton onClick={handleClick} className="brand-text">
+    <UnstyledButton onClick={handleClick} className="brand-text" fz="inherit">
       {name}
     </UnstyledButton>
-  );
-}
+  );}

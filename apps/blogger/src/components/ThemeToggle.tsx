@@ -29,6 +29,7 @@ export default function ThemeToggle() {
       pos="fixed"
       right={20}
       bottom={20}
+      className="theme-toggle-btn"
       style={{ zIndex: 999 }}
     >
       {isDark ? <Sun size={20} /> : <Moon size={20} />}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Title, Anchor } from "@mantine/core";
+import { Title, Anchor, Text } from "@mantine/core";
 import UserDropdown from "./UserDropdown";
 import BlogNameLogin from "./BlogNameLogin";
 
@@ -25,38 +25,36 @@ export default function Greeting({ blogName }: { blogName: string }) {
       .catch(() => setLoaded(true));
   }, []);
 
-  if (!loaded) {
+  const renderBlogName = () =>
+    user?.isAdmin ? (
+      <Anchor href="/admin" underline="never" className="brand-text" fz="inherit">
+        {blogName}
+      </Anchor>
+    ) : (
+      <BlogNameLogin name={blogName} />
+    );
+
+  if (!loaded || !user) {
     return (
-      <Title order={1}>
-        你好，我是 <BlogNameLogin name={blogName} />
+      <Title order={1} ta="center" style={{ fontSize: "clamp(34px, 6vw, 56px)", letterSpacing: "-0.03em" }}>
+        你好，我是 {renderBlogName()}
       </Title>
     );
   }
 
   if (user?.isAdmin) {
     return (
-      <Title order={1}>
-        你好，我是{" "}
-        <Anchor href="/admin" underline="never" className="brand-text">
-          {blogName}
-        </Anchor>
-      </Title>
-    );
-  }
-
-  if (user) {
-    return (
-      <Title order={1}>
-        你好
-        <UserDropdown name={user.name || user.email || ""} />
-        ，我是 {blogName}
+      <Title order={1} ta="center" style={{ fontSize: "clamp(34px, 6vw, 56px)", letterSpacing: "-0.03em" }}>
+        你好，我是 {renderBlogName()}
       </Title>
     );
   }
 
   return (
-    <Title order={1}>
-      你好，我是 <BlogNameLogin name={blogName} />
+    <Title order={1} ta="center" style={{ fontSize: "clamp(34px, 6vw, 56px)", letterSpacing: "-0.03em" }}>
+      你好
+      <UserDropdown name={user.name || user.email || ""} />
+      ，我是 <Text component="span" className="brand-text" fz="inherit">{blogName}</Text>
     </Title>
   );
 }

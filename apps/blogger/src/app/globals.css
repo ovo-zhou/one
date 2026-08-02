@@ -11,15 +11,198 @@ body {
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--mantine-color-primary-6) 22%, transparent);
+  background: color-mix(in srgb, var(--mantine-color-primary-6) 25%, transparent);
 }
 
-/* ===== 设计 Token（品牌视觉）=====
+/* ===== 设计 Token（Aurora Glass 品牌视觉）=====
    换主色：改 src/lib/theme.ts 的 primary 色组（一处生效）
    换品牌渐变：只改下面 --brand-gradient 这一行 */
 :root {
-  --brand-gradient: linear-gradient(90deg, var(--mantine-color-blue-6), var(--mantine-color-violet-6));
+  --brand-from: #6366f1;
+  --brand-mid: #a855f7;
+  --brand-to: #ec4899;
+  --brand-gradient: linear-gradient(115deg, var(--brand-from) 0%, var(--brand-mid) 50%, var(--brand-to) 100%);
+  --brand-gradient-soft: linear-gradient(115deg, rgba(99, 102, 241, 0.14) 0%, rgba(168, 85, 247, 0.14) 50%, rgba(236, 72, 153, 0.14) 100%);
+  --brand-glow: rgba(139, 92, 246, 0.35);
+  --aurora-1: rgba(99, 102, 241, 0.5);
+  --aurora-2: rgba(168, 85, 247, 0.45);
+  --aurora-3: rgba(236, 72, 153, 0.35);
   --crop-bg: #000;
+}
+
+/* ===== 极光背景层 ===== */
+.aurora-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--mantine-color-body);
+}
+
+.aurora-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  will-change: transform;
+  animation: aurora-drift 14s ease-in-out infinite alternate;
+}
+
+.aurora-blob-1 {
+  width: 44vw;
+  height: 44vw;
+  left: -12vw;
+  top: -14vw;
+  background: radial-gradient(circle at 30% 30%, var(--aurora-1), transparent 65%);
+}
+
+.aurora-blob-2 {
+  width: 38vw;
+  height: 38vw;
+  right: -10vw;
+  top: 8vh;
+  background: radial-gradient(circle at 60% 40%, var(--aurora-2), transparent 65%);
+  animation-duration: 18s;
+  animation-delay: -4s;
+}
+
+.aurora-blob-3 {
+  width: 42vw;
+  height: 42vw;
+  left: 22vw;
+  bottom: -16vw;
+  background: radial-gradient(circle at 50% 50%, var(--aurora-3), transparent 65%);
+  animation-duration: 16s;
+  animation-delay: -8s;
+}
+
+@keyframes aurora-drift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  33% {
+    transform: translate3d(4vw, -3vh, 0) scale(1.08);
+  }
+  66% {
+    transform: translate3d(-3vw, 4vh, 0) scale(0.94);
+  }
+  100% {
+    transform: translate3d(2vw, -2vh, 0) scale(1.03);
+  }
+}
+
+/* ===== 玻璃拟态 ===== */
+.glass-card {
+  background: color-mix(in srgb, var(--mantine-color-body) 62%, transparent);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border: 1px solid color-mix(in srgb, var(--mantine-color-default-border) 65%, transparent);
+  border-radius: var(--mantine-radius-lg);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+.glass-chip {
+  background: color-mix(in srgb, var(--mantine-color-body) 55%, transparent);
+  backdrop-filter: blur(14px) saturate(1.3);
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
+  border: 1px solid color-mix(in srgb, var(--mantine-color-default-border) 60%, transparent);
+  border-radius: var(--mantine-radius-xl);
+}
+
+/* ===== 渐变文字 ===== */
+.brand-text {
+  background-image: var(--brand-gradient);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  transition: background-position 400ms ease;
+}
+
+.brand-text:hover {
+  background-position: 100% center;
+}
+
+/* ===== 发光按钮（主要 CTA）===== */
+.btn-glow {
+  background-image: var(--brand-gradient) !important;
+  background-size: 200% auto !important;
+  border: none !important;
+  color: #fff !important;
+  box-shadow: 0 6px 24px var(--brand-glow) !important;
+  transition: background-position 300ms ease, box-shadow 300ms ease, transform 150ms ease !important;
+}
+
+.btn-glow:hover:not(:disabled) {
+  background-position: 100% center !important;
+  box-shadow: 0 8px 32px var(--brand-glow) !important;
+  transform: translateY(-1px);
+}
+
+/* ===== 全局组件覆盖 ===== */
+
+/* 后台表格表头 */
+.admin-table thead th {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--mantine-color-dimmed) !important;
+  font-weight: 700;
+}
+
+.admin-table tbody tr td {
+  background: transparent;
+}
+
+/* 输入框 focus：渐变光环 */
+.mantine-Input-input:focus {
+  border-color: color-mix(in srgb, var(--mantine-color-primary-5) 80%, transparent) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand-glow) 40%, transparent) !important;
+}
+
+/* 表格行 hover：渐变边条 */
+.admin-table tbody tr {
+  transition: background-color 150ms ease;
+}
+
+.admin-table tbody tr:hover td:first-child {
+  box-shadow: inset 3px 0 0 var(--mantine-color-primary-6);
+}
+
+/* Modal 玻璃化 */
+.mantine-Modal-content {
+  background: color-mix(in srgb, var(--mantine-color-body) 82%, transparent) !important;
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.24) !important;
+}
+
+/* Badge 升级：渐变圆点
+   Mantine Badge 默认 inline-grid 单列，伪元素会被排到文字上一行；
+   改为 inline-flex 横排居中 */
+.badge-dot {
+  position: relative;
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+}
+
+.badge-dot::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 8px currentColor;
+}
+
+/* Divider 渐变色（强调场景） */
+.divider-gradient::before,
+.divider-gradient::after {
+  background: linear-gradient(90deg, transparent, var(--mantine-color-primary-5), transparent) !important;
 }
 
 /* ===== 编辑器专属 ===== */
@@ -69,7 +252,7 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: color-mix(in srgb, #228be6 18%, transparent);
+  background: color-mix(in srgb, #8b5cf6 18%, transparent);
   pointer-events: none;
 }
 
@@ -115,7 +298,7 @@ body {
 .ProseMirror h2,
 .ProseMirror h3,
 .ProseMirror h4 {
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1.35;
   margin: 1.5em 0 0.6em;
   letter-spacing: -0.02em;
@@ -185,15 +368,32 @@ body {
   gap: 0.4em;
 }
 
+.ProseMirror ul[data-type="taskList"] > li > label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5em;
+}
+
+/* tiptap 任务项内段落默认 margin 会把文字推下，导致 checkbox 与首行文字不对齐；
+   与渲染端（无 p 包裹）保持一致，统一从 li 顶部开始 */
+.ProseMirror ul[data-type="taskList"] > li > div > p {
+  margin: 0;
+}
+
+.ProseMirror ul[data-type="taskList"] > li > label input[type="checkbox"] {
+  margin: calc((1lh - 15px) / 2) 0 0 0;
+  flex: 0 0 auto;
+}
+
 .prose-content ul[data-type="taskList"] input,
 .prose-content ul.contains-task-list input,
 .ProseMirror ul[data-type="taskList"] input {
-  margin: 0.5em 0.3em 0 0;
+  margin: calc((1lh - 15px) / 2) 0.3em 0 0;
 }
 
 .prose-content blockquote,
 .ProseMirror blockquote {
-  border-left: 3px solid color-mix(in srgb, var(--mantine-color-primary-6) 45%, transparent);
+  border-left: 3px solid color-mix(in srgb, var(--mantine-color-primary-6) 50%, transparent);
   padding-left: 1em;
   margin: 1.25em 0;
   color: var(--mantine-color-dimmed);
@@ -216,7 +416,7 @@ body {
 .ProseMirror img {
   max-width: 100%;
   height: auto;
-  border-radius: 6px;
+  border-radius: var(--mantine-radius-md);
 }
 
 .prose-content hr,
@@ -231,9 +431,10 @@ body {
 .ProseMirror :not(pre) > code {
   font-family: var(--mantine-font-family-monospace);
   font-size: 0.9em;
-  background: color-mix(in srgb, var(--mantine-color-text) 8%, transparent);
+  background: var(--brand-gradient-soft);
+  border: 1px solid color-mix(in srgb, var(--mantine-color-primary-5) 25%, transparent);
   padding: 0.15em 0.4em;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
 /* pre 仅作容器，背景/内边距/滚动条交给 .hljs（github-dark 主题） */
@@ -271,31 +472,285 @@ body {
 }
 
 .prose-content th {
-  background: color-mix(in srgb, var(--mantine-color-text) 5%, transparent);
+  background: var(--brand-gradient-soft);
   font-weight: 600;
 }
 
-/* ===== highlight.js 代码块背景(与暗色底色统一) ===== */
+/* ===== highlight.js 代码块背景(与暗色底色统一) =====
+   圆角归零：统一由外层 pre 裁剪（避免与代码块头部/容器圆角拼接错位）
+   背景/文字放高特异性规则，确保覆盖 github-dark 主题默认值 */
 .hljs {
   background: #0a0a0a;
 }
 
+.prose-content .hljs {
+  background: #0a0a0a;
+  color: #c9d1d9;
+}
+
+/* ===== 阅读排版增强（编辑器与渲染页一致）===== */
+.prose-content,
+.ProseMirror {
+  font-size: 17px;
+  line-height: 1.9;
+  letter-spacing: 0.01em;
+}
+
+.prose-content h2,
+.ProseMirror h2 {
+  position: relative;
+  padding-bottom: 0.4em;
+}
+
+.prose-content h2::after,
+.ProseMirror h2::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 2.2em;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--brand-gradient);
+}
+
+.prose-content blockquote,
+.ProseMirror blockquote {
+  border-left: none;
+  background:
+    linear-gradient(180deg, var(--brand-from) 0%, var(--brand-mid) 50%, var(--brand-to) 100%) left center / 4px 100% no-repeat,
+    var(--brand-gradient-soft);
+  border-radius: var(--mantine-radius-md);
+  padding: 0.9em 1.2em 0.9em calc(1.2em + 6px);
+  font-size: 1.05em;
+  color: var(--mantine-color-text);
+}
+
+.prose-content a,
+.ProseMirror a {
+  background-image: linear-gradient(90deg, var(--brand-from), var(--brand-to));
+  background-size: 0% 2px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 200ms ease;
+}
+
+.prose-content a:hover,
+.ProseMirror a:hover {
+  text-decoration: none;
+  background-size: 100% 2px;
+}
+
+.prose-content pre,
+.ProseMirror pre {
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--mantine-color-primary-5) 22%, transparent);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.prose-content th,
+.ProseMirror th {
+  background: var(--brand-gradient-soft);
+  font-weight: 600;
+}
+
+.prose-content th,
+.prose-content td,
+.ProseMirror th,
+.ProseMirror td {
+  padding: 0.65em 1em;
+}
+
+.prose-content tbody tr:nth-child(odd),
+.ProseMirror tbody tr:nth-child(odd) {
+  background: color-mix(in srgb, var(--mantine-color-text) 3%, transparent);
+}
+
+.prose-content img,
+.ProseMirror img {
+  display: block;
+  margin: 1.5em auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.prose-content input[type="checkbox"],
+.ProseMirror input[type="checkbox"] {
+  accent-color: var(--mantine-color-primary-6);
+  width: 15px;
+  height: 15px;
+}
+
+.prose-content hr,
+.ProseMirror hr {
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--mantine-color-primary-5), transparent);
+}
+
+/* ===== 阅读端代码块头部（语言标签 + 复制）===== */
+.prose-content pre {
+  display: flex;
+  flex-direction: column;
+}
+
+.prose-content .code-block-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  background: #0d0d14;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  font-family: var(--mantine-font-family-monospace);
+}
+
+.prose-content .code-block-lang {
+  font-size: 12px;
+  color: #a1a1b5;
+  font-weight: 600;
+  text-transform: lowercase;
+  letter-spacing: 0.05em;
+}
+
+.prose-content .code-block-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  background: transparent;
+  color: #a1a1b5;
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease;
+}
+
+.prose-content .code-block-copy:hover {
+  color: #fff;
+  background: color-mix(in srgb, var(--mantine-color-primary-5) 28%, transparent);
+  border-color: var(--mantine-color-primary-5);
+}
+
+/* ===== 列表增强：渐变圆点 + 层级区分（排除任务列表）===== */
+.prose-content ul:not([data-type="taskList"]):not(.contains-task-list),
+.ProseMirror ul:not([data-type="taskList"]) {
+  list-style: none;
+  padding-left: 0.25em;
+}
+
+.prose-content ul:not([data-type="taskList"]):not(.contains-task-list) > li,
+.ProseMirror ul:not([data-type="taskList"]) > li {
+  position: relative;
+  padding-left: 1.5em;
+}
+
+.prose-content ul:not([data-type="taskList"]):not(.contains-task-list) > li::before,
+.ProseMirror ul:not([data-type="taskList"]) > li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.72em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--brand-gradient);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--brand-glow) 45%, transparent);
+}
+
+.prose-content ul:not([data-type="taskList"]):not(.contains-task-list) ul:not([data-type="taskList"]):not(.contains-task-list),
+.ProseMirror ul:not([data-type="taskList"]) ul:not([data-type="taskList"]) {
+  margin: 0.35em 0;
+  padding-left: 0.6em;
+}
+
+.prose-content ul:not([data-type="taskList"]):not(.contains-task-list) ul:not([data-type="taskList"]):not(.contains-task-list) > li::before,
+.ProseMirror ul:not([data-type="taskList"]) ul:not([data-type="taskList"]) > li::before {
+  width: 5px;
+  height: 5px;
+  top: 0.74em;
+  background: var(--mantine-color-primary-5);
+  box-shadow: none;
+}
+
+.prose-content ol li::marker,
+.ProseMirror ol li::marker {
+  color: var(--mantine-color-primary-6);
+  font-weight: 700;
+}
+
+.prose-content li,
+.ProseMirror li {
+  margin: 0.35em 0;
+}
+
+.prose-content li > ul,
+.prose-content li > ol,
+.ProseMirror li > ul,
+.ProseMirror li > ol {
+  margin: 0.35em 0;
+}
+
 /* ===== 编辑器 ===== */
+.editor-shell {
+  border: 1px solid var(--mantine-color-default-border) !important;
+  border-radius: var(--mantine-radius-md) !important;
+  background: color-mix(in srgb, var(--mantine-color-body) 70%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+
 .editor-shell:focus-within {
-  border-color: color-mix(in srgb, var(--mantine-color-primary-6) 55%, transparent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--mantine-color-primary-6) 20%, transparent);
+  border-color: transparent !important;
+  background-image: var(--brand-gradient-soft);
+  box-shadow:
+    0 0 0 1.5px var(--mantine-color-primary-5),
+    0 0 24px color-mix(in srgb, var(--brand-glow) 45%, transparent) !important;
 }
 
 /* ===== 后台 ===== */
+.app-header {
+  background: color-mix(in srgb, var(--mantine-color-body) 72%, transparent) !important;
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  border-bottom: 1px solid color-mix(in srgb, var(--mantine-color-default-border) 70%, transparent) !important;
+}
+
+.app-navbar {
+  background: color-mix(in srgb, var(--mantine-color-body) 68%, transparent) !important;
+  backdrop-filter: blur(18px) saturate(1.3);
+  -webkit-backdrop-filter: blur(18px) saturate(1.3);
+  border-right: 1px solid color-mix(in srgb, var(--mantine-color-default-border) 70%, transparent) !important;
+}
+
 .admin-nav-link {
   position: relative;
   border-radius: var(--mantine-radius-md);
   transition: background-color 150ms ease, color 150ms ease;
 }
 
+/* 折叠态：NavLink 只剩图标时宽度会收缩导致溢出，改为撑满并居中图标 */
+.admin-nav-link.nav-collapsed {
+  width: 100%;
+  justify-content: center;
+  padding-inline: 0;
+}
+
+.admin-nav-link.nav-collapsed .mantine-NavLink-body {
+  display: none;
+}
+
+.admin-nav-link.nav-collapsed .mantine-NavLink-section[data-position="left"] {
+  margin-right: 0;
+}
+
 .admin-nav-link[data-active] {
-  background: color-mix(in srgb, var(--mantine-color-primary-6) 12%, transparent);
-  color: var(--mantine-color-primary-6);
+  background: var(--brand-gradient) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 16px var(--brand-glow);
 }
 
 .admin-nav-link[data-active]::before {
@@ -307,7 +762,7 @@ body {
   width: 3px;
   height: 16px;
   border-radius: 2px;
-  background: var(--mantine-color-primary-6);
+  background: rgba(255, 255, 255, 0.9);
 }
 
 /* ===== 通用工具 class ===== */
@@ -325,58 +780,118 @@ body {
   gap: 6px;
 }
 
-.brand-text {
-  background-image: var(--brand-gradient);
+/* ===== 首页 ===== */
+.post-card {
+  position: relative;
+  padding: 24px;
+  border-radius: var(--mantine-radius-lg);
+  background: color-mix(in srgb, var(--mantine-color-body) 55%, transparent);
+  backdrop-filter: blur(16px) saturate(1.3);
+  -webkit-backdrop-filter: blur(16px) saturate(1.3);
+  border: 1px solid color-mix(in srgb, var(--mantine-color-default-border) 60%, transparent);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 4px 20px rgba(0, 0, 0, 0.05);
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+  overflow: hidden;
+}
+
+.post-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: var(--brand-gradient);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 250ms ease;
+  pointer-events: none;
+}
+
+.post-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+}
+
+.post-card:hover::before {
+  opacity: 1;
+}
+
+.post-card:hover .post-title {
+  background-position: 100% center;
+}
+
+.post-title {
+  background-image: linear-gradient(90deg, var(--mantine-color-text) 0%, var(--mantine-color-text) 45%, var(--brand-from) 90%, var(--brand-to) 100%);
+  background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-}
-
-/* ===== 首页 ===== */
-.post-link {
-  transition: color 150ms ease;
-}
-
-.post-link:hover {
-  color: var(--mantine-color-primary-6);
+  transition: background-position 350ms ease;
 }
 
 .page-pill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 14px;
+  padding: 10px 24px !important;
   border-radius: 999px;
-  border: 1px solid var(--mantine-color-default-border);
-  transition: border-color 150ms ease, color 150ms ease;
+  border: 1px solid color-mix(in srgb, var(--mantine-color-default-border) 60%, transparent);
+  background: color-mix(in srgb, var(--mantine-color-body) 50%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: border-color 150ms ease, color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
 }
 
 .page-pill:hover {
-  border-color: color-mix(in srgb, var(--mantine-color-primary-6) 45%, transparent);
+  border-color: transparent;
+  background-image: var(--brand-gradient-soft);
+  color: var(--mantine-color-primary-6);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--brand-glow) 30%, transparent);
+  transform: translateY(-1px);
+}
+
+a.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 150ms ease;
+}
+
+a.back-link:hover {
   color: var(--mantine-color-primary-6);
 }
 
-/* ===== 主题调色板覆盖（Vercel 风格：纯黑暗色）=====
-   随 --mantine-color-* 语义变量生效，浅色默认由主题接管 */
+/* ===== 主题调色板覆盖（Aurora 风格）===== */
 :root[data-mantine-color-scheme='light'] {
   --mantine-color-default-hover: #fafafa;
+  --aurora-1: rgba(99, 102, 241, 0.22);
+  --aurora-2: rgba(168, 85, 247, 0.2);
+  --aurora-3: rgba(236, 72, 153, 0.16);
 }
 
 :root[data-mantine-color-scheme='dark'] {
-  --mantine-color-body: #000000;
-  --mantine-color-default: #0a0a0a;
-  --mantine-color-default-hover: #111111;
-  --mantine-color-default-border: #333333;
-  --mantine-color-text: #ededed;
-  --mantine-color-dimmed: #a1a1a1;
+  --mantine-color-body: #05050a;
+  --mantine-color-default: #0b0b14;
+  --mantine-color-default-hover: #131322;
+  --mantine-color-default-border: #2a2a3d;
+  --mantine-color-text: #ededf2;
+  --mantine-color-dimmed: #a1a1b5;
 }
 
 /* ===== 编辑器工具栏吸顶 ===== */
 .editor-toolbar {
   position: sticky;
   z-index: 10;
-  background: var(--mantine-color-body);
+  background: color-mix(in srgb, var(--mantine-color-body) 80%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--mantine-color-default-border);
+  border-radius: var(--mantine-radius-md) var(--mantine-radius-md) 0 0;
+  overflow: hidden;
 }
 
 /* ===== 全屏编辑器 ===== */
@@ -396,13 +911,58 @@ body {
   flex-direction: column;
   border: none !important;
   border-radius: 0 !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
 }
 
 .editor-fullscreen .editor-toolbar {
   top: 0;
+  border-radius: 0;
 }
 
 .editor-fullscreen > div > div:last-child {
   flex: 1;
   overflow-y: auto;
+}
+
+.user-link {
+  background-image: linear-gradient(90deg, var(--brand-from), var(--brand-to));
+  background-size: 0% 2px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  padding-bottom: 2px;
+  transition: background-size 250ms ease, color 250ms ease;
+  cursor: pointer;
+}
+
+.user-link:hover {
+  color: var(--mantine-color-primary-6);
+  background-size: 100% 2px;
+}
+
+/* ===== 主题切换按钮（玻璃胶囊）===== */
+.theme-toggle-btn {
+  background: color-mix(in srgb, var(--mantine-color-body) 60%, transparent) !important;
+  backdrop-filter: blur(14px) saturate(1.3);
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
+  border: 1px solid color-mix(in srgb, var(--mantine-color-default-border) 70%, transparent) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.14) !important;
+  transition: box-shadow 200ms ease, transform 150ms ease, border-color 200ms ease !important;
+}
+
+.theme-toggle-btn:hover {
+  border-color: var(--mantine-color-primary-5) !important;
+  box-shadow: 0 0 24px color-mix(in srgb, var(--brand-glow) 55%, transparent) !important;
+  transform: translateY(-2px);
+}
+
+/* ===== 动效降级 ===== */
+@media (prefers-reduced-motion: reduce) {
+  .aurora-blob,
+  .brand-text,
+  .post-card,
+  .btn-glow {
+    animation: none !important;
+    transition: none !important;
+  }
 }

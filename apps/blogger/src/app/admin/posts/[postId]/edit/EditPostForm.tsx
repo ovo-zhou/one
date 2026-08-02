@@ -54,7 +54,7 @@ export default function EditPostForm({
   };
 
   return (
-    <Stack gap="md" maw={900}>
+    <Stack gap="md" maw={900} className="glass-card" p="xl">
       <TextInput
         label="标题"
         placeholder="输入文章标题"
@@ -79,7 +79,7 @@ export default function EditPostForm({
         </Text>
       )}
       <Group>
-        <Button onClick={handleSubmit} loading={saving}>
+        <Button className="btn-glow" onClick={handleSubmit} loading={saving}>
           保存更新
         </Button>
         <Button variant="default" onClick={() => router.back()}>

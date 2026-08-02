@@ -15,7 +15,7 @@ export default function UserDropdown({ name }: UserDropdownProps) {
     <>
       <Menu trigger="click" position="bottom-start">
         <Menu.Target>
-          <Text component="span" td="underline" className="cursor-pointer">
+          <Text component="span" className="user-link">
             {name}
           </Text>
         </Menu.Target>

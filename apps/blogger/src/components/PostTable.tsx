@@ -121,7 +121,7 @@ export default function PostTable({ initialData }: { initialData: PostListData }
   );
 
   return (
-    <Box>
+    <Box className="scroll-x">
       <Group justify="space-between" mb="md">
         <Group>
           <TextInput
@@ -135,11 +135,10 @@ export default function PostTable({ initialData }: { initialData: PostListData }
             搜索
           </Button>
         </Group>
-        <Button leftSection={<Plus size={16} />} onClick={() => router.push("/admin/posts/new")}>新建文章</Button>
+        <Button className="btn-glow" leftSection={<Plus size={16} />} onClick={() => router.push("/admin/posts/new")}>新建文章</Button>
       </Group>
 
-      <Box className="scroll-x">
-      <Table striped highlightOnHover withTableBorder miw={600}>
+      <Table striped highlightOnHover withTableBorder miw={600} className="admin-table">
         <Table.Thead>
           <Table.Tr>
             <Table.Th>标题</Table.Th>
@@ -169,17 +168,17 @@ export default function PostTable({ initialData }: { initialData: PostListData }
             (data.items || []).map((post) => (
               <Table.Tr key={post.id}>
                 <Table.Td>
-                  <Text fw={500} lineClamp={1}>
+                  <Text fw={600} lineClamp={1}>
                     {post.title || "(无标题)"}
                   </Text>
                 </Table.Td>
                 <Table.Td>
                   {post.status === "LIVE" ? (
-                    <Badge color="green" variant="light">
+                    <Badge color="green" variant="light" className="badge-dot">
                       已发布
                     </Badge>
                   ) : (
-                    <Badge color="yellow" variant="light">
+                    <Badge color="yellow" variant="light" className="badge-dot">
                       草稿
                     </Badge>
                   )}
@@ -232,7 +231,6 @@ export default function PostTable({ initialData }: { initialData: PostListData }
           )}
         </Table.Tbody>
       </Table>
-      </Box>
 
       <Group justify="flex-end" mt="md">
         <Button

@@ -67,11 +67,7 @@ export default function AdminEditor({ content, onChange }: AdminEditorProps) {
   }, [isFullscreen]);
 
   const editorContent = (
-    <Box
-      className="editor-shell"
-      bd="1px solid var(--mantine-color-default-border)"
-      bdrs="md"
-    >
+    <Box className="editor-shell">
       {editor && (
         <EditorToolbar
           editor={editor}

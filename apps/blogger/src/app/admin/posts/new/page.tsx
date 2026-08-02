@@ -36,8 +36,8 @@ export default function NewPostPage() {
 
   return (
     <Box>
-      <Title order={2} mb="lg">新建文章</Title>
-      <Stack gap="md" maw={900}>
+      <Title order={2} mb="lg" className="brand-text">新建文章</Title>
+      <Stack gap="md" maw={900} className="glass-card" p="xl">
         <TextInput
           label="标题"
           placeholder="输入文章标题"
@@ -67,7 +67,7 @@ export default function NewPostPage() {
           </Text>
         )}
         <Group>
-          <Button onClick={handleSubmit} loading={saving}>
+          <Button className="btn-glow" onClick={handleSubmit} loading={saving}>
             {isDraft ? "保存草稿" : "立即发布"}
           </Button>
           <Button variant="default" onClick={() => router.back()}>
