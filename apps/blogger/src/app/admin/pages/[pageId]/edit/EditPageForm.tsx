@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { TextInput, Button, Group, Stack, Text } from "@mantine/core";
+import { TextInput, Button, Group, Stack, Text, Box } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import AdminEditor from "../../../../../components/AdminEditor";
 import { updatePage } from "../../../../../actions/page/updatePage";
@@ -54,10 +54,10 @@ export default function EditPageForm({
         onChange={(e) => setTitle(e.currentTarget.value)}
         required
       />
-      <div>
+      <Box>
         <Text size="sm" fw={500} mb={4}>内容</Text>
         <AdminEditor content={content} onChange={setContent} />
-      </div>
+      </Box>
       {error && <Text c="red" size="sm">{error}</Text>}
       <Group>
         <Button onClick={handleSubmit} loading={saving}>保存更新</Button>

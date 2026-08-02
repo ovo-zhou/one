@@ -1,5 +1,5 @@
 import { getPageById } from "../../../../../actions/page/getPageById";
-import { Title } from "@mantine/core";
+import { Title, Box } from "@mantine/core";
 import EditPageForm from "./EditPageForm";
 
 export default async function EditPagePage({ params }: { params: Promise<{ pageId: string }> }) {
@@ -7,7 +7,7 @@ export default async function EditPagePage({ params }: { params: Promise<{ pageI
   const page = await getPageById(pageId);
 
   return (
-    <div>
+    <Box>
       <Title order={2} mb="lg">编辑页面</Title>
       <EditPageForm
         pageId={pageId}
@@ -15,6 +15,6 @@ export default async function EditPagePage({ params }: { params: Promise<{ pageI
         initialContent={page.content || ""}
         initialStatus={page.status || "LIVE"}
       />
-    </div>
+    </Box>
   );
 }

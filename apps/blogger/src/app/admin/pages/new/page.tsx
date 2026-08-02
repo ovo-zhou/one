@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { TextInput, Button, Group, Stack, Switch, Title, Text } from "@mantine/core";
+import { TextInput, Button, Group, Stack, Switch, Title, Text, Box } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import AdminEditor from "../../../../components/AdminEditor";
 import { createPage } from "../../../../actions/page/createPage";
@@ -34,7 +34,7 @@ export default function NewPagePage() {
   };
 
   return (
-    <div>
+    <Box>
       <Title order={2} mb="lg">新建页面</Title>
       <Stack gap="md" maw={900}>
         <TextInput
@@ -44,10 +44,10 @@ export default function NewPagePage() {
           onChange={(e) => setTitle(e.currentTarget.value)}
           required
         />
-        <div>
+        <Box>
           <Text size="sm" fw={500} mb={4}>内容</Text>
           <AdminEditor content={content} onChange={setContent} />
-        </div>
+        </Box>
         <Switch
           label="保存为草稿"
           checked={isDraft}
@@ -61,6 +61,6 @@ export default function NewPagePage() {
           <Button variant="default" onClick={() => router.back()}>取消</Button>
         </Group>
       </Stack>
-    </div>
+    </Box>
   );
 }

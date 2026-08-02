@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Title } from "@mantine/core";
+import { Title, Anchor } from "@mantine/core";
 import UserDropdown from "./UserDropdown";
 import BlogNameLogin from "./BlogNameLogin";
 
@@ -37,18 +37,9 @@ export default function Greeting({ blogName }: { blogName: string }) {
     return (
       <Title order={1}>
         你好，我是{" "}
-        <a
-          href="/admin"
-          style={{
-            textDecoration: "none",
-            backgroundImage: "linear-gradient(90deg, #228be6, #7950f2)",
-            WebkitBackgroundClip: "text",
-            backgroundClip: "text",
-            color: "transparent",
-          }}
-        >
+        <Anchor href="/admin" underline="never" className="brand-text">
           {blogName}
-        </a>
+        </Anchor>
       </Title>
     );
   }

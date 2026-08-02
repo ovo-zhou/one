@@ -1,6 +1,7 @@
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { Box } from "@mantine/core";
 import { highlightCode } from "../lib/highlight";
 
 type CodeProps = ComponentPropsWithoutRef<"code"> & {
@@ -29,10 +30,10 @@ function CodeBlock({ className, children, ...props }: CodeProps) {
 
 export default function MarkdownRenderer({ content }: { content: string }) {
   return (
-    <div className="prose-content">
+    <Box className="prose-content">
       <ReactMarkdown remarkPlugins={[remarkGfm]} components={{ code: CodeBlock }}>
         {content}
       </ReactMarkdown>
-    </div>
+    </Box>
   );
 }

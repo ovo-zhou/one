@@ -1,5 +1,5 @@
 import { getAdminPostById } from "../../../../../actions/post/getAdminPostById";
-import { Title } from "@mantine/core";
+import { Title, Box } from "@mantine/core";
 import EditPostForm from "./EditPostForm";
 
 export default async function EditPostPage({ params }: { params: Promise<{ postId: string }> }) {
@@ -7,7 +7,7 @@ export default async function EditPostPage({ params }: { params: Promise<{ postI
   const post = await getAdminPostById(postId);
 
   return (
-    <div>
+    <Box>
       <Title order={2} mb="lg">编辑文章</Title>
       <EditPostForm
         postId={postId}
@@ -16,6 +16,6 @@ export default async function EditPostPage({ params }: { params: Promise<{ postI
         initialLabels={post.labels || []}
         initialStatus={post.status ?? undefined}
       />
-    </div>
+    </Box>
   );
 }

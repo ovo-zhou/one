@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
-import { Modal, Button, Group, Stack, SegmentedControl, Alert, Text } from "@mantine/core";
+import { Modal, Button, Group, Stack, SegmentedControl, Alert, Text, Slider, Box } from "@mantine/core";
 import Cropper from "react-easy-crop";
 import type { Area } from "react-easy-crop";
 import { readFileAsDataURL, processAndPack, type CropArea } from "../lib/image";
@@ -99,7 +99,7 @@ export default function ImageUploadModal({ opened, onClose, onInsert }: ImageUpl
           <Button onClick={() => inputRef.current?.click()}>选择图片</Button>
         ) : (
           <>
-            <div style={{ position: "relative", height: 320, background: "#000", borderRadius: 4 }}>
+            <Box pos="relative" h={320} bg="var(--crop-bg)" bdrs="md">
               <Cropper
                 image={imageSrc}
                 crop={crop}
@@ -109,7 +109,7 @@ export default function ImageUploadModal({ opened, onClose, onInsert }: ImageUpl
                 onZoomChange={setZoom}
                 onCropComplete={onCropComplete}
               />
-            </div>
+            </Box>
             <Group justify="space-between">
               <SegmentedControl
                 size="xs"
@@ -117,18 +117,21 @@ export default function ImageUploadModal({ opened, onClose, onInsert }: ImageUpl
                 onChange={setAspectKey}
                 data={["16:9", "4:3", "1:1"]}
               />
-              <Text size="xs" c="dimmed">
-                缩放
-                <input
-                  type="range"
+              <Stack gap={4} w={220}>
+                <Text size="xs" c="dimmed">
+                  缩放
+                </Text>
+                <Slider
+                  size="sm"
                   min={1}
                   max={3}
                   step={0.1}
                   value={zoom}
-                  onChange={(e) => setZoom(Number(e.target.value))}
-                  style={{ marginLeft: 8, verticalAlign: "middle" }}
+                  onChange={setZoom}
+                  label={null}
+                  marks={[{ value: 1, label: "1x" }, { value: 2, label: "2x" }, { value: 3, label: "3x" }]}
                 />
-              </Text>
+              </Stack>
             </Group>
             <Group justify="apart">
               <Button variant="subtle" onClick={() => inputRef.current?.click()}>

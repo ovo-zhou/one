@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { TextInput, Button, Group, Stack, Switch, TagsInput, Title, Text } from "@mantine/core";
+import { TextInput, Button, Group, Stack, Switch, TagsInput, Title, Text, Box } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import AdminEditor from "../../../../components/AdminEditor";
 import { createPost } from "../../../../actions/post/createPost";
@@ -35,7 +35,7 @@ export default function NewPostPage() {
   };
 
   return (
-    <div>
+    <Box>
       <Title order={2} mb="lg">新建文章</Title>
       <Stack gap="md" maw={900}>
         <TextInput
@@ -52,10 +52,10 @@ export default function NewPostPage() {
           onChange={setLabels}
           clearable
         />
-        <div>
+        <Box>
           <Text size="sm" fw={500} mb={4}>内容</Text>
           <AdminEditor content={content} onChange={setContent} />
-        </div>
+        </Box>
         <Switch
           label="保存为草稿"
           checked={isDraft}
@@ -75,6 +75,6 @@ export default function NewPostPage() {
           </Button>
         </Group>
       </Stack>
-    </div>
+    </Box>
   );
 }

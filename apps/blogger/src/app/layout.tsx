@@ -7,6 +7,7 @@ import "highlight.js/styles/github-dark.css";
 import { MantineProvider, Container } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
 import ThemeToggle from "../components/ThemeToggle";
+import { theme } from "../lib/theme";
 
 export const metadata: Metadata = {
   title: "Next.js App",
@@ -22,7 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body>
-        <MantineProvider defaultColorScheme="light">
+        <MantineProvider theme={theme} defaultColorScheme="light">
           <Notifications position="top-right" />
           <Container fluid p={0}>
             {children}

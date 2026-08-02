@@ -27,27 +27,22 @@ export default async function Home() {
   return (
     <main>
       <Flex justify="center">
-        <Box w={{ base: "100%", sm: 600, lg: 900 }} px={{ base: "md", sm: 0 }}>
-          <Stack align="stretch" justify="center" gap="xl" h={{ base: 300, sm: 350, lg: 400 }}>
+        <Box w={{ base: "100%", sm: 600, lg: 900 }} px={{ base: "md", sm: 0 }} pt={{ base: "xl", sm: 80 }} pb="lg">
+          <Stack align="stretch" gap="sm">
             <Greeting blogName={blog.name} />
-            <Title order={4}>{blog.description}</Title>
+            <Text size="lg" c="dimmed" fw={400}>
+              {blog.description}
+            </Text>
             {pages.items && pages.items.length > 0 && (
               <Flex justify="center" mt="lg">
-                <Group w={{ base: "100%", sm: 600, lg: 900 }} gap="md">
+                <Group gap="md">
                   {pages.items.map((page) => (
                     <Anchor
                       key={page.id}
                       href={`/pages/${page.id}`}
                       underline="never"
                       c="inherit"
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: 6,
-                        padding: "6px 14px",
-                        borderRadius: 999,
-                        border: "1px solid var(--mantine-color-default-border)",
-                      }}
+                      className="page-pill"
                     >
                       <Text size="sm" fw={500}>
                         {page.title}
@@ -62,29 +57,41 @@ export default async function Home() {
       </Flex>
 
       <Flex justify="center">
-        <Stack w={{ base: "100%", sm: 600, lg: 900 }} gap="lg" px={{ base: "md", sm: 0 }}>
+        <Stack
+          w={{ base: "100%", sm: 600, lg: 720 }}
+          gap="lg"
+          px={{ base: "md", sm: 0 }}
+          pb={{ base: "xl", sm: 80 }}
+        >
           {posts.items.map((post) => (
             <Box key={post.id}>
-              <Anchor href={`/${post.id}`} underline="hover" c="inherit">
-                <Title order={3}>{post.title}</Title>
+              <Group gap="xs" mb={6}>
+                <Text size="sm" c="dimmed">
+                  {dayjs(post.published).format("YYYY 年 M 月 D 日")}
+                </Text>
+                <Text size="sm" c="dimmed">
+                  · {post.author.displayName}
+                </Text>
+              </Group>
+              <Anchor href={`/${post.id}`} underline="never" c="inherit" className="post-link">
+                <Title order={3} lineClamp={2}>
+                  {post.title}
+                </Title>
               </Anchor>
-              <Text size="sm" c="dimmed" mt={4}>
-                {post.author.displayName} ·{" "}
-                {dayjs(post.published).format("YYYY/MM/DD HH:mm:ss")}
-              </Text>
-              <Text size="sm" mt="xs" lineClamp={3}>
+              <Text size="sm" c="dimmed" mt="xs" lineClamp={3}>
                 {post.content.replace(/<[^>]*>/g, "").substring(0, 200)}
               </Text>
-              <Divider mt="md" />
+              <Divider mt="xl" />
             </Box>
           ))}
         </Stack>
       </Flex>
-      <Flex justify="center" mt="xl">
-        <Text size="sm" c="dimmed" style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+
+      <Flex justify="center" py="xl" style={{ borderTop: "1px solid var(--mantine-color-default-border)" }}>
+        <Group gap={4} c="dimmed">
           <Copyright size={14} />
-          {dayjs().year()} {blog.name}
-        </Text>
+          <Text size="sm">{dayjs().year()} {blog.name}</Text>
+        </Group>
       </Flex>
     </main>
   );

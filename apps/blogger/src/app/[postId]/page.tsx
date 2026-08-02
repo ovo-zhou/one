@@ -3,7 +3,8 @@ import getPostById from "../../actions/post/getPostById";
 import getPosts from "../../actions/post/getPosts";
 import MarkdownRenderer from "../../components/MarkdownRenderer";
 import dayjs from "dayjs";
-import { Flex, Title, Text, Stack, Container } from "@mantine/core";
+import { Flex, Title, Text, Stack, Container, Divider, Anchor } from "@mantine/core";
+import { ArrowLeft } from "lucide-react";
 
 export const revalidate = 43200;
 
@@ -31,12 +32,24 @@ export default async function PostPage({ params }: { params: Promise<{ postId: s
   return (
     <main>
       <Flex justify="center">
-        <Container w={{ base: "100%", sm: 600, lg: 900 }} px={{ base: "md", sm: 0 }} py={{ base: "lg", sm: "xl" }}>
+        <Container size="md" px={{ base: "md", sm: 0 }} py={{ base: "lg", sm: 80 }}>
           <Stack gap="md">
+            <Anchor
+              href="/"
+              underline="never"
+              size="sm"
+              c="dimmed"
+              w="fit-content"
+              className="flex-center"
+            >
+              <ArrowLeft size={14} />
+              返回首页
+            </Anchor>
             <Title order={1}>{post.title}</Title>
-            <Text size="sm" c="dimmed">
-              {post.author.displayName} · {dayjs(post.published).format("YYYY/MM/DD HH:mm:ss")}
+            <Text size="sm" c="dimmed" mb="md">
+              {post.author.displayName} · {dayjs(post.published).format("YYYY 年 M 月 D 日")}
             </Text>
+            <Divider />
             <MarkdownRenderer content={post.content} />
           </Stack>
         </Container>

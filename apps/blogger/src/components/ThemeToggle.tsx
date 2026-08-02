@@ -26,12 +26,10 @@ export default function ThemeToggle() {
       radius="xl"
       aria-label="切换主题"
       onClick={handleToggle}
-      style={{
-        position: "fixed",
-        right: 20,
-        bottom: 20,
-        zIndex: 999,
-      }}
+      pos="fixed"
+      right={20}
+      bottom={20}
+      style={{ zIndex: 999 }}
     >
       {isDark ? <Sun size={20} /> : <Moon size={20} />}
     </ActionIcon>

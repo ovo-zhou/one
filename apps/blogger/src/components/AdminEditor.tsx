@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
+import { Box } from "@mantine/core";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
@@ -66,7 +67,11 @@ export default function AdminEditor({ content, onChange }: AdminEditorProps) {
   }, [isFullscreen]);
 
   const editorContent = (
-    <div style={{ border: "1px solid var(--mantine-color-default-border)", borderRadius: "4px" }}>
+    <Box
+      className="editor-shell"
+      bd="1px solid var(--mantine-color-default-border)"
+      bdrs="md"
+    >
       {editor && (
         <EditorToolbar
           editor={editor}
@@ -75,19 +80,19 @@ export default function AdminEditor({ content, onChange }: AdminEditorProps) {
           onToggleFullscreen={toggleFullscreen}
         />
       )}
-      <div style={{ minHeight: "300px" }}>
+      <Box mih={300}>
         <EditorContent editor={editor} />
-      </div>
+      </Box>
       <ImageUploadModal
         opened={imageModalOpen}
         onClose={() => setImageModalOpen(false)}
         onInsert={handleInsertImage}
       />
-    </div>
+    </Box>
   );
 
   if (isFullscreen) {
-    return <div className="editor-fullscreen">{editorContent}</div>;
+    return <Box className="editor-fullscreen">{editorContent}</Box>;
   }
 
   return editorContent;

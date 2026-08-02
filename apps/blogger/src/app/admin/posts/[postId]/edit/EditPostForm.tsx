@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { TextInput, Button, Group, Stack, TagsInput, Text } from "@mantine/core";
+import { TextInput, Button, Group, Stack, TagsInput, Text, Box } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import AdminEditor from "../../../../../components/AdminEditor";
 import { updatePost } from "../../../../../actions/post/updatePost";
@@ -69,10 +69,10 @@ export default function EditPostForm({
         onChange={setLabels}
         clearable
       />
-      <div>
+      <Box>
         <Text size="sm" fw={500} mb={4}>内容</Text>
         <AdminEditor content={content} onChange={setContent} />
-      </div>
+      </Box>
       {error && (
         <Text c="red" size="sm">
           {error}

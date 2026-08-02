@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import { UnstyledButton } from "@mantine/core";
 
 export default function BlogNameLogin({ name }: { name: string }) {
   const countRef = useRef(0);
@@ -19,23 +20,8 @@ export default function BlogNameLogin({ name }: { name: string }) {
   };
 
   return (
-    <button
-      type="button"
-      onClick={handleClick}
-      style={{
-        background: "none",
-        border: "none",
-        padding: 0,
-        font: "inherit",
-        cursor: "pointer",
-        textDecoration: "none",
-        backgroundImage: "linear-gradient(90deg, #228be6, #7950f2)",
-        WebkitBackgroundClip: "text",
-        backgroundClip: "text",
-        color: "transparent",
-      }}
-    >
+    <UnstyledButton onClick={handleClick} className="brand-text">
       {name}
-    </button>
+    </UnstyledButton>
   );
 }

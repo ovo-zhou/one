@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useEditorState, type Editor } from "@tiptap/react";
-import { ActionIcon, Group, Tooltip, Divider, Popover, TextInput, Button, Stack } from "@mantine/core";
+import { ActionIcon, Group, Tooltip, Divider, Popover, TextInput, Button, Stack, Box } from "@mantine/core";
 import {
   type LucideIcon,
   Undo2,
@@ -50,7 +50,7 @@ function ToolButton({
   return (
     <Tooltip label={label} position="bottom" withArrow>
       <ActionIcon
-        variant={active ? "filled" : "subtle"}
+        variant={active ? "light" : "subtle"}
         size="md"
         disabled={disabled}
         onClick={onClick}
@@ -115,10 +115,7 @@ export default function EditorToolbar({ editor, onUploadImage, isFullscreen, onT
       wrap="wrap"
       p="6px 8px"
       className="editor-toolbar"
-      style={{
-        borderBottom: "1px solid var(--mantine-color-default-border)",
-        top: isFullscreen ? 0 : 56,
-      }}
+      style={{ top: isFullscreen ? 0 : 56 }}
     >
       <ToolButton icon={Undo2} label="撤销" disabled={!s.canUndo} onClick={() => run(() => editor.chain().focus().undo().run())} />
       <ToolButton icon={Redo2} label="重做" disabled={!s.canRedo} onClick={() => run(() => editor.chain().focus().redo().run())} />
@@ -152,9 +149,9 @@ export default function EditorToolbar({ editor, onUploadImage, isFullscreen, onT
 
       <Popover opened={linkOpened} onChange={setLinkOpened} width={260} position="bottom" shadow="md">
         <Popover.Target>
-          <span>
+          <Box component="span">
             <ToolButton icon={LinkIcon} label="链接" active={s.link} onClick={openLink} />
-          </span>
+          </Box>
         </Popover.Target>
         <Popover.Dropdown>
           <Stack gap="xs">

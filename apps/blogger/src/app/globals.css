@@ -1,10 +1,25 @@
 * {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
 body {
   font-family: system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--mantine-color-primary-6) 22%, transparent);
+}
+
+/* ===== 设计 Token（品牌视觉）=====
+   换主色：改 src/lib/theme.ts 的 primary 色组（一处生效）
+   换品牌渐变：只改下面 --brand-gradient 这一行 */
+:root {
+  --brand-gradient: linear-gradient(90deg, var(--mantine-color-blue-6), var(--mantine-color-violet-6));
+  --crop-bg: #000;
 }
 
 /* ===== 编辑器专属 ===== */
@@ -100,9 +115,10 @@ body {
 .ProseMirror h2,
 .ProseMirror h3,
 .ProseMirror h4 {
-  font-weight: 600;
-  line-height: 1.3;
-  margin: 1.4em 0 0.6em;
+  font-weight: 700;
+  line-height: 1.35;
+  margin: 1.5em 0 0.6em;
+  letter-spacing: -0.02em;
 }
 
 .prose-content h1,
@@ -177,16 +193,18 @@ body {
 
 .prose-content blockquote,
 .ProseMirror blockquote {
-  border-left: 3px solid var(--mantine-color-default-border);
+  border-left: 3px solid color-mix(in srgb, var(--mantine-color-primary-6) 45%, transparent);
   padding-left: 1em;
-  margin: 1em 0;
+  margin: 1.25em 0;
   color: var(--mantine-color-dimmed);
+  font-size: 1.02em;
 }
 
 .prose-content a,
 .ProseMirror a {
   color: var(--mantine-color-anchor);
   text-decoration: none;
+  text-underline-offset: 3px;
 }
 
 .prose-content a:hover,
@@ -198,14 +216,14 @@ body {
 .ProseMirror img {
   max-width: 100%;
   height: auto;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
 .prose-content hr,
 .ProseMirror hr {
   border: none;
   border-top: 1px solid var(--mantine-color-default-border);
-  margin: 1.5em 0;
+  margin: 2em 0;
 }
 
 /* 行内代码（块级代码的 .hljs 由导入的 github-dark 主题负责） */
@@ -262,7 +280,84 @@ body {
   background: #0a0a0a;
 }
 
-/* ===== 主题调色板覆盖(Vercel 风格:纯黑暗色) ===== */
+/* ===== 编辑器 ===== */
+.editor-shell:focus-within {
+  border-color: color-mix(in srgb, var(--mantine-color-primary-6) 55%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--mantine-color-primary-6) 20%, transparent);
+}
+
+/* ===== 后台 ===== */
+.admin-nav-link {
+  position: relative;
+  border-radius: var(--mantine-radius-md);
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.admin-nav-link[data-active] {
+  background: color-mix(in srgb, var(--mantine-color-primary-6) 12%, transparent);
+  color: var(--mantine-color-primary-6);
+}
+
+.admin-nav-link[data-active]::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 16px;
+  border-radius: 2px;
+  background: var(--mantine-color-primary-6);
+}
+
+/* ===== 通用工具 class ===== */
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.scroll-x {
+  overflow-x: auto;
+}
+
+.flex-center {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.brand-text {
+  background-image: var(--brand-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ===== 首页 ===== */
+.post-link {
+  transition: color 150ms ease;
+}
+
+.post-link:hover {
+  color: var(--mantine-color-primary-6);
+}
+
+.page-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--mantine-color-default-border);
+  transition: border-color 150ms ease, color 150ms ease;
+}
+
+.page-pill:hover {
+  border-color: color-mix(in srgb, var(--mantine-color-primary-6) 45%, transparent);
+  color: var(--mantine-color-primary-6);
+}
+
+/* ===== 主题调色板覆盖（Vercel 风格：纯黑暗色）=====
+   随 --mantine-color-* 语义变量生效，浅色默认由主题接管 */
 :root[data-mantine-color-scheme='light'] {
   --mantine-color-default-hover: #fafafa;
 }
@@ -281,6 +376,7 @@ body {
   position: sticky;
   z-index: 10;
   background: var(--mantine-color-body);
+  border-bottom: 1px solid var(--mantine-color-default-border);
 }
 
 /* ===== 全屏编辑器 ===== */

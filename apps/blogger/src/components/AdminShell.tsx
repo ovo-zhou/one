@@ -39,8 +39,9 @@ function SidebarContent({ collapsed, onNavigate }: { collapsed: boolean; onNavig
   };
 
   return (
-    <Stack gap={0}>
+    <Stack gap={2} px="xs">
       <NavLink
+        className="admin-nav-link"
         label={collapsed ? undefined : "文章管理"}
         leftSection={<Newspaper size={18} />}
         active={pathname.startsWith("/admin/posts") || pathname === "/admin"}
@@ -48,6 +49,7 @@ function SidebarContent({ collapsed, onNavigate }: { collapsed: boolean; onNavig
         styles={{ root: { borderRadius: 0 } }}
       />
       <NavLink
+        className="admin-nav-link"
         label={collapsed ? undefined : "页面管理"}
         leftSection={<FileText size={18} />}
         active={pathname.startsWith("/admin/pages")}
@@ -89,22 +91,26 @@ function TopBar({
               <MenuIcon size={20} />
             </ActionIcon>
           )}
-          <Anchor href="/admin" underline="never" c="inherit" fw={700} size="lg">
+          <Anchor
+            href="/admin"
+            underline="never"
+            c="inherit"
+            fw={700}
+            size="lg"
+            className="flex-center"
+          >
+            <Box w={8} h={8} bdrs="xl" bg="var(--brand-gradient)" flex="0 0 auto" />
             博客后台
           </Anchor>
         </Group>
 
         <Menu trigger="click" position="bottom-end">
           <Menu.Target>
-            <Text
-              component="span"
-              size="sm"
-              style={{ cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}
-            >
+            <Group component="span" gap={6} className="cursor-pointer">
               <CircleUser size={18} />
               {userName}
               <ChevronDown size={14} />
-            </Text>
+            </Group>
           </Menu.Target>
           <Menu.Dropdown>
             <Menu.Item leftSection={<Home size={16} />} onClick={() => router.push("/")}>

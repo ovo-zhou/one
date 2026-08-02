@@ -102,15 +102,14 @@ export default function PageTable({ initialData }: { initialData: PageListData }
     },
     [fetchData, tokens, currentPage]
   );
-  console.log("data.items", data.items);
   return (
-    <div>
+    <Box>
       <Group justify="flex-end" mb="md">
         <Button leftSection={<Plus size={16} />} onClick={() => router.push("/admin/pages/new")}>新建页面</Button>
       </Group>
 
-      <Box style={{ overflowX: "auto" }}>
-        <Table striped highlightOnHover withTableBorder style={{ minWidth: 500 }}>
+      <Box className="scroll-x">
+        <Table striped highlightOnHover withTableBorder miw={500}>
           <Table.Thead>
             <Table.Tr>
               <Table.Th>标题</Table.Th>
@@ -226,6 +225,6 @@ export default function PageTable({ initialData }: { initialData: PageListData }
           <Button color="red" onClick={handleDelete}>确认删除</Button>
         </Group>
       </Modal>
-    </div>
+    </Box>
   );
 }

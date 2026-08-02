@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useTransition } from "react";
-import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Search } from "lucide-react";
 import {
   Table,
   TextInput,
@@ -121,7 +121,7 @@ export default function PostTable({ initialData }: { initialData: PostListData }
   );
 
   return (
-    <div>
+    <Box>
       <Group justify="space-between" mb="md">
         <Group>
           <TextInput
@@ -129,6 +129,7 @@ export default function PostTable({ initialData }: { initialData: PostListData }
             value={search}
             onChange={(e) => setSearch(e.currentTarget.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            leftSection={<Search size={16} />}
           />
           <Button variant="light" onClick={handleSearch} loading={isPending}>
             搜索
@@ -137,8 +138,8 @@ export default function PostTable({ initialData }: { initialData: PostListData }
         <Button leftSection={<Plus size={16} />} onClick={() => router.push("/admin/posts/new")}>新建文章</Button>
       </Group>
 
-      <Box style={{ overflowX: "auto" }}>
-      <Table striped highlightOnHover withTableBorder style={{ minWidth: 600 }}>
+      <Box className="scroll-x">
+      <Table striped highlightOnHover withTableBorder miw={600}>
         <Table.Thead>
           <Table.Tr>
             <Table.Th>标题</Table.Th>
@@ -270,6 +271,6 @@ export default function PostTable({ initialData }: { initialData: PostListData }
           </Button>
         </Group>
       </Modal>
-    </div>
+    </Box>
   );
 }
