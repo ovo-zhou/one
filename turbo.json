@@ -6,7 +6,7 @@
       "dependsOn": ["^build"],
       "env": ["client_id", "client_secret", "api_key", "blog_id", "jwt_secret", "session_cookie_name", "admin_email", "BLOB_READ_WRITE_TOKEN", "BLOB_STORE_ID", "BLOB_WEBHOOK_PUBLIC_KEY"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+      "outputs": [".next/**", "!.next/cache/**", "dist/**", "out/**"]
     },
     "dev": {
       "cache": false,

@@ -7,6 +7,7 @@
     "dev:blogger": "turbo dev --filter=@one/blogger",
     "dev:vite-react": "turbo dev --filter=@one/vite-react",
     "dev:node-service": "turbo dev --filter=@one/node-service",
+    "dev:electron-app": "turbo dev --filter=@one/electron-app",
     "build": "turbo build",
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
@@ -26,5 +27,8 @@
   "packageManager": "pnpm@11.5.0",
   "engines": {
     "node": ">=22"
+  },
+  "dependencies": {
+    "@base-ui/react": "^1.6.0"
   }
 }
