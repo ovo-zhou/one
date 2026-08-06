@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useEditorState, type Editor } from "@tiptap/react";
-import { ActionIcon, Group, Tooltip, Divider, Popover, TextInput, Button, Stack, Box } from "@mantine/core";
+import { ActionIcon, Group, Tooltip, Divider, Popover, TextInput, Button, Stack, Box, Menu, Modal, Text } from "@mantine/core";
 import {
   type LucideIcon,
   Undo2,
@@ -23,9 +23,11 @@ import {
   Link as LinkIcon,
   ImagePlus,
   Table2,
+  LayoutTemplate,
   Maximize,
   Minimize,
 } from "lucide-react";
+import { WRITING_TEMPLATES, type WritingTemplate } from "../lib/writingTemplates";
 
 interface EditorToolbarProps {
   editor: Editor;
@@ -65,6 +67,7 @@ function ToolButton({
 export default function EditorToolbar({ editor, onUploadImage, isFullscreen, onToggleFullscreen }: EditorToolbarProps) {
   const [linkOpened, setLinkOpened] = useState(false);
   const [linkUrl, setLinkUrl] = useState("");
+  const [pendingTemplate, setPendingTemplate] = useState<WritingTemplate | null>(null);
 
   const s = useEditorState({
     editor,
@@ -109,7 +112,22 @@ export default function EditorToolbar({ editor, onUploadImage, isFullscreen, onT
     setLinkOpened(false);
   };
 
+  const applyTemplate = (tpl: WritingTemplate) => {
+    if (editor.isEmpty) {
+      editor.chain().focus().setContent(tpl.markdown).run();
+      return;
+    }
+    setPendingTemplate(tpl);
+  };
+
+  const overwriteTemplate = () => {
+    if (!pendingTemplate) return;
+    editor.chain().focus().selectAll().insertContent(pendingTemplate.markdown).run();
+    setPendingTemplate(null);
+  };
+
   return (
+    <>
     <Group
       gap="xs"
       wrap="wrap"
@@ -180,6 +198,26 @@ export default function EditorToolbar({ editor, onUploadImage, isFullscreen, onT
 
       <Divider orientation="vertical" />
 
+      <Menu position="bottom-start" shadow="md" width={260}>
+        <Menu.Target>
+          <Box component="span">
+            <ToolButton icon={LayoutTemplate} label="写作模板" onClick={() => {}} />
+          </Box>
+        </Menu.Target>
+        <Menu.Dropdown>
+          {WRITING_TEMPLATES.map((tpl) => (
+            <Menu.Item key={tpl.id} onClick={() => applyTemplate(tpl)}>
+              <Stack gap={2}>
+                <Text size="sm" fw={500}>{tpl.label}</Text>
+                <Text size="xs" c="dimmed">{tpl.description}</Text>
+              </Stack>
+            </Menu.Item>
+          ))}
+        </Menu.Dropdown>
+      </Menu>
+
+      <Divider orientation="vertical" />
+
       {onToggleFullscreen && (
         <ToolButton
           icon={isFullscreen ? Minimize : Maximize}
@@ -188,5 +226,27 @@ export default function EditorToolbar({ editor, onUploadImage, isFullscreen, onT
         />
       )}
     </Group>
+    <Modal
+      opened={!!pendingTemplate}
+      onClose={() => setPendingTemplate(null)}
+      title="覆盖当前内容？"
+      size="sm"
+      centered
+    >
+      <Stack gap="md">
+        <Text size="sm">
+          当前编辑器已有内容，插入写作模板「{pendingTemplate?.label}」将覆盖现有内容，是否继续？
+        </Text>
+        <Group justify="flex-end" gap="xs">
+          <Button size="xs" variant="subtle" onClick={() => setPendingTemplate(null)}>
+            取消
+          </Button>
+          <Button size="xs" onClick={overwriteTemplate}>
+            覆盖
+          </Button>
+        </Group>
+      </Stack>
+    </Modal>
+    </>
   );
 }
