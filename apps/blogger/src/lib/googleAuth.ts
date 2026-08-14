@@ -3,7 +3,7 @@ import { google } from "googleapis";
 const clientId = process.env.client_id!;
 const clientSecret = process.env.client_secret!;
 const baseUrl = process.env.NODE_ENV === "production"
-  ? "https://cicihuang.vercel.app"
+  ? "https://www.ryandev.cn"
   : "http://localhost:1008";
 const redirectUri = `${baseUrl}/api/auth/callback`;
 
