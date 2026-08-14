@@ -11,13 +11,14 @@ import {
   Group,
   Input,
   Modal,
+  Progress,
   Stack,
   Text,
   Tooltip,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { ArrowLeft, Check, Copy, Download, FileText, Upload } from "lucide-react";
-import { formatRemaining } from "../../lib/locker";
+import { formatBytes, formatRemaining } from "../../lib/locker";
 
 interface LockerCell {
   code: string;
@@ -40,6 +41,7 @@ export default function LockerPage() {
   const [pickupOpen, setPickupOpen] = useState(false);
   const [pickupCode, setPickupCode] = useState("");
   const [downloading, setDownloading] = useState(false);
+  const [downloadProgress, setDownloadProgress] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
   const [now, setNow] = useState(Date.now());
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -111,6 +113,7 @@ export default function LockerPage() {
       return;
     }
     setDownloading(true);
+    setDownloadProgress(null);
     try {
       const res = await fetch(`/api/locker/download?code=${pickupCode}`);
       if (!res.ok) {
@@ -118,8 +121,29 @@ export default function LockerPage() {
         fetchStats();
         return;
       }
-      const blob = await res.blob();
       const fileName = extractFileName(res.headers.get("Content-Disposition") || "");
+      const totalSize = Number(res.headers.get("Content-Length")) || 0;
+      let blob: Blob;
+      const reader = res.body?.getReader();
+      if (reader) {
+        const contentType = res.headers.get("Content-Type") || "application/octet-stream";
+        const chunks: BlobPart[] = [];
+        let received = 0;
+        for (;;) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          if (value) {
+            chunks.push(value);
+            received += value.length;
+            setDownloadProgress(
+              totalSize > 0 ? Math.min(100, Math.round((received / totalSize) * 100)) : -received
+            );
+          }
+        }
+        blob = new Blob(chunks, { type: contentType });
+      } else {
+        blob = await res.blob();
+      }
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -137,6 +161,7 @@ export default function LockerPage() {
       notifications.show({ title: "取件失败", message: "网络异常，请稍后重试", color: "red" });
     } finally {
       setDownloading(false);
+      setDownloadProgress(null);
     }
   };
 
@@ -242,6 +267,16 @@ export default function LockerPage() {
                     className="locker-code-input"
                     autoFocus
                   />
+                  {downloadProgress !== null && (
+                    <Stack gap={4}>
+                      <Progress value={downloadProgress >= 0 ? downloadProgress : 100} animated />
+                      <Text size="xs" c="dimmed" ta="center">
+                        {downloadProgress >= 0
+                          ? `正在取件 ${downloadProgress}%`
+                          : `正在取件 ${formatBytes(-downloadProgress)}`}
+                      </Text>
+                    </Stack>
+                  )}
                   <Button
                     className="locker-btn"
                     leftSection={<Download size={16} />}

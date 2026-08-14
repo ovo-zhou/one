@@ -149,42 +149,31 @@ export async function uploadLockerFile(file: File): Promise<LockerFile> {
   };
 }
 
-export interface LockerContent {
-  bytes: Uint8Array;
+export interface LockerStream {
+  stream: ReadableStream<Uint8Array>;
   info: LockerFile;
   contentType: string;
   size: number;
 }
 
-export async function consumeLockerFile(code: string): Promise<LockerContent | null> {
+export async function openLockerFile(code: string): Promise<LockerStream | null> {
   const info = await getLockerFile(code);
   if (!info) return null;
   const result = await get(info.pathname, {
     access: "public",
     token: process.env.BLOB_READ_WRITE_TOKEN!,
   });
-  if (!result || !result.stream) return null;
-  const chunks: Uint8Array[] = [];
-  const reader = result.stream.getReader();
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    if (value) chunks.push(value);
-  }
-  const total = chunks.reduce((n, c) => n + c.length, 0);
-  const bytes = new Uint8Array(total);
-  let offset = 0;
-  for (const chunk of chunks) {
-    bytes.set(chunk, offset);
-    offset += chunk.length;
-  }
-  await del(info.pathname, { token: process.env.BLOB_READ_WRITE_TOKEN! }).catch(() => {});
+  if (!result || result.statusCode === 304 || !result.stream) return null;
   return {
-    bytes,
+    stream: result.stream,
     info,
     contentType: result.blob.contentType,
     size: result.blob.size,
   };
+}
+
+export async function removeLockerFile(info: LockerFile): Promise<void> {
+  await del(info.pathname, { token: process.env.BLOB_READ_WRITE_TOKEN! }).catch(() => {});
 }
 
 export async function deleteLockerFile(code: string): Promise<boolean> {
