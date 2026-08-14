@@ -956,6 +956,97 @@ a.back-link:hover {
   transform: translateY(-2px);
 }
 
+/* ===== 文件快递柜（项目品牌色）===== */
+.locker-accent {
+  color: var(--mantine-color-primary-6);
+}
+
+.locker-grid-card {
+  padding: 20px;
+}
+
+.locker-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+@media (min-width: var(--mantine-breakpoint-sm)) {
+  .locker-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+@media (min-width: var(--mantine-breakpoint-lg)) {
+  .locker-grid {
+    grid-template-columns: repeat(9, 1fr);
+  }
+}
+
+.locker-cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed color-mix(in srgb, var(--mantine-color-default-border) 90%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--mantine-color-body) 40%, transparent);
+  transition: border-color 150ms ease, transform 150ms ease, box-shadow 150ms ease;
+}
+
+.locker-cell-used {
+  border: 1px solid transparent;
+  background-image: var(--brand-gradient);
+  color: #fff;
+  box-shadow: 0 4px 14px var(--brand-glow);
+  cursor: default;
+}
+
+.locker-panel {
+  padding: 20px;
+}
+
+.locker-btn {
+  background-image: var(--brand-gradient) !important;
+  background-size: 200% auto !important;
+  border: none !important;
+  color: #fff !important;
+  box-shadow: 0 6px 20px var(--brand-glow) !important;
+  transition: background-position 300ms ease, transform 150ms ease, box-shadow 150ms ease !important;
+}
+
+.locker-btn:hover:not(:disabled) {
+  background-position: 100% center;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 28px var(--brand-glow) !important;
+}
+
+.locker-code-box {
+  padding: 16px;
+  border-radius: var(--mantine-radius-md);
+  border: 1px dashed color-mix(in srgb, var(--mantine-color-primary-5) 55%, transparent);
+  background: var(--brand-gradient-soft);
+}
+
+.locker-code {
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 40px;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  background-image: var(--brand-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.locker-code-input input {
+  text-align: center;
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+}
+
 /* ===== 动效降级 ===== */
 @media (prefers-reduced-motion: reduce) {
   .aurora-blob,

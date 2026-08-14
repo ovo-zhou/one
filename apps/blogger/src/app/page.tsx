@@ -38,23 +38,26 @@ export default async function Home() {
             <Text size="lg" c="dimmed" fw={400} ta="center" maw={560}>
               {blog.description}
             </Text>
-            {pages.items && pages.items.length > 0 && (
-              <Flex justify="center" mt="md" wrap="wrap" gap="sm">
-                {pages.items.map((page) => (
-                  <Anchor
-                    key={page.id}
-                    href={`/pages/${page.id}`}
-                    underline="never"
-                    c="inherit"
-                    className="page-pill"
-                  >
-                    <Text size="sm" fw={600}>
-                      {page.title}
-                    </Text>
-                  </Anchor>
-                ))}
-              </Flex>
-            )}
+            <Flex justify="center" mt="md" wrap="wrap" gap="sm">
+              {(pages.items ?? []).map((page) => (
+                <Anchor
+                  key={page.id}
+                  href={`/pages/${page.id}`}
+                  underline="never"
+                  c="inherit"
+                  className="page-pill"
+                >
+                  <Text size="sm" fw={600}>
+                    {page.title}
+                  </Text>
+                </Anchor>
+              ))}
+              <Anchor href="/locker" underline="never" c="inherit" className="page-pill">
+                <Text size="sm" fw={600}>
+                  文件快递柜
+                </Text>
+              </Anchor>
+            </Flex>
           </Stack>
         </Box>
       </Flex>
