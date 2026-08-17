@@ -60,13 +60,16 @@ export default function PinApp(): React.JSX.Element {
   }, [])
 
   return (
-    <div className="relative h-screen w-screen overflow-hidden bg-black">
+    <div
+      className="relative h-screen w-screen overflow-hidden bg-black"
+      style={DRAG_STYLE}
+      onDoubleClick={() => void window.api.screenshotPinAction(PIN_ID, 'close')}
+    >
       {src && (
         <img
           src={src}
           draggable={false}
           className="absolute inset-0 h-full w-full select-none"
-          style={DRAG_STYLE}
           alt=""
         />
       )}
@@ -75,6 +78,8 @@ export default function PinApp(): React.JSX.Element {
       <div
         className="absolute top-1.5 right-1.5 flex items-center gap-1 rounded-md border border-white/15 bg-black/80 px-1.5 py-1 opacity-0 shadow-lg transition-opacity hover:opacity-100 focus-within:opacity-100"
         style={NO_DRAG_STYLE}
+        onMouseDown={(e) => e.stopPropagation()}
+        onDoubleClick={(e) => e.stopPropagation()}
       >
         <input
           type="range"

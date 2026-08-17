@@ -2,6 +2,7 @@ import { app, dialog, Menu } from 'electron'
 import { manualCheckForUpdate } from './updater'
 import { getPrefs } from './prefs'
 import { startScreenshot } from './screenshot/manager'
+import { triggerTranslateShortcut } from './translate/manager'
 import {
   getSystemProxyState,
   installRootCa,
@@ -29,6 +30,14 @@ function buildTemplate(): MenuTemplate {
       accelerator: getPrefs().screenshot.shortcut,
       click: () => {
         void startScreenshot()
+      }
+    },
+    {
+      id: 'app-translate',
+      label: '划词翻译',
+      accelerator: getPrefs().translate.enabled ? getPrefs().translate.shortcut : undefined,
+      click: () => {
+        void triggerTranslateShortcut()
       }
     }
   ]

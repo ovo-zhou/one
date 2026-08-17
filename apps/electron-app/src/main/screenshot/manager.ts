@@ -8,9 +8,14 @@ import {
   removeCapturedBuffer,
   type CapturedDisplay
 } from './capture'
-import { createOverlayWindow } from './overlay'
+import {
+  destroyOverlayWindow,
+  ensureOverlayWindow,
+  setOverlayClosedHandler,
+  stageOverlayBounds
+} from './overlay'
 import { createPin } from './pin'
-import { saveNativeImage } from './save'
+import { saveDataUrl } from './save'
 import {
   ensureWindowDetect,
   startWindowDetect,
@@ -39,6 +44,10 @@ type Phase = 'idle' | 'starting' | 'live' | 'editing'
 const POLL_MS = 40
 /** Cursor must dwell on a new display this long before swapping the overlay. */
 const SWITCH_DWELL_MS = 80
+/** Upper bound for the renderer ready handshake before showing anyway. */
+const READY_TIMEOUT_MS = 2000
+/** Upper bound for waiting on the warm renderer's first page load. */
+const LOAD_TIMEOUT_MS = 1500
 
 let phase: Phase = 'idle'
 let overlay: BrowserWindow | null = null
@@ -52,6 +61,41 @@ let lastWindowsSig: string | null = null
 let lastCursorPoint: { x: number; y: number } | null = null
 let mainWindow: BrowserWindow | null = null
 const sessionIds = new Set<string>()
+
+/** Ready-handshake state: resolver for the pending present + its timeout. */
+let readyResolve: (() => void) | null = null
+let readyTimer: NodeJS.Timeout | null = null
+/** Generation counter to ignore stale presents (session torn down mid-flight). */
+let presentGen = 0
+
+/**
+ * Called via IPC when the overlay renderer has decoded the frame and painted
+ * its first frame. The overlay is only shown after this, which removes the
+ * black flash of the old create-then-load flow.
+ */
+export function notifyOverlayReady(): void {
+  if (readyTimer) {
+    clearTimeout(readyTimer)
+    readyTimer = null
+  }
+  readyResolve?.()
+  readyResolve = null
+}
+
+function resetReadyHandshake(): void {
+  if (readyTimer) {
+    clearTimeout(readyTimer)
+    readyTimer = null
+  }
+  readyResolve = null
+}
+
+// If the overlay window is closed externally (e.g. Cmd+W) mid-session, tear
+// the session down so the hidden main window is restored.
+setOverlayClosedHandler(() => {
+  overlay = null
+  if (phase !== 'idle') void teardown()
+})
 
 /** Starts a screenshot session. Returns false if one is already active. */
 export function startScreenshot(): boolean {
@@ -124,46 +168,94 @@ async function updateForCursor(initial: boolean): Promise<void> {
   maybeBroadcastWindows(display)
 }
 
-/** Captures the display and replaces the overlay window. */
+/**
+ * Repositions the persistent overlay onto the captured display, pushes the
+ * init payload, waits for the renderer's ready handshake (frame decoded +
+ * first paint), then shows. Hides the window first so cross-display switches
+ * never show a stale frame at the wrong geometry.
+ */
+async function presentOverlay(shot: CapturedDisplay): Promise<void> {
+  const gen = ++presentGen
+  let win = ensureOverlayWindow()
+  if (win.webContents.isCrashed()) {
+    destroyOverlayWindow()
+    win = ensureOverlayWindow()
+  }
+  // The warm renderer may still be loading during the first seconds after
+  // app launch; wait briefly so the init push is not lost.
+  if (win.webContents.isLoading()) {
+    await new Promise<void>((resolve) => {
+      const done = (): void => {
+        clearTimeout(timer)
+        win.webContents.removeListener('did-finish-load', done)
+        resolve()
+      }
+      const timer = setTimeout(done, LOAD_TIMEOUT_MS)
+      win.webContents.once('did-finish-load', done)
+    })
+    if (gen !== presentGen) return
+  }
+
+  const bounds = shot.bounds
+  if (win.isVisible()) win.hide()
+  stageOverlayBounds(bounds)
+
+  resetReadyHandshake()
+  const ready = new Promise<void>((resolve) => {
+    readyResolve = resolve
+    readyTimer = setTimeout(() => {
+      readyResolve = null
+      resolve()
+    }, READY_TIMEOUT_MS)
+  })
+  overlay = win
+  win.webContents.send(IPC.screenshotInit, {
+    displayId: shot.index,
+    imageId: shot.id,
+    width: bounds.width,
+    height: bounds.height,
+    scaleFactor: shot.scaleFactor
+  })
+  await ready
+  if (gen !== presentGen || win.isDestroyed()) return
+  win.setAlwaysOnTop(true, 'screen-saver')
+  win.show()
+  win.focus()
+}
+
+/** Captures the display and presents the overlay on it (window is reused). */
 async function switchToDisplay(display: Display): Promise<void> {
   if (capturing || phase !== 'live') return
   capturing = true
+  const startedAt = Date.now()
   try {
-    await destroyOverlay()
     const shot = await captureOneDisplay(display)
     if (phase !== 'live') {
       // Session was cancelled while capturing.
       removeCapturedBuffer(shot.id)
       return
     }
+    const prev = captured
     sessionIds.add(shot.id)
     captured = shot
     currentDisplayId = display.id
     lastHighlightSig = null
     lastWindowsSig = null
-    const win = createOverlayWindow(shot)
-    overlay = win
-    win.once('closed', () => {
-      if (overlay === win && (phase === 'live' || phase === 'editing')) void teardown()
-    })
+    lastCursorPoint = null
+    await presentOverlay(shot)
+    console.log(`[screenshot] overlay presented in ${Date.now() - startedAt}ms`)
+    if (phase !== 'live') return
+    if (prev && prev.id !== shot.id) {
+      sessionIds.delete(prev.id)
+      removeCapturedBuffer(prev.id)
+    }
+    // Broadcast immediately: the highlight must be visible the instant the
+    // frozen frame appears, without waiting for cursor movement.
     maybeBroadcastWindows(display)
+    maybeBroadcastHighlight(display, screen.getCursorScreenPoint())
   } finally {
     capturing = false
   }
-}
-
-async function destroyOverlay(): Promise<void> {
-  const win = overlay
-  const old = captured
-  overlay = null
-  captured = null
-  currentDisplayId = null
-  pendingSwitch = null
-  lastHighlightSig = null
-  lastWindowsSig = null
-  lastCursorPoint = null
-  if (win && !win.isDestroyed()) win.destroy()
-  if (old) removeCapturedBuffer(old.id)
 }
 
 function maybeBroadcastHighlight(display: Display, cursorPoint: { x: number; y: number }): void {
@@ -226,7 +318,17 @@ async function teardown(): Promise<void> {
   }
   stopWindowDetect()
   pendingSwitch = null
-  await destroyOverlay()
+  resetReadyHandshake()
+  presentGen++
+  // Hide (keep) the overlay for the next session; its renderer stays warm.
+  const win = overlay
+  overlay = null
+  captured = null
+  currentDisplayId = null
+  lastHighlightSig = null
+  lastWindowsSig = null
+  lastCursorPoint = null
+  if (win && !win.isDestroyed() && win.isVisible()) win.hide()
   for (const id of sessionIds) removeCapturedBuffer(id)
   sessionIds.clear()
   phase = 'idle'
@@ -246,25 +348,24 @@ export async function finishScreenshot(payload: ScreenshotFinishPayload): Promis
   // Close overlays first so dialogs / pins don't appear over a black screen.
   await teardown()
 
-  let image: Electron.NativeImage | null = null
-  try {
-    image = nativeImage.createFromDataURL(payload.dataUrl)
+  // copy/pin receive PNG data URLs, which NativeImage can decode.
+  const imageFromPayload = (): Electron.NativeImage => {
+    const image = nativeImage.createFromDataURL(payload.dataUrl)
     if (image.isEmpty()) throw new Error('empty image')
-  } catch {
-    dialog.showErrorBox('截图', '生成截图内容失败')
-    return
+    return image
   }
 
   try {
     switch (payload.mode) {
       case 'copy':
-        clipboard.writeImage(image)
+        clipboard.writeImage(imageFromPayload())
         break
       case 'save':
-        await saveNativeImage(image)
+        // Write the renderer-encoded bytes directly (supports WebP).
+        await saveDataUrl(payload.dataUrl)
         break
       case 'pin':
-        await createPin(image, payload.width, payload.height)
+        await createPin(imageFromPayload(), payload.width, payload.height)
         break
     }
   } catch (err) {

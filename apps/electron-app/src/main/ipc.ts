@@ -1,14 +1,19 @@
-import { app, ipcMain, webContents } from 'electron'
+import { app, dialog, ipcMain, webContents } from 'electron'
+import { writeFile } from 'fs/promises'
 import {
   IPC,
   type AppInfo,
   type ModuleStatusEventPayload,
-  type PrefsPatch
+  type PrefsPatch,
+  type TestImageSavePayload
 } from '../shared/contracts'
 import { getPrefs, setPrefs } from './prefs'
 import { getAllServices, getService } from './services/registry'
 import { registerScreenshotIpc } from './screenshot/ipc'
 import { applyScreenshotShortcut } from './screenshot/shortcut'
+import { registerTranslateIpc } from './translate/ipc'
+import { applyTranslateShortcut, unregisterTranslateShortcut } from './translate/shortcut'
+import { applyTranslatePrefs } from './translate/manager'
 import { rebuildAppMenu } from './menu'
 
 function broadcastStatus(moduleId: string, payload: ModuleStatusEventPayload['status']): void {
@@ -27,6 +32,7 @@ let activeModuleId: string | null = null
 /** Registers all main-process IPC handlers. Call once after app ready. */
 export function registerIpcHandlers(): void {
   registerScreenshotIpc()
+  registerTranslateIpc()
 
   ipcMain.handle(
     IPC.appInfo,
@@ -47,6 +53,33 @@ export function registerIpcHandlers(): void {
         throw new Error(`快捷键「${next.screenshot.shortcut}」注册失败，可能已被其他应用占用`)
       }
       rebuildAppMenu()
+    }
+    if (next.translate.shortcut !== before.translate.shortcut) {
+      if (!next.translate.enabled) {
+        // Feature disabled: shortcuts stay unregistered; just persist.
+      } else {
+        const ok = await applyTranslateShortcut(next.translate.shortcut)
+        if (!ok) {
+          setPrefs({ translate: { shortcut: before.translate.shortcut } })
+          throw new Error(`快捷键「${next.translate.shortcut}」注册失败，可能已被其他应用占用`)
+        }
+        rebuildAppMenu()
+      }
+    }
+    if (next.translate.enabled !== before.translate.enabled) {
+      if (next.translate.enabled) {
+        const ok = await applyTranslateShortcut(next.translate.shortcut)
+        if (!ok) {
+          setPrefs({ translate: { enabled: false } })
+          throw new Error(`快捷键「${next.translate.shortcut}」注册失败，可能已被其他应用占用`)
+        }
+      } else {
+        unregisterTranslateShortcut()
+      }
+      rebuildAppMenu()
+      await applyTranslatePrefs()
+    } else if (next.translate.autoPopup !== before.translate.autoPopup) {
+      await applyTranslatePrefs()
     }
     return next
   })
@@ -76,6 +109,22 @@ export function registerIpcHandlers(): void {
     const service = getService(moduleId)
     if (!service) throw new Error(`Unknown module service: ${moduleId}`)
     await service.stop()
+  })
+
+  ipcMain.handle(IPC.testImageSave, async (_event, payload: TestImageSavePayload) => {
+    const ext = payload.format === 'jpeg' ? 'jpg' : payload.format
+    const filterName =
+      payload.format === 'png' ? 'PNG 图片' : payload.format === 'jpeg' ? 'JPEG 图片' : 'WebP 图片'
+    const { canceled, filePath } = await dialog.showSaveDialog({
+      title: '保存测试图',
+      defaultPath: payload.fileName.endsWith(`.${ext}`)
+        ? payload.fileName
+        : `${payload.fileName}.${ext}`,
+      filters: [{ name: filterName, extensions: [ext] }]
+    })
+    if (canceled || !filePath) return null
+    await writeFile(filePath, new Uint8Array(payload.data))
+    return filePath
   })
 }
 

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   ArrowUpRight,
   Circle,
@@ -84,15 +84,29 @@ export function Toolbar(props: ToolbarProps): React.JSX.Element {
   const { sel, winW, winH } = props
   const [panel, setPanel] = useState<'color' | 'size' | null>(null)
 
-  const barW = 360
+  // The bar sizes to its content; measure it so the centering/clamping math
+  // uses the real width (it used to be a fixed 360px while the content is
+  // ~520px, leaving the trailing icons outside the bar background).
+  const barRef = useRef<HTMLDivElement>(null)
+  const [barW, setBarW] = useState(524)
+  useEffect(() => {
+    const el = barRef.current
+    if (!el) return
+    const update = (): void => setBarW(el.offsetWidth)
+    update()
+    const ro = new ResizeObserver(update)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
   const left = Math.min(Math.max(8, sel.x + sel.w / 2 - barW / 2), winW - barW - 8)
   const below = sel.y + sel.h + 12
   const top = below + BAR_HEIGHT + 8 < winH ? below : Math.max(8, sel.y - BAR_HEIGHT - 12)
 
   const bar = (
     <div
-      className="flex items-center gap-0.5 rounded-lg border border-white/10 bg-neutral-900/95 px-1.5 py-1 shadow-xl backdrop-blur"
-      style={{ width: barW }}
+      ref={barRef}
+      className="flex w-fit items-center gap-0.5 rounded-lg border border-white/10 bg-neutral-900/95 px-1.5 py-1 shadow-xl backdrop-blur"
       onMouseDown={(e) => e.stopPropagation()}
     >
       <div className="flex items-center gap-0.5 border-r border-white/10 pr-1">

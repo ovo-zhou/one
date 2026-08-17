@@ -21,6 +21,15 @@ export function createMainWindow(): BrowserWindow {
     show: false,
     title: APP_NAME,
     autoHideMenuBar: true,
+    // mac: hide the native title but keep traffic lights; the renderer draws
+    // its own draggable title bar (see shell/TitleBar.tsx). Traffic lights
+    // are 12px tall; y=12 centers them in the 36px custom bar.
+    ...(process.platform === 'darwin'
+      ? {
+          titleBarStyle: 'hiddenInset' as const,
+          trafficLightPosition: { x: 16, y: 12 }
+        }
+      : {}),
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),

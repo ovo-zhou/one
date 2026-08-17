@@ -1,16 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { ScreenshotRect } from '../../../shared/contracts'
+import type { ScreenshotInitPayload, ScreenshotRect } from '../../../shared/contracts'
 import type { Point, Rect, Shape, Tool } from './shapes'
 import { STROKE_WIDTHS, hitShape, normalizeRect, rectOf } from './shapes'
 import { drawShape, type ShapeEnv } from './render'
 import { Toolbar } from './components/Toolbar'
 import { Magnifier } from './components/Magnifier'
 
-const params = new URLSearchParams(window.location.search)
-const WIN_W = Number(params.get('w')) || 1
-const WIN_H = Number(params.get('h')) || 1
-const SF = Number(params.get('sf')) || 1
-const IMAGE_ID = params.get('id') ?? ''
+// Geometry is pushed per-session via the screenshotInit IPC (the window stays
+// warm and is reused across displays). snapRect and other module-scope code
+// read the current values at call time, which is always within a session.
+let WIN_W = 1
+let WIN_H = 1
+let SF = 1
 
 const ACCENT = '#3d8bff'
 const HANDLE = 8
@@ -215,11 +216,53 @@ export default function ScreenshotApp(): React.JSX.Element {
 
   const strokeWidth = STROKE_WIDTHS[Math.min(size, STROKE_WIDTHS.length - 1)]
 
+  // ---- session init from main (full state reset, reused window) ----
+  const [session, setSession] = useState<ScreenshotInitPayload | null>(null)
+
+  useEffect(() => {
+    return window.api.onScreenshotInit((payload) => {
+      WIN_W = Math.max(1, payload.width)
+      WIN_H = Math.max(1, payload.height)
+      SF = Math.max(1, payload.scaleFactor)
+      dragRef.current = null
+      finishedRef.current = false
+      baseRef.current = null
+      highlightRef.current = null
+      windowsRef.current = []
+      pastRef.current = []
+      redoRef.current = []
+      setReady(false)
+      setLoadError(null)
+      setSel(null)
+      setMode('idle')
+      setTool('select')
+      setDraft(null)
+      setTextDraft(null)
+      setCursor(null)
+      setShowDim(false)
+      setCanUndo(false)
+      setCanRedo(false)
+      setWindowHighlight(null)
+      setSession({ ...payload })
+    })
+  }, [])
+
   // ---- load the captured image (bytes via IPC, drawn from a blob URL) ----
   useEffect(() => {
+    if (!session) return
     let cancelled = false
+    const notifyReady = (): void => {
+      // Double rAF: the handshake must fire only after the first frame that
+      // includes the frozen image has been painted, so main never shows a
+      // black flash.
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (!cancelled) void window.api.notifyScreenshotReady()
+        })
+      })
+    }
     void window.api
-      .getScreenshotImage(IMAGE_ID)
+      .getScreenshotImage(session.imageId)
       .then((bytes) => {
         if (cancelled) return
         const blob = new Blob([bytes], { type: 'image/jpeg' })
@@ -235,12 +278,14 @@ export default function ScreenshotApp(): React.JSX.Element {
           baseRef.current = { canvas, ctx, scale: canvas.width / WIN_W }
           URL.revokeObjectURL(url)
           setReady(true)
+          notifyReady()
         }
         img.onerror = () => {
           if (cancelled) return
           URL.revokeObjectURL(url)
           setLoadError(`无法解码捕获的图像`)
-          console.error('[screenshot] image decode failed for', IMAGE_ID)
+          console.error('[screenshot] image decode failed for', session.imageId)
+          notifyReady()
         }
         img.src = url
       })
@@ -248,11 +293,12 @@ export default function ScreenshotApp(): React.JSX.Element {
         if (cancelled) return
         setLoadError(`获取截图图像失败：${err instanceof Error ? err.message : String(err)}`)
         console.error('[screenshot] getScreenshotImage failed:', err)
+        notifyReady()
       })
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [session])
 
   // ---- window highlight / edges from main (cursor-following) ----
   useEffect(() => {
@@ -321,16 +367,26 @@ export default function ScreenshotApp(): React.JSX.Element {
     ctx.drawImage(base.canvas, 0, 0, WIN_W, WIN_H)
 
     if (!sel) {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.45)'
-      ctx.fillRect(0, 0, WIN_W, WIN_H)
       if (windowHighlight) {
+        // Snipaste-style: dim everything except the window under the cursor,
+        // which stays at full brightness.
         const hl = windowHighlight
+        ctx.save()
+        ctx.beginPath()
+        ctx.rect(0, 0, WIN_W, WIN_H)
+        ctx.rect(hl.x, hl.y, hl.w, hl.h)
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.45)'
+        ctx.fill('evenodd')
+        ctx.restore()
         ctx.strokeStyle = ACCENT
         ctx.lineWidth = 2
         ctx.strokeRect(hl.x + 1, hl.y + 1, hl.w - 2, hl.h - 2)
         ctx.strokeStyle = '#ffffff'
         ctx.lineWidth = 1
         ctx.strokeRect(hl.x + 3.5, hl.y + 3.5, hl.w - 7, hl.h - 7)
+      } else {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.45)'
+        ctx.fillRect(0, 0, WIN_W, WIN_H)
       }
       return
     }
@@ -381,44 +437,66 @@ export default function ScreenshotApp(): React.JSX.Element {
   }, [ready, sel, mode, shapes, draft, windowHighlight])
 
   // ---- finish ----
-  const composeSelection = useCallback((): string | null => {
-    const base = baseRef.current
-    if (!base || !sel) return null
-    const out = document.createElement('canvas')
-    out.width = Math.max(1, Math.round(sel.w * SF))
-    out.height = Math.max(1, Math.round(sel.h * SF))
-    const ctx = out.getContext('2d')!
-    ctx.drawImage(
-      base.canvas,
-      sel.x * base.scale,
-      sel.y * base.scale,
-      sel.w * base.scale,
-      sel.h * base.scale,
-      0,
-      0,
-      out.width,
-      out.height
-    )
-    ctx.setTransform(out.width / sel.w, 0, 0, out.height / sel.h, 0, 0)
-    const shapeEnv: ShapeEnv = {
-      base: base.canvas,
-      imgScale: base.scale,
-      selX: sel.x,
-      selY: sel.y,
-      selW: sel.w,
-      selH: sel.h
-    }
-    for (const s of shapes) drawShape(ctx, s, shapeEnv)
-    return out.toDataURL('image/png')
-  }, [sel, shapes])
+  const composeSelection = useCallback(
+    (mime = 'image/png'): string | null => {
+      const base = baseRef.current
+      if (!base || !sel) return null
+      const out = document.createElement('canvas')
+      out.width = Math.max(1, Math.round(sel.w * SF))
+      out.height = Math.max(1, Math.round(sel.h * SF))
+      const ctx = out.getContext('2d')!
+      ctx.drawImage(
+        base.canvas,
+        sel.x * base.scale,
+        sel.y * base.scale,
+        sel.w * base.scale,
+        sel.h * base.scale,
+        0,
+        0,
+        out.width,
+        out.height
+      )
+      ctx.setTransform(out.width / sel.w, 0, 0, out.height / sel.h, 0, 0)
+      const shapeEnv: ShapeEnv = {
+        base: base.canvas,
+        imgScale: base.scale,
+        selX: sel.x,
+        selY: sel.y,
+        selW: sel.w,
+        selH: sel.h
+      }
+      for (const s of shapes) drawShape(ctx, s, shapeEnv)
+      return out.toDataURL(mime, 0.92)
+    },
+    [sel, shapes]
+  )
 
   const doFinish = useCallback(
     (mode: 'copy' | 'save' | 'pin'): void => {
       if (finishedRef.current || !sel) return
-      const dataUrl = composeSelection()
-      if (!dataUrl) return
-      finishedRef.current = true
-      void window.api.finishScreenshot({ mode, dataUrl, width: sel.w, height: sel.h })
+      const send = (dataUrl: string | null): void => {
+        if (!dataUrl || finishedRef.current) return
+        finishedRef.current = true
+        void window.api.finishScreenshot({ mode, dataUrl, width: sel.w, height: sel.h })
+      }
+      if (mode === 'save') {
+        // Encode per the format pref here; the main process writes the bytes
+        // as-is (WebP is not encodable via NativeImage).
+        void window.api
+          .getPrefs()
+          .then((p) => {
+            const mime =
+              p.screenshot.format === 'webp'
+                ? 'image/webp'
+                : p.screenshot.format === 'jpeg'
+                  ? 'image/jpeg'
+                  : 'image/png'
+            send(composeSelection(mime))
+          })
+          .catch(() => send(composeSelection()))
+      } else {
+        send(composeSelection())
+      }
     },
     [composeSelection, sel]
   )
@@ -473,15 +551,6 @@ export default function ScreenshotApp(): React.JSX.Element {
 
       if (textDraft) {
         commitTextDraft()
-        if (tool === 'text') {
-          const s = sel
-          if (!s) return
-          const lp = { x: pt.x - s.x, y: pt.y - s.y }
-          if (lp.x >= 0 && lp.y >= 0 && lp.x <= s.w && lp.y <= s.h) {
-            setTextDraft({ x: lp.x, y: lp.y, value: '' })
-          }
-        }
-        return
       }
 
       if (tool === 'text') {
@@ -495,7 +564,9 @@ export default function ScreenshotApp(): React.JSX.Element {
           startNewSelection(pt)
           return
         }
-        setTextDraft({ x: lp.x, y: lp.y, value: '' })
+        // The draft is opened on pointerup (see onPointerUp): opening it here
+        // would mount the textarea mid-click, and the captured mousedown on
+        // the canvas instantly blurs it, discarding the draft before typing.
         return
       }
 
@@ -646,7 +717,17 @@ export default function ScreenshotApp(): React.JSX.Element {
       const drag = dragRef.current
       dragRef.current = null
       setShowDim(false)
-      if (!drag) return
+      if (!drag) {
+        // Open the text draft only after the click has fully settled, so the
+        // textarea mounts with focus (no pointer-capture / blur race).
+        if (tool === 'text' && sel) {
+          const lp = { x: e.clientX - sel.x, y: e.clientY - sel.y }
+          if (lp.x >= 0 && lp.y >= 0 && lp.x <= sel.w && lp.y <= sel.h) {
+            setTextDraft({ x: lp.x, y: lp.y, value: '' })
+          }
+        }
+        return
+      }
       setMode('idle')
 
       if (drag.kind === 'new') {
@@ -675,7 +756,7 @@ export default function ScreenshotApp(): React.JSX.Element {
       }
       setSel((prev) => (prev ? snapSel(prev) : prev))
     },
-    [snapSel, shapes, commitShapes, sel]
+    [snapSel, shapes, commitShapes, sel, tool]
   )
 
   // ---- keyboard ----
@@ -830,6 +911,22 @@ export default function ScreenshotApp(): React.JSX.Element {
       {ready && !sel && !loadError && (
         <div className="pointer-events-none absolute top-3 left-1/2 z-20 -translate-x-1/2 rounded-full bg-black/60 px-3 py-1 text-xs whitespace-nowrap text-white/90">
           拖拽框选区域 · 点击高亮窗口快速选择 · 选区边缘自动吸附窗口 · Esc 取消
+        </div>
+      )}
+
+      {/* highlighted-window dimension badge */}
+      {ready && !sel && !loadError && windowHighlight && (
+        <div
+          className="pointer-events-none absolute z-20 rounded bg-black/70 px-1.5 py-0.5 text-xs font-medium text-white"
+          style={{
+            left: Math.max(4, Math.min(WIN_W - 90, windowHighlight.x + windowHighlight.w / 2 - 40)),
+            top:
+              windowHighlight.y + windowHighlight.h + 6 + 22 > WIN_H
+                ? windowHighlight.y - 22
+                : windowHighlight.y + windowHighlight.h + 6
+          }}
+        >
+          {Math.round(windowHighlight.w * SF)} × {Math.round(windowHighlight.h * SF)}
         </div>
       )}
 

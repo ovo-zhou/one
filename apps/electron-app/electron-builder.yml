@@ -24,6 +24,10 @@ extraResources:
     to: windowlist
     filter:
       - '!*.swift'
+  - from: resources/selectionwatch
+    to: selectionwatch
+    filter:
+      - '!*.swift'
 win:
   executableName: all-in-one
 nsis:

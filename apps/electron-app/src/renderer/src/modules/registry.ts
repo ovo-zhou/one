@@ -1,5 +1,5 @@
 import { lazy, type LazyExoticComponent, type ComponentType } from 'react'
-import { Bot, Camera, Music, Settings, Waypoints, type LucideIcon } from 'lucide-react'
+import { Bot, Braces, ImagePlus, Settings, Waypoints, type LucideIcon } from 'lucide-react'
 import type { ModuleServiceStatus } from '../../../shared/contracts'
 
 export type ModuleStatusDot = Pick<ModuleServiceStatus, 'phase'>
@@ -29,16 +29,6 @@ export type AppModule = ReactModule | WebModule
 
 export const MODULES: AppModule[] = [
   {
-    id: 'screenshot',
-    name: '截图',
-    description: '截图 · 标注 · 贴图',
-    icon: Camera,
-    order: 5,
-    enabled: true,
-    kind: 'react',
-    Component: lazy(() => import('./screenshot/ScreenshotPanel'))
-  },
-  {
     id: 'dsh',
     name: 'DeepSeek Harness',
     description: 'AI 编码助手',
@@ -48,14 +38,24 @@ export const MODULES: AppModule[] = [
     kind: 'web'
   },
   {
-    id: 'music',
-    name: '音乐',
-    description: '本地音乐播放',
-    icon: Music,
-    order: 20,
-    enabled: false,
+    id: 'json',
+    name: 'JSON 工具',
+    description: 'JSON 解析 · 格式化 · 折叠',
+    icon: Braces,
+    order: 12,
+    enabled: true,
     kind: 'react',
-    Component: lazy(() => import('./music/MusicPanel'))
+    Component: lazy(() => import('./json/JsonPanel'))
+  },
+  {
+    id: 'testimage',
+    name: '测试图生成',
+    description: '占位图 · 尺寸 · 导出',
+    icon: ImagePlus,
+    order: 14,
+    enabled: true,
+    kind: 'react',
+    Component: lazy(() => import('./testimage/TestImagePanel'))
   },
   {
     id: 'whistle',

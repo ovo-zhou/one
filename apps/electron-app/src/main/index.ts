@@ -8,6 +8,14 @@ import { APP_ID, APP_NAME, createMainWindow } from './window'
 import { applyScreenshotShortcut, unregisterScreenshotShortcut } from './screenshot/shortcut'
 import { stopWindowDetect } from './screenshot/window-detect'
 import { cleanupPinImages, closeAllPins } from './screenshot/pin'
+import { destroyOverlayWindow, ensureOverlayWindow, isOverlayWindow } from './screenshot/overlay'
+import { applyTranslateShortcut, unregisterTranslateShortcut } from './translate/shortcut'
+import { setupTranslate, teardownTranslate } from './translate/manager'
+import {
+  destroyTooltipWindow,
+  ensureTooltipWindow,
+  isTranslateTooltipWindow
+} from './translate/tooltip'
 import { getPrefs } from './prefs'
 
 // Ensure a single app instance; focus the existing window on relaunch.
@@ -15,7 +23,11 @@ if (!app.requestSingleInstanceLock()) {
   app.quit()
 } else {
   app.on('second-instance', () => {
-    const win = BrowserWindow.getAllWindows()[0]
+    // Never focus the (persistent, hidden) screenshot overlay or translate
+    // tooltip windows.
+    const win = BrowserWindow.getAllWindows().find(
+      (w) => !isOverlayWindow(w) && !isTranslateTooltipWindow(w)
+    )
     if (win) {
       if (win.isMinimized()) win.restore()
       win.focus()
@@ -34,19 +46,44 @@ if (!app.requestSingleInstanceLock()) {
     })
 
     void applyScreenshotShortcut(getPrefs().screenshot.shortcut)
+    if (getPrefs().translate.enabled) {
+      void applyTranslateShortcut(getPrefs().translate.shortcut)
+    }
+    void setupTranslate()
     registerIpcHandlers()
     setupMenu()
     setupAutoCheck()
     createMainWindow()
 
+    // Pre-warm the screenshot overlay renderer shortly after launch so the
+    // first screenshot skips the ~300-600ms window cold start. Same for the
+    // translate tooltip window.
+    setTimeout(() => {
+      if (!quitting) ensureOverlayWindow()
+    }, 1000)
+    setTimeout(() => {
+      if (!quitting) ensureTooltipWindow()
+    }, 1500)
+
     app.on('activate', () => {
-      if (BrowserWindow.getAllWindows().length === 0) createMainWindow()
+      if (
+        BrowserWindow.getAllWindows().filter(
+          (w) => !isOverlayWindow(w) && !isTranslateTooltipWindow(w)
+        ).length === 0
+      ) {
+        createMainWindow()
+      }
     })
   })
 }
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
+  // The screenshot overlay is persistent and hidden; it must not keep the
+  // app alive after the real windows are gone.
+  const realWindows = BrowserWindow.getAllWindows().filter(
+    (w) => !isOverlayWindow(w) && !isTranslateTooltipWindow(w)
+  )
+  if (process.platform !== 'darwin' && realWindows.length === 0) {
     app.quit()
   }
 })
@@ -61,9 +98,13 @@ app.on('before-quit', (event) => {
   void disableProxyIfOwned().finally(async () => {
     stopAllServices()
     unregisterScreenshotShortcut()
+    unregisterTranslateShortcut()
+    teardownTranslate()
     stopWindowDetect()
     closeAllPins()
     await cleanupPinImages()
+    destroyOverlayWindow()
+    destroyTooltipWindow()
     app.exit()
   })
 })

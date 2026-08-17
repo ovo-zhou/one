@@ -1,6 +1,7 @@
 import { Settings } from 'lucide-react'
 import { Button } from '../components/ui/button'
 import { StatusBadge } from '../shell/StatusBadge'
+import { IS_MAC } from '../shell/TitleBar'
 import type { ModuleStatusDot } from '../modules/registry'
 
 interface ModuleCardProps {
@@ -52,15 +53,19 @@ interface HomePageProps {
 export function HomePage({ modules, phases, onOpen }: HomePageProps): React.JSX.Element {
   return (
     <div className="flex h-full flex-1 flex-col overflow-auto">
-      <Button
-        variant="ghost"
-        size="icon"
-        aria-label="设置"
-        className="absolute top-3 right-3"
-        onClick={() => onOpen('settings')}
-      >
-        <Settings />
-      </Button>
+      {/* Mac shows settings in the custom title bar (App.tsx); elsewhere use
+          the in-page button since TitleBar returns null. */}
+      {!IS_MAC && (
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="设置"
+          className="absolute top-3 right-3"
+          onClick={() => onOpen('settings')}
+        >
+          <Settings />
+        </Button>
+      )}
       <div className="flex flex-1 flex-col items-center justify-center gap-10 p-10">
         <h1 className="text-2xl font-semibold tracking-tight">All in One</h1>
         <div className="grid w-full max-w-xl grid-cols-[repeat(auto-fit,minmax(10rem,1fr))] gap-4">

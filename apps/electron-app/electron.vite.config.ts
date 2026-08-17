@@ -17,7 +17,8 @@ export default defineConfig({
         input: {
           index: resolve('src/renderer/index.html'),
           screenshot: resolve('src/renderer/screenshot.html'),
-          pin: resolve('src/renderer/pin.html')
+          pin: resolve('src/renderer/pin.html'),
+          translate: resolve('src/renderer/translate.html')
         }
       }
     },

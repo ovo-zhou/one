@@ -98,7 +98,9 @@ export async function captureOneDisplay(display: Display): Promise<CapturedDispl
   const buf = Buffer.from(source.thumbnail.toJPEG(90))
   const id = makeId()
   bufferStore.set(id, buf)
-  console.log(`[screenshot] captured display ${display.id}: ${width}x${height}, jpeg ${buf.length} bytes`)
+  console.log(
+    `[screenshot] captured display ${display.id}: ${width}x${height}, jpeg ${buf.length} bytes`
+  )
   return {
     index: display.id,
     bounds: display.bounds,

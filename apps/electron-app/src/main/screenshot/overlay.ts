@@ -1,23 +1,49 @@
 import { join } from 'path'
-import { BrowserWindow, screen } from 'electron'
+import { BrowserWindow } from 'electron'
 import { is } from '@electron-toolkit/utils'
-import type { CapturedDisplay } from './capture'
 
 /**
- * One fullscreen, frameless, always-on-top window for the display currently
- * under the cursor. The window only deals with its own display and
- * scaleFactor, which sidesteps mixed-DPI coordinate mapping entirely.
+ * One persistent, frameless, always-on-top overlay window kept hidden with a
+ * warm renderer, so triggering a screenshot only needs capture + show. The
+ * window only deals with one display at a time and its scaleFactor, which
+ * sidesteps mixed-DPI coordinate mapping entirely. Session payloads (frame,
+ * geometry) arrive via the screenshotInit push channel.
  */
-export function createOverlayWindow(captured: CapturedDisplay): BrowserWindow {
-  const bounds = captured.bounds
-  const expected = {
-    x: bounds.x,
-    y: bounds.y,
-    width: bounds.width,
-    height: bounds.height
+
+let overlayWindow: BrowserWindow | null = null
+/** Bounds the post-show guard should assert (set per present, see manager). */
+let expectedBounds: Electron.Rectangle | null = null
+let closedHandler: (() => void) | null = null
+
+/** Sets the handler invoked when the overlay window is destroyed externally. */
+export function setOverlayClosedHandler(handler: () => void): void {
+  closedHandler = handler
+}
+
+/** True if the given window is the screenshot overlay. */
+export function isOverlayWindow(win: BrowserWindow): boolean {
+  return win === overlayWindow
+}
+
+function loadOverlayPage(win: BrowserWindow): void {
+  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+    void win.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/screenshot.html`)
+  } else {
+    void win.loadFile(join(__dirname, '../renderer/screenshot.html'))
   }
+}
+
+/**
+ * Creates the overlay window once. At app start this pre-warms the renderer
+ * (~300-600ms cold start saved on the first screenshot).
+ */
+export function ensureOverlayWindow(): BrowserWindow {
+  if (overlayWindow && !overlayWindow.isDestroyed()) return overlayWindow
   const win = new BrowserWindow({
-    ...expected,
+    x: 0,
+    y: 0,
+    width: 1,
+    height: 1,
     frame: false,
     hasShadow: false,
     minimizable: false,
@@ -26,6 +52,9 @@ export function createOverlayWindow(captured: CapturedDisplay): BrowserWindow {
     skipTaskbar: true,
     show: false,
     backgroundColor: '#000000',
+    // Without this macOS clamps the frame into the visible work area on show
+    // (below the menu bar / beside the Dock), misaligning the frozen frame.
+    enableLargerThanScreen: process.platform === 'darwin',
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: true,
@@ -37,36 +66,16 @@ export function createOverlayWindow(captured: CapturedDisplay): BrowserWindow {
   win.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
   win.setFullScreen(false)
 
-  const query: Record<string, string> = {
-    display: String(captured.index),
-    sf: String(captured.scaleFactor),
-    w: String(bounds.width),
-    h: String(bounds.height),
-    id: captured.id
-  }
-
-  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    const url = new URL(`${process.env['ELECTRON_RENDERER_URL']}/screenshot.html`)
-    url.search = new URLSearchParams(query).toString()
-    void win.loadURL(url.toString())
-  } else {
-    void win.loadFile(join(__dirname, '../renderer/screenshot.html'), { query })
-  }
-
-  win.once('ready-to-show', () => {
-    win.show()
-    win.focus()
-  })
-
-  // macOS ignores bounds changes queued before the window's first show and
-  // can clamp the window into the visible frame (below the menu bar / next
-  // to the Dock). Re-assert the full bounds once the window is on screen and
-  // keep re-applying until it sticks.
-  win.once('show', () => {
+  // macOS ignores bounds changes queued before the window's first show.
+  // enableLargerThanScreen removes the work-area clamp; re-assert the expected
+  // bounds once the window is on screen as a fallback and verify it sticks.
+  win.on('show', () => {
     setTimeout(() => {
       if (win.isDestroyed()) return
       win.setAlwaysOnTop(true, 'screen-saver')
       win.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+      const expected = expectedBounds
+      if (!expected) return
       win.setBounds(expected)
       let tries = 0
       const timer = setInterval(() => {
@@ -76,14 +85,17 @@ export function createOverlayWindow(captured: CapturedDisplay): BrowserWindow {
           return
         }
         const actual = win.getBounds()
-        if ((actual.x === expected.x && actual.y === expected.y) || tries >= 6) {
+        const aligned =
+          actual.x === expected.x &&
+          actual.y === expected.y &&
+          actual.width === expected.width &&
+          actual.height === expected.height
+        if (aligned || tries >= 6) {
           clearInterval(timer)
-          if (actual.x !== expected.x || actual.y !== expected.y) {
-            const nearest = screen.getDisplayNearestPoint({ x: actual.x, y: actual.y })
+          if (!aligned) {
             console.warn(
               `[screenshot] overlay bounds still off after ${tries} tries: got ` +
-                `${JSON.stringify(actual)}, expected ${JSON.stringify(expected)}, ` +
-                `nearest display ${nearest.id} workArea=${JSON.stringify(nearest.workArea)}`
+                `${JSON.stringify(actual)}, expected ${JSON.stringify(expected)}`
             )
           }
           return
@@ -93,5 +105,40 @@ export function createOverlayWindow(captured: CapturedDisplay): BrowserWindow {
     }, 50)
   })
 
+  win.on('closed', () => {
+    overlayWindow = null
+    expectedBounds = null
+    closedHandler?.()
+  })
+
+  loadOverlayPage(win)
+  overlayWindow = win
   return win
+}
+
+/** Returns the live overlay window, or null when not created / destroyed. */
+export function getOverlayWindow(): BrowserWindow | null {
+  return overlayWindow && !overlayWindow.isDestroyed() ? overlayWindow : null
+}
+
+/** Destroys the overlay window (app quit / crashed renderer). */
+export function destroyOverlayWindow(): void {
+  const win = overlayWindow
+  overlayWindow = null
+  expectedBounds = null
+  if (win && !win.isDestroyed()) {
+    // Explicit destroy must not run the external-close recovery handler.
+    win.removeAllListeners('closed')
+    win.destroy()
+  }
+}
+
+/**
+ * Records the bounds the overlay should cover for the upcoming present and
+ * applies them while hidden. The post-show guard re-asserts them.
+ */
+export function stageOverlayBounds(bounds: Electron.Rectangle): void {
+  expectedBounds = { ...bounds }
+  const win = getOverlayWindow()
+  if (win) win.setBounds(expectedBounds)
 }

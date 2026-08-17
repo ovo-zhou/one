@@ -16,6 +16,14 @@ interface PinEntry {
 let nextId = 1
 const pins = new Map<number, PinEntry>()
 
+/** In-memory PNG buffers keyed by absolute file path, served to pin windows. */
+const pinBuffers = new Map<string, Buffer>()
+
+/** Returns the in-memory PNG bytes for a pin image path (see readScreenshotImage). */
+export function getPinBuffer(file: string): Buffer | null {
+  return pinBuffers.get(file) ?? null
+}
+
 /** Creates an always-on-top pin window showing the given image. */
 export async function createPin(
   image: Electron.NativeImage,
@@ -24,8 +32,11 @@ export async function createPin(
 ): Promise<number> {
   const id = nextId++
   const file = `pin-${id}-${randomUUID().slice(0, 8)}.png`
+  const path = join(pinsDir(), file)
+  const png = image.toPNG()
+  pinBuffers.set(path, png)
   await mkdir(pinsDir(), { recursive: true })
-  await writeFile(join(pinsDir(), file), image.toPNG())
+  await writeFile(path, png)
 
   const w = Math.max(40, Math.round(width))
   const h = Math.max(40, Math.round(height))
@@ -39,6 +50,7 @@ export async function createPin(
     frame: false,
     hasShadow: true,
     resizable: true,
+    maximizable: false,
     skipTaskbar: true,
     show: false,
     backgroundColor: '#000000',
@@ -53,7 +65,7 @@ export async function createPin(
 
   const query: Record<string, string> = {
     id: String(id),
-    file: join(pinsDir(), file),
+    file: path,
     w: String(w),
     h: String(h)
   }
@@ -69,7 +81,8 @@ export async function createPin(
   })
   win.on('closed', () => {
     pins.delete(id)
-    void rm(join(pinsDir(), file), { force: true })
+    pinBuffers.delete(path)
+    void rm(path, { force: true })
   })
 
   pins.set(id, { win, image, file })
