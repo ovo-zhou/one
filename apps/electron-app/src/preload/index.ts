@@ -1,22 +1,40 @@
-import { contextBridge } from 'electron'
-import { electronAPI } from '@electron-toolkit/preload'
+import { contextBridge, ipcRenderer } from 'electron'
+import { IPC, type ModuleServiceStatus } from '../shared/contracts'
 
-// Custom APIs for renderer
-const api = {}
+type StatusListener = (status: ModuleServiceStatus) => void
 
-// Use `contextBridge` APIs to expose Electron APIs to
-// renderer only if context isolation is enabled, otherwise
-// just add to the DOM global.
-if (process.contextIsolated) {
-  try {
-    contextBridge.exposeInMainWorld('electron', electronAPI)
-    contextBridge.exposeInMainWorld('api', api)
-  } catch (error) {
-    console.error(error)
+let nextToken = 1
+const listeners = new Map<number, { moduleId: string; listener: StatusListener }>()
+
+ipcRenderer.on(
+  IPC.moduleStatusChange,
+  (_event, payload: { moduleId: string; status: ModuleServiceStatus }) => {
+    for (const entry of listeners.values()) {
+      if (entry.moduleId === payload.moduleId) entry.listener(payload.status)
+    }
   }
-} else {
-  // @ts-ignore (define in dts)
-  window.electron = electronAPI
-  // @ts-ignore (define in dts)
-  window.api = api
+)
+
+const api = {
+  getAppInfo: () => ipcRenderer.invoke(IPC.appInfo),
+  getPrefs: () => ipcRenderer.invoke(IPC.prefsGet),
+  setPrefs: (patch: Record<string, unknown>) => ipcRenderer.invoke(IPC.prefsSet, patch),
+  getActiveModule: () => ipcRenderer.invoke(IPC.appGetActiveModule),
+  setActiveModule: (moduleId: string | null) =>
+    ipcRenderer.invoke(IPC.appSetActiveModule, moduleId),
+  activateModule: (moduleId: string) => ipcRenderer.invoke(IPC.moduleActivate, moduleId),
+  stopModule: (moduleId: string) => ipcRenderer.invoke(IPC.moduleStop, moduleId),
+  getModuleStatus: (moduleId: string) => ipcRenderer.invoke(IPC.moduleGetStatus, moduleId),
+  subscribeModuleStatus: async (moduleId: string, listener: StatusListener) => {
+    const token = nextToken++
+    listeners.set(token, { moduleId, listener })
+    return token
+  },
+  unsubscribeModuleStatus: async (token: number) => {
+    listeners.delete(token)
+  }
 }
+
+contextBridge.exposeInMainWorld('api', api)
+
+export type Api = typeof api
