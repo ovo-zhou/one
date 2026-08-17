@@ -46,5 +46,6 @@ linux:
 npmRebuild: false
 publish:
   provider: github
-  repo: ovo-zhou/one
+  owner: ovo-zhou
+  repo: one
   releaseType: release
