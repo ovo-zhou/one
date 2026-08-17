@@ -23,6 +23,16 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Fail fast when the tag does not match the app version, otherwise
+      # electron-builder publishes artifacts to the wrong release.
+      - name: Verify tag matches app version
+        run: |
+          APP_VERSION="$(node -p "require('./apps/electron-app/package.json').version")"
+          if [ "v${APP_VERSION}" != "${GITHUB_REF_NAME}" ]; then
+            echo "::error::tag ${GITHUB_REF_NAME} does not match app version ${APP_VERSION}. Bump apps/electron-app/package.json first."
+            exit 1
+          fi
+
       # Reset the release so electron-builder's parallel upload tasks never
       # race to create it (422 already_exists) and re-runs produce clean
       # assets instead of failing on leftovers.
