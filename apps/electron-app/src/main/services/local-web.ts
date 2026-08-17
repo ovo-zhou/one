@@ -1,6 +1,6 @@
 import { spawn, type ChildProcess } from 'child_process'
-import { existsSync } from 'fs'
-import { join } from 'path'
+import { existsSync, realpathSync } from 'fs'
+import { delimiter, dirname, join } from 'path'
 import type { ModuleServiceStatus } from '../../shared/contracts'
 import { BaseModuleService } from './base'
 
@@ -8,12 +8,39 @@ const STOP_TIMEOUT_MS = 5_000
 const MAX_RESTARTS = 3
 
 /**
+ * Resolve the Node.js binary bundled with the app (resources/services/
+ * node-runtime, installed by scripts/install-services.sh). Falls back to
+ * the system PATH node for dev setups that skipped the installer.
+ */
+export function resolveServicesNode(): string {
+  const candidates = [
+    // Dev: apps/electron-app/resources/services/node-runtime (out/main -> ../../)
+    join(__dirname, '../../resources/services/node-runtime/bin/node'),
+    // Packaged: <resources>/services/node-runtime
+    join(process.resourcesPath, 'services/node-runtime/bin/node')
+  ]
+  for (const bin of candidates) {
+    if (existsSync(bin)) return bin
+  }
+  return 'node'
+}
+
+/**
  * Base class for module services backed by a local web server process
- * (spawned from node_modules/.bin): lazy start, readiness detection,
- * crash restart with backoff, process-group cleanup on quit.
+ * (from node_modules): lazy start, readiness detection, crash restart with
+ * backoff, process-group cleanup on quit.
+ *
+ * Services run on a bundled real Node.js runtime (resources/services/
+ * node-runtime) so native modules work and subprocesses spawned by the
+ * services themselves (process.execPath) stay plain node processes —
+ * never GUI Electron instances. User machines need no system Node.js.
  */
 export abstract class LocalWebService extends BaseModuleService {
   protected abstract readonly serviceName: string
+  /** npm package name providing the service CLI. */
+  protected abstract readonly packageName: string
+  /** JS entry file of the package CLI, relative to the package root. */
+  protected abstract readonly packageBinEntry: string
   protected abstract readonly binName: string
 
   protected get startTimeoutMs(): number {
@@ -66,16 +93,43 @@ export abstract class LocalWebService extends BaseModuleService {
    */
   protected abstract waitForReady(child: ChildProcess, getOutput: () => string): Promise<string>
 
-  protected resolveBin(): string {
-    // Dev: apps/electron-app/node_modules/.bin/<bin> (out/main/index.js -> ../../)
-    const dev = join(__dirname, '../../node_modules/.bin', this.binName)
-    if (existsSync(dev)) return dev
-    // Packaged: copied via electron-builder extraResources
-    const packaged = join(process.resourcesPath, this.binName, 'node_modules/.bin', this.binName)
-    if (existsSync(packaged)) return packaged
+  /**
+   * Locate the package root in dev (resources/services install, resolving
+   * npm/junction symlinks) and when packaged (extraResources/services).
+   * Returns the absolute path of the CLI JS entry file.
+   */
+  protected resolveEntry(): string {
+    const pkgDir = join('node_modules', this.packageName)
+    const candidates = [
+      // Dev: apps/electron-app/resources/services (out/main/index.js -> ../../)
+      join(__dirname, '../../resources/services', pkgDir),
+      // Packaged: <resources>/services
+      join(process.resourcesPath, 'services', pkgDir)
+    ]
+    for (const root of candidates) {
+      if (existsSync(root)) return join(realpathSync(root), this.packageBinEntry)
+    }
     throw new Error(
-      `${this.binName} binary not found. Run \`pnpm install\` in apps/electron-app first.`
+      `${this.binName} package not found. Run \`pnpm install:services\` in apps/electron-app first.`
     )
+  }
+
+  /** Spawn the CLI on the bundled Node.js runtime. */
+  protected spawnService(args: string[], cwd: string | null): ChildProcess {
+    // Prepend the bundled node dir to PATH so subprocesses spawned by the
+    // service itself (e.g. whistle's pfork children resolve `node` from
+    // PATH) also use the bundled runtime on machines without system Node.
+    const nodeBin = resolveServicesNode()
+    return spawn(nodeBin, [this.resolveEntry(), ...args], {
+      cwd: cwd ?? undefined,
+      env: {
+        ...process.env,
+        ...this.binEnv(),
+        PATH: `${dirname(nodeBin)}${delimiter}${process.env.PATH ?? ''}`
+      },
+      stdio: ['ignore', 'pipe', 'pipe'],
+      detached: true
+    })
   }
 
   protected killTree(child: ChildProcess): void {
@@ -138,12 +192,7 @@ export abstract class LocalWebService extends BaseModuleService {
 
       let child: ChildProcess
       try {
-        child = spawn(this.resolveBin(), this.binArgs(), {
-          cwd: this.binCwd() ?? undefined,
-          env: { ...process.env, ...this.binEnv() },
-          stdio: ['ignore', 'pipe', 'pipe'],
-          detached: true
-        })
+        child = this.spawnService(this.binArgs(), this.binCwd())
       } catch (err) {
         reject(err instanceof Error ? err : new Error(String(err)))
         return

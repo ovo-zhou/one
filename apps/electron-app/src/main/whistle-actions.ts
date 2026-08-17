@@ -1,8 +1,9 @@
 import { execFile, spawn } from 'child_process'
-import { existsSync } from 'fs'
+import { existsSync, realpathSync } from 'fs'
 import { join } from 'path'
 import { createRequire } from 'module'
 import { getPrefs, setPrefs } from './prefs'
+import { resolveServicesNode } from './services/local-web'
 
 const WHISTLE_HOST = '127.0.0.1'
 const WHISTLE_PORT = 8899
@@ -102,12 +103,15 @@ export async function disableProxyIfOwned(): Promise<void> {
   setPrefs({ systemProxyEnabledByApp: false })
 }
 
-function resolveW2Bin(): string {
-  const dev = join(__dirname, '../../node_modules/.bin/w2')
-  if (existsSync(dev)) return dev
-  const packaged = join(process.resourcesPath, 'w2', 'node_modules/.bin', 'w2')
-  if (existsSync(packaged)) return packaged
-  throw new Error('w2 binary not found')
+function resolveWhistleEntry(): string {
+  const candidates = [
+    join(__dirname, '../../resources/services/node_modules/whistle'),
+    join(process.resourcesPath, 'services/node_modules/whistle')
+  ]
+  for (const root of candidates) {
+    if (existsSync(root)) return join(realpathSync(root), 'bin/whistle.js')
+  }
+  throw new Error('whistle package not found. Run `pnpm install:services` first.')
 }
 
 /**
@@ -120,11 +124,9 @@ export async function installRootCa(): Promise<{ ok: boolean; message: string }>
     let child
     try {
       child = spawn(
-        resolveW2Bin(),
-        ['ca', '--host', WHISTLE_HOST, '--port', String(WHISTLE_PORT)],
-        {
-          stdio: ['ignore', 'pipe', 'pipe']
-        }
+        resolveServicesNode(),
+        [resolveWhistleEntry(), 'ca', '--host', WHISTLE_HOST, '--port', String(WHISTLE_PORT)],
+        { stdio: ['ignore', 'pipe', 'pipe'] }
       )
     } catch (err) {
       resolve({ ok: false, message: err instanceof Error ? err.message : String(err) })

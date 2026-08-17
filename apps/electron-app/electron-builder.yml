@@ -9,8 +9,17 @@ files:
   - '!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+  - '!scripts/*'
+  - '!resources/services/*'
 asarUnpack:
   - resources/**
+afterPack: scripts/after-pack.js
+extraResources:
+  - from: resources/services
+    to: services
+    filter:
+      - '!package.json'
+      - '!node_modules'
 win:
   executableName: all-in-one
 nsis:
@@ -23,6 +32,9 @@ mac:
   extendInfo:
     - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
   notarize: false
+  target:
+    - dmg
+    - zip
 dmg:
   artifactName: ${name}-${version}.${ext}
 linux:
@@ -34,3 +46,7 @@ linux:
 appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false
+publish:
+  provider: github
+  repo: ovo-zhou/one
+  releaseType: release

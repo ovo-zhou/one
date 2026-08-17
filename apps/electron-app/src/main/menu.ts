@@ -1,4 +1,5 @@
 import { app, dialog, Menu } from 'electron'
+import { manualCheckForUpdate } from './updater'
 import {
   getSystemProxyState,
   installRootCa,
@@ -50,6 +51,13 @@ function buildTemplate(): MenuTemplate {
         ...whistleItems,
         { type: 'separator' },
         { role: 'services' },
+        { type: 'separator' },
+        {
+          label: '检查更新…',
+          click: () => {
+            manualCheckForUpdate()
+          }
+        },
         { type: 'separator' },
         { role: 'hide' },
         { role: 'hideOthers' },

@@ -23,6 +23,8 @@ async function isWhistleUp(): Promise<boolean> {
  */
 export class WhistleService extends LocalWebService {
   protected readonly serviceName = 'whistle'
+  protected readonly packageName = 'whistle'
+  protected readonly packageBinEntry = 'bin/whistle.js'
   protected readonly binName = 'w2'
 
   protected get startTimeoutMs(): number {

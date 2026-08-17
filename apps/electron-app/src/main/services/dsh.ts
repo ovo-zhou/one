@@ -10,6 +10,8 @@ const URL_PATTERN = /https?:\/\/[^\s"'<>]+/
  */
 export class DshService extends LocalWebService {
   protected readonly serviceName = 'dsh'
+  protected readonly packageName = '@deepseek-ai/dsh'
+  protected readonly packageBinEntry = 'lib/bin.js'
   protected readonly binName = 'dsh'
 
   protected binArgs(): string[] {
@@ -26,7 +28,7 @@ export class DshService extends LocalWebService {
   }
 
   protected waitForReady(child: ChildProcess, getOutput: () => string): Promise<string> {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const onData = (): void => {
         const match = URL_PATTERN.exec(getOutput())
         if (match) {
@@ -36,12 +38,19 @@ export class DshService extends LocalWebService {
           resolve(url)
         }
       }
+      const onExit = (code: number | null): void => {
+        cleanup()
+        const tail = getOutput().trim().split('\n').slice(-3).join(' ')
+        reject(new Error(`dsh exited during startup (${code})${tail ? `: ${tail}` : ''}`))
+      }
       const cleanup = (): void => {
         child.stdout?.removeListener('data', onData)
         child.stderr?.removeListener('data', onData)
+        child.removeListener('exit', onExit)
       }
       child.stdout?.on('data', onData)
       child.stderr?.on('data', onData)
+      child.once('exit', onExit)
     })
   }
 }

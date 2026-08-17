@@ -7,10 +7,3 @@ allowBuilds:
   esbuild: true
   protobufjs: true
   sharp: true
-  "@deepseek-ai/dsh": true
-  "@deepseek-ai/dsh-subprocess-local": true
-  "@google/genai": true
-  koffi: true
-  node-pty: true
-minimumReleaseAgeExclude:
-  - whistle@2.10.9

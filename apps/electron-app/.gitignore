@@ -4,3 +4,6 @@ out
 .DS_Store
 .eslintcache
 *.log*
+resources/services/node_modules
+resources/services/node-runtime
+resources/services/package-lock.json

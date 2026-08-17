@@ -2,6 +2,7 @@ import { app, BrowserWindow } from 'electron'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { registerIpcHandlers, stopAllServices } from './ipc'
 import { setupMenu } from './menu'
+import { setupAutoCheck } from './updater'
 import { disableProxyIfOwned } from './whistle-actions'
 import { APP_ID, APP_NAME, createMainWindow } from './window'
 
@@ -30,6 +31,7 @@ if (!app.requestSingleInstanceLock()) {
 
     registerIpcHandlers()
     setupMenu()
+    setupAutoCheck()
     createMainWindow()
 
     app.on('activate', () => {
