@@ -23,7 +23,7 @@ extraResources:
 win:
   executableName: all-in-one
 nsis:
-  artifactName: ${name}-${version}-setup.${ext}
+  artifactName: all-in-one-${version}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
@@ -32,19 +32,17 @@ mac:
   extendInfo:
     - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
   notarize: false
+  artifactName: all-in-one-${version}-${arch}.${ext}
   target:
     - dmg
     - zip
-dmg:
-  artifactName: ${name}-${version}.${ext}
 linux:
+  artifactName: all-in-one-${version}-${arch}.${ext}
   target:
     - AppImage
     - deb
   maintainer: ryan
   category: Utility
-appImage:
-  artifactName: ${name}-${version}.${ext}
 npmRebuild: false
 publish:
   provider: github
