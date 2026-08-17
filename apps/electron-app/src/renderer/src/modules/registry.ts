@@ -1,5 +1,5 @@
 import { lazy, type LazyExoticComponent, type ComponentType } from 'react'
-import { Bot, Music, Settings, Waypoints, type LucideIcon } from 'lucide-react'
+import { Bot, Camera, Music, Settings, Waypoints, type LucideIcon } from 'lucide-react'
 import type { ModuleServiceStatus } from '../../../shared/contracts'
 
 export type ModuleStatusDot = Pick<ModuleServiceStatus, 'phase'>
@@ -28,6 +28,16 @@ export interface WebModule extends BaseModule {
 export type AppModule = ReactModule | WebModule
 
 export const MODULES: AppModule[] = [
+  {
+    id: 'screenshot',
+    name: '截图',
+    description: '截图 · 标注 · 贴图',
+    icon: Camera,
+    order: 5,
+    enabled: true,
+    kind: 'react',
+    Component: lazy(() => import('./screenshot/ScreenshotPanel'))
+  },
   {
     id: 'dsh',
     name: 'DeepSeek Harness',

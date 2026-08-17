@@ -6,6 +6,12 @@ import icon from '../../resources/icon.png?asset'
 export const APP_ID = 'com.one.allinone'
 export const APP_NAME = 'All in One'
 
+let mainWindow: BrowserWindow | null = null
+
+export function getMainWindow(): BrowserWindow | null {
+  return mainWindow
+}
+
 export function createMainWindow(): BrowserWindow {
   const win = new BrowserWindow({
     width: 1200,
@@ -28,6 +34,10 @@ export function createMainWindow(): BrowserWindow {
     win.show()
   })
 
+  win.on('closed', () => {
+    if (mainWindow === win) mainWindow = null
+  })
+
   // Open external links in the system browser instead of new Electron windows.
   win.webContents.setWindowOpenHandler((details) => {
     void shell.openExternal(details.url)
@@ -40,5 +50,6 @@ export function createMainWindow(): BrowserWindow {
     void win.loadFile(join(__dirname, '../renderer/index.html'))
   }
 
+  mainWindow = win
   return win
 }

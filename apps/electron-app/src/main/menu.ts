@@ -1,5 +1,7 @@
 import { app, dialog, Menu } from 'electron'
 import { manualCheckForUpdate } from './updater'
+import { getPrefs } from './prefs'
+import { startScreenshot } from './screenshot/manager'
 import {
   getSystemProxyState,
   installRootCa,
@@ -19,6 +21,17 @@ type MenuTemplate = Electron.MenuItemConstructorOptions[]
 
 function buildTemplate(): MenuTemplate {
   const isMac = process.platform === 'darwin'
+
+  const screenshotItems: MenuTemplate = [
+    {
+      id: 'app-screenshot',
+      label: '截图',
+      accelerator: getPrefs().screenshot.shortcut,
+      click: () => {
+        void startScreenshot()
+      }
+    }
+  ]
 
   const whistleItems: MenuTemplate = [
     {
@@ -47,6 +60,8 @@ function buildTemplate(): MenuTemplate {
       label: app.name,
       submenu: [
         { role: 'about' },
+        { type: 'separator' },
+        ...screenshotItems,
         { type: 'separator' },
         ...whistleItems,
         { type: 'separator' },
@@ -77,7 +92,13 @@ function buildTemplate(): MenuTemplate {
     // whistle items and quit.
     template[0] = {
       label: app.name,
-      submenu: [...whistleItems, { type: 'separator' }, { role: 'quit' }]
+      submenu: [
+        ...screenshotItems,
+        { type: 'separator' },
+        ...whistleItems,
+        { type: 'separator' },
+        { role: 'quit' }
+      ]
     }
   }
 
@@ -86,6 +107,11 @@ function buildTemplate(): MenuTemplate {
 
 function rebuildMenu(): void {
   Menu.setApplicationMenu(Menu.buildFromTemplate(buildTemplate()))
+}
+
+/** Public so pref changes can refresh the menu (e.g. shortcut text). */
+export function rebuildAppMenu(): void {
+  rebuildMenu()
 }
 
 async function refreshProxyState(): Promise<void> {

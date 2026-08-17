@@ -20,6 +20,10 @@ extraResources:
     filter:
       - '!package.json'
       - '!node_modules'
+  - from: resources/windowlist
+    to: windowlist
+    filter:
+      - '!*.swift'
 win:
   executableName: all-in-one
 nsis:

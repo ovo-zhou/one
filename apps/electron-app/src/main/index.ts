@@ -5,6 +5,10 @@ import { setupMenu } from './menu'
 import { setupAutoCheck } from './updater'
 import { disableProxyIfOwned } from './whistle-actions'
 import { APP_ID, APP_NAME, createMainWindow } from './window'
+import { applyScreenshotShortcut, unregisterScreenshotShortcut } from './screenshot/shortcut'
+import { stopWindowDetect } from './screenshot/window-detect'
+import { cleanupPinImages, closeAllPins } from './screenshot/pin'
+import { getPrefs } from './prefs'
 
 // Ensure a single app instance; focus the existing window on relaunch.
 if (!app.requestSingleInstanceLock()) {
@@ -29,6 +33,7 @@ if (!app.requestSingleInstanceLock()) {
       optimizer.watchWindowShortcuts(window)
     })
 
+    void applyScreenshotShortcut(getPrefs().screenshot.shortcut)
     registerIpcHandlers()
     setupMenu()
     setupAutoCheck()
@@ -53,8 +58,12 @@ app.on('before-quit', (event) => {
   if (quitting) return
   quitting = true
   event.preventDefault()
-  void disableProxyIfOwned().finally(() => {
+  void disableProxyIfOwned().finally(async () => {
     stopAllServices()
+    unregisterScreenshotShortcut()
+    stopWindowDetect()
+    closeAllPins()
+    await cleanupPinImages()
     app.exit()
   })
 })

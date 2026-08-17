@@ -1,5 +1,12 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import { IPC, type ModuleServiceStatus } from '../shared/contracts'
+import {
+  IPC,
+  type ModuleServiceStatus,
+  type PrefsPatch,
+  type ScreenshotFinishPayload,
+  type ScreenshotPinAction,
+  type ScreenshotRect
+} from '../shared/contracts'
 
 type StatusListener = (status: ModuleServiceStatus) => void
 
@@ -18,7 +25,7 @@ ipcRenderer.on(
 const api = {
   getAppInfo: () => ipcRenderer.invoke(IPC.appInfo),
   getPrefs: () => ipcRenderer.invoke(IPC.prefsGet),
-  setPrefs: (patch: Record<string, unknown>) => ipcRenderer.invoke(IPC.prefsSet, patch),
+  setPrefs: (patch: PrefsPatch) => ipcRenderer.invoke(IPC.prefsSet, patch),
   getActiveModule: () => ipcRenderer.invoke(IPC.appGetActiveModule),
   setActiveModule: (moduleId: string | null) =>
     ipcRenderer.invoke(IPC.appSetActiveModule, moduleId),
@@ -32,7 +39,40 @@ const api = {
   },
   unsubscribeModuleStatus: async (token: number) => {
     listeners.delete(token)
-  }
+  },
+  startScreenshot: () => ipcRenderer.invoke(IPC.screenshotStart),
+  cancelScreenshotSession: () => ipcRenderer.invoke(IPC.screenshotCancel),
+  setScreenshotSelectionActive: (active: boolean) =>
+    ipcRenderer.invoke(IPC.screenshotSelectionChanged, active),
+  onScreenshotWindowHighlight: (listener: (rect: ScreenshotRect | null) => void) => {
+    const handler = (_event: unknown, rect: ScreenshotRect | null): void => listener(rect)
+    ipcRenderer.on(IPC.screenshotWindowHighlight, handler)
+    return () => {
+      ipcRenderer.removeListener(IPC.screenshotWindowHighlight, handler)
+    }
+  },
+  onScreenshotWindows: (
+    listener: (data: { displayId: number; rects: ScreenshotRect[] }) => void
+  ) => {
+    const handler = (_event: unknown, data: { displayId: number; rects: ScreenshotRect[] }): void =>
+      listener(data)
+    ipcRenderer.on(IPC.screenshotWindows, handler)
+    return () => {
+      ipcRenderer.removeListener(IPC.screenshotWindows, handler)
+    }
+  },
+  finishScreenshot: (payload: ScreenshotFinishPayload) =>
+    ipcRenderer.invoke(IPC.screenshotFinish, payload),
+  getScreenshotImage: (file: string) => ipcRenderer.invoke(IPC.screenshotGetImage, file),
+  chooseScreenshotSaveDir: () => ipcRenderer.invoke(IPC.screenshotChooseSaveDir),
+  validateScreenshotShortcut: (accelerator: string) =>
+    ipcRenderer.invoke(IPC.screenshotValidateShortcut, accelerator),
+  screenshotPinAction: (pinId: number, action: ScreenshotPinAction) =>
+    ipcRenderer.invoke(IPC.screenshotPinAction, pinId, action),
+  screenshotPinResize: (pinId: number, width: number, height: number) =>
+    ipcRenderer.invoke(IPC.screenshotPinResize, pinId, width, height),
+  screenshotPinSetOpacity: (pinId: number, opacity: number) =>
+    ipcRenderer.invoke(IPC.screenshotPinOpacity, pinId, opacity)
 }
 
 contextBridge.exposeInMainWorld('api', api)

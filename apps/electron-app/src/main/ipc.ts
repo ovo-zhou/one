@@ -1,7 +1,15 @@
 import { app, ipcMain, webContents } from 'electron'
-import { IPC, type AppInfo, type ModuleStatusEventPayload } from '../shared/contracts'
+import {
+  IPC,
+  type AppInfo,
+  type ModuleStatusEventPayload,
+  type PrefsPatch
+} from '../shared/contracts'
 import { getPrefs, setPrefs } from './prefs'
 import { getAllServices, getService } from './services/registry'
+import { registerScreenshotIpc } from './screenshot/ipc'
+import { applyScreenshotShortcut } from './screenshot/shortcut'
+import { rebuildAppMenu } from './menu'
 
 function broadcastStatus(moduleId: string, payload: ModuleStatusEventPayload['status']): void {
   const event: ModuleStatusEventPayload = { moduleId, status: payload }
@@ -18,6 +26,8 @@ let activeModuleId: string | null = null
 
 /** Registers all main-process IPC handlers. Call once after app ready. */
 export function registerIpcHandlers(): void {
+  registerScreenshotIpc()
+
   ipcMain.handle(
     IPC.appInfo,
     (): AppInfo => ({
@@ -27,7 +37,19 @@ export function registerIpcHandlers(): void {
   )
 
   ipcMain.handle(IPC.prefsGet, () => getPrefs())
-  ipcMain.handle(IPC.prefsSet, (_event, patch) => setPrefs(patch))
+  ipcMain.handle(IPC.prefsSet, async (_event, patch: PrefsPatch) => {
+    const before = getPrefs()
+    const next = setPrefs(patch)
+    if (next.screenshot.shortcut !== before.screenshot.shortcut) {
+      const ok = await applyScreenshotShortcut(next.screenshot.shortcut)
+      if (!ok) {
+        setPrefs({ screenshot: { shortcut: before.screenshot.shortcut } })
+        throw new Error(`快捷键「${next.screenshot.shortcut}」注册失败，可能已被其他应用占用`)
+      }
+      rebuildAppMenu()
+    }
+    return next
+  })
 
   ipcMain.handle(IPC.appGetActiveModule, () => activeModuleId)
   ipcMain.handle(IPC.appSetActiveModule, (_event, moduleId: string | null) => {
