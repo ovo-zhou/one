@@ -23,6 +23,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Reset the release so electron-builder's parallel upload tasks never
+      # race to create it (422 already_exists) and re-runs produce clean
+      # assets instead of failing on leftovers.
+      - name: Reset GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete "${GITHUB_REF_NAME}" --repo "${GITHUB_REPOSITORY}" --yes || true
+          gh release create "${GITHUB_REF_NAME}" --repo "${GITHUB_REPOSITORY}" \
+            --title "${GITHUB_REF_NAME}" --generate-notes
+
       - name: Build & publish (mac)
         working-directory: apps/electron-app
         env:
