@@ -36,10 +36,13 @@ nsis:
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
 mac:
-  # Ad-hoc signature: unsigned downloads degrade to a "cannot verify
-  # developer" prompt (System Settings -> Open Anyway) instead of the
-  # scary "app is damaged" Gatekeeper error.
-  identity: null
+  # Ad-hoc signature ("-" signs with a local ad-hoc identity; null would skip
+  # signing entirely and produce a bundle Gatekeeper rejects as "damaged").
+  # Unsigned downloads degrade to a "cannot verify developer" prompt
+  # (right-click -> Open) instead of the "app is damaged" Gatekeeper error.
+  identity: "-"
+  hardenedRuntime: false
+  entitlements: build/entitlements.mac.plist
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
     - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.

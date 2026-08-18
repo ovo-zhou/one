@@ -6,6 +6,26 @@ const path = require('node:path')
  * the app bundle. extraResources intentionally does not copy directories
  * named node_modules, so we do it explicitly (symlinks dereferenced).
  */
+
+function dereferenceSymlinks(dir) {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const p = path.join(dir, entry.name)
+    if (entry.isSymbolicLink()) {
+      const target = fs.realpathSync(p)
+      const st = fs.statSync(target)
+      fs.rmSync(p)
+      if (st.isDirectory()) {
+        fs.cpSync(target, p, { recursive: true, dereference: true })
+        dereferenceSymlinks(p)
+      } else {
+        fs.copyFileSync(target, p)
+      }
+    } else if (entry.isDirectory()) {
+      dereferenceSymlinks(p)
+    }
+  }
+}
+
 exports.default = async function afterPack(context) {
   const projectDir = context.packager.info.projectDir
   const src = path.join(projectDir, 'resources', 'services')
@@ -22,8 +42,13 @@ exports.default = async function afterPack(context) {
     resourcesDir = path.join(context.appOutDir, 'resources')
   }
 
-  fs.cpSync(path.join(src, 'node_modules'), path.join(resourcesDir, 'services', 'node_modules'), {
-    recursive: true
+  const dest = path.join(resourcesDir, 'services', 'node_modules')
+  fs.cpSync(path.join(src, 'node_modules'), dest, {
+    recursive: true,
+    dereference: true
   })
+  // fs.cpSync keeps absolute symlinks as-is even with dereference: true
+  // (verified on Node 22/24), which breaks macOS code signing.
+  dereferenceSymlinks(dest)
   console.log(`  • afterPack  copied services/node_modules -> ${resourcesDir}/services`)
 }
