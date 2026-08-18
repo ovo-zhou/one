@@ -49,6 +49,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # GitHub macOS runners default to a 256 fd soft limit; ad-hoc signing
+          # reads every bundled file and hits EMFILE. Raise to the hard limit.
+          ulimit -n 10240
           pnpm install:services
           pnpm build
           pnpm exec electron-builder --mac --publish always
