@@ -1,5 +1,5 @@
 import type { BrowserWindow, Display } from 'electron'
-import { clipboard, dialog, nativeImage, screen, shell } from 'electron'
+import { clipboard, dialog, nativeImage, screen, shell, systemPreferences } from 'electron'
 import { IPC, type ScreenshotFinishPayload, type ScreenshotRect } from '../../shared/contracts'
 import { getMainWindow } from '../window'
 import { resetTccService, SCREEN_CAPTURE_SETTINGS_URL } from '../tcc'
@@ -117,23 +117,29 @@ export function startScreenshot(): boolean {
       startWindowDetect()
       phase = 'live'
       // Blank early show: the overlay (opacity 0, crosshair cursor) appears
-      // immediately over the live desktop. The permission gate runs AFTER
-      // the show — the first getMediaAccessStatus call can take seconds and
-      // must not delay the first paint — but strictly BEFORE any capture.
+      // immediately over the live desktop; the frozen frame replaces the
+      // view once decoded.
       const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint())
       currentDisplayId = display.id
       await presentOverlay(display, null)
       console.log(`[screenshot] session visible in ${Date.now() - t0}ms`)
+      // Permission gate AFTER the show (the raw query costs up to ~1.3s
+      // when the TCC session is cold — it must not delay the crosshair)
+      // but strictly BEFORE any capture. On failure the session is torn
+      // down FIRST so the guide dialog is never trapped under the
+      // always-on-top overlay; the user re-triggers after granting.
+      if (
+        process.platform === 'darwin' &&
+        systemPreferences.getMediaAccessStatus('screen') !== 'granted'
+      ) {
+        await teardown()
+        await ensureScreenPermission()
+        return
+      }
       if (phase === 'live') {
         pollTimer = setInterval(() => {
           void updateForCursor()
         }, POLL_MS)
-      }
-      if (!(await ensureScreenPermission())) {
-        // No grant: guide the user; the session (incl. polling) is torn down
-        // and re-triggering the shortcut restarts the flow after granting.
-        await teardown()
-        return
       }
       await switchToDisplay(display)
     } catch (err) {
