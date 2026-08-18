@@ -1,7 +1,8 @@
 import type { BrowserWindow, Display } from 'electron'
-import { clipboard, dialog, nativeImage, screen } from 'electron'
+import { clipboard, dialog, nativeImage, screen, shell } from 'electron'
 import { IPC, type ScreenshotFinishPayload, type ScreenshotRect } from '../../shared/contracts'
 import { getMainWindow } from '../window'
+import { resetTccService, SCREEN_CAPTURE_SETTINGS_URL } from '../tcc'
 import { captureOneDisplay, removeCapturedBuffer, type CapturedDisplay } from './capture'
 import {
   destroyOverlayWindow,
@@ -92,6 +93,32 @@ setOverlayClosedHandler(() => {
   if (phase !== 'idle') void teardown()
 })
 
+/**
+ * Repair dialog for stale screen-capture grants: System Settings shows the
+ * app checked, but the ad-hoc re-signed binary no longer matches the stored
+ * grant. Reset via tccutil, then the user re-checks and restarts the app
+ * (screen capture grants only apply to freshly started processes).
+ */
+async function showScreenCaptureRepairDialog(detail: string): Promise<void> {
+  const { response } = await dialog.showMessageBox({
+    type: 'warning',
+    message: '需要「屏幕录制」权限',
+    detail:
+      `${detail}\n\n` +
+      '若系统设置中已勾选本应用仍失败（应用更新后常见），说明旧版本的授权已失效：' +
+      '请点击「重置后重新授权」，在系统设置中重新勾选，然后重启本应用。',
+    buttons: ['打开系统设置', '重置后重新授权', '取消'],
+    defaultId: 0,
+    cancelId: 2
+  })
+  if (response === 0) {
+    void shell.openExternal(SCREEN_CAPTURE_SETTINGS_URL)
+  } else if (response === 1) {
+    resetTccService('ScreenCapture')
+    void shell.openExternal(SCREEN_CAPTURE_SETTINGS_URL)
+  }
+}
+
 /** Starts a screenshot session. Returns false if one is already active. */
 export function startScreenshot(): boolean {
   if (phase !== 'idle') return false
@@ -117,7 +144,13 @@ export function startScreenshot(): boolean {
       console.error('[screenshot] failed to start:', err)
       await teardown()
       const message = err instanceof Error ? err.message : String(err)
-      dialog.showErrorBox('截图', `启动截图失败：\n${message}`)
+      // Permission failures (empty or all-black capture) get the repair
+      // dialog: stale grants are expected after every ad-hoc re-sign.
+      if (message.includes('屏幕录制') && process.platform === 'darwin') {
+        await showScreenCaptureRepairDialog(message)
+      } else {
+        dialog.showErrorBox('截图', `启动截图失败：\n${message}`)
+      }
     }
   })()
   return true

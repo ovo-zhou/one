@@ -1,8 +1,9 @@
 import { execFile, type ChildProcess } from 'child_process'
 import { existsSync, readFileSync } from 'fs'
 import { homedir } from 'os'
-import { dirname, join } from 'path'
+import { join } from 'path'
 import { app, dialog, shell, systemPreferences } from 'electron'
+import { resetTccService } from '../tcc'
 
 /**
  * Selection watching for the translate feature.
@@ -111,24 +112,7 @@ export function openAccessibilitySettings(): void {
  * the currently running binary.
  */
 export function resetAccessibilityPermission(): void {
-  if (app.isPackaged) {
-    // .../Contents/MacOS/<exe> -> .../Contents/Info.plist
-    const infoPlist = join(dirname(dirname(process.execPath)), 'Info.plist')
-    execFile(
-      'defaults',
-      ['read', infoPlist.replace(/\.plist$/, ''), 'CFBundleIdentifier'],
-      (readErr, stdout) => {
-        const bundleId = readErr ? '' : stdout.trim()
-        if (!bundleId) {
-          console.error('[selectionwatch] could not determine bundle id')
-          return
-        }
-        execFile('tccutil', ['reset', 'Accessibility', bundleId], (err) => {
-          if (err) console.error('[selectionwatch] tccutil reset failed:', err)
-        })
-      }
-    )
-  }
+  resetTccService('Accessibility')
   void shell.openExternal(ACCESSIBILITY_SETTINGS_URL)
 }
 
