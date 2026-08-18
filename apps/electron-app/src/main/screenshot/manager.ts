@@ -2,12 +2,7 @@ import type { BrowserWindow, Display } from 'electron'
 import { clipboard, dialog, nativeImage, screen } from 'electron'
 import { IPC, type ScreenshotFinishPayload, type ScreenshotRect } from '../../shared/contracts'
 import { getMainWindow } from '../window'
-import {
-  captureOneDisplay,
-  ensureScreenPermission,
-  removeCapturedBuffer,
-  type CapturedDisplay
-} from './capture'
+import { captureOneDisplay, removeCapturedBuffer, type CapturedDisplay } from './capture'
 import {
   destroyOverlayWindow,
   ensureOverlayWindow,
@@ -103,10 +98,6 @@ export function startScreenshot(): boolean {
   phase = 'starting'
   void (async () => {
     try {
-      if (!(await ensureScreenPermission())) {
-        phase = 'idle'
-        return
-      }
       if (phase !== 'starting') return
       if (!(await ensureWindowDetect())) {
         console.warn('[screenshot] window detection unavailable - edge snapping disabled')

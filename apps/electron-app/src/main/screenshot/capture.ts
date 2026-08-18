@@ -1,5 +1,5 @@
 import type { Display } from 'electron'
-import { desktopCapturer, dialog, shell, systemPreferences } from 'electron'
+import { desktopCapturer } from 'electron'
 
 export interface CapturedDisplay {
   /** Electron display id. */
@@ -16,29 +16,6 @@ const bufferStore = new Map<string, Buffer>()
 
 function makeId(): string {
   return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`
-}
-
-const PERMISSION_SETTINGS_URL =
-  'x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture'
-
-export async function ensureScreenPermission(): Promise<boolean> {
-  if (process.platform !== 'darwin') return true
-  if (systemPreferences.getMediaAccessStatus('screen') === 'granted') return true
-  const { response } = await dialog.showMessageBox({
-    type: 'warning',
-    message: '需要「屏幕录制」权限',
-    detail:
-      '截图需要屏幕录制权限。请前往 系统设置 → 隐私与安全性 → 屏幕录制，勾选本应用后重启。\n\n' +
-      '开发模式下权限归属于启动应用的终端（如 VS Code 或 Terminal），请勾选对应程序。\n\n' +
-      '注意：新授权需要重启应用后才会生效。',
-    buttons: ['打开系统设置', '取消'],
-    defaultId: 0,
-    cancelId: 1
-  })
-  if (response === 0) {
-    await shell.openExternal(PERMISSION_SETTINGS_URL)
-  }
-  return false
 }
 
 /**
@@ -81,7 +58,10 @@ export async function captureOneDisplay(display: Display): Promise<CapturedDispl
   )
   const source = byId ?? bySize ?? sources[0]
   if (!source || source.thumbnail.isEmpty()) {
-    throw new Error('未能捕获屏幕画面。macOS 上若刚授予「屏幕录制」权限，需要重启应用才能生效。')
+    throw new Error(
+      '未能捕获屏幕画面。请前往 系统设置 → 隐私与安全性 → 屏幕录制，勾选本应用后重启。\n\n' +
+        '开发模式下权限归属于启动应用的终端（如 VS Code 或 Terminal），请勾选对应程序。'
+    )
   }
   if (isLikelyBlack(source.thumbnail)) {
     console.error(
@@ -90,8 +70,8 @@ export async function captureOneDisplay(display: Display): Promise<CapturedDispl
         'screen recording permission is likely missing or not yet effective'
     )
     throw new Error(
-      '捕获到的屏幕画面是黑色的。请检查「屏幕录制」权限：开发模式下需要给启动应用的终端' +
-        '（VS Code / Terminal）授权，授权后必须重启应用才能生效。'
+      '捕获到的屏幕画面是黑色的。请前往 系统设置 → 隐私与安全性 → 屏幕录制，勾选本应用后重启。\n\n' +
+        '开发模式下权限归属于启动应用的终端（如 VS Code 或 Terminal），请勾选对应程序。'
     )
   }
   // JPEG encoding is ~10x faster than PNG and avoids disk I/O on the critical path.
