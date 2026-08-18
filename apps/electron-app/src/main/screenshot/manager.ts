@@ -3,7 +3,12 @@ import { clipboard, dialog, nativeImage, screen, shell } from 'electron'
 import { IPC, type ScreenshotFinishPayload, type ScreenshotRect } from '../../shared/contracts'
 import { getMainWindow } from '../window'
 import { resetTccService, SCREEN_CAPTURE_SETTINGS_URL } from '../tcc'
-import { captureOneDisplay, removeCapturedBuffer, type CapturedDisplay } from './capture'
+import {
+  captureOneDisplay,
+  ensureScreenPermission,
+  removeCapturedBuffer,
+  type CapturedDisplay
+} from './capture'
 import {
   destroyOverlayWindow,
   ensureOverlayWindow,
@@ -125,6 +130,13 @@ export function startScreenshot(): boolean {
   phase = 'starting'
   void (async () => {
     try {
+      if (phase !== 'starting') return
+      // Standard flow: no capture attempt until the screen-recording grant
+      // is in effect; ensureScreenPermission guides the user otherwise.
+      if (!(await ensureScreenPermission())) {
+        phase = 'idle'
+        return
+      }
       if (phase !== 'starting') return
       if (!(await ensureWindowDetect())) {
         console.warn('[screenshot] window detection unavailable - edge snapping disabled')

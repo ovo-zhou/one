@@ -1,5 +1,6 @@
 import type { Display } from 'electron'
-import { desktopCapturer } from 'electron'
+import { desktopCapturer, dialog, shell, systemPreferences } from 'electron'
+import { resetTccService, SCREEN_CAPTURE_SETTINGS_URL } from '../tcc'
 
 export interface CapturedDisplay {
   /** Electron display id. */
@@ -16,6 +17,57 @@ const bufferStore = new Map<string, Buffer>()
 
 function makeId(): string {
   return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`
+}
+
+/**
+ * Standard permission gate: capture only after the screen-recording grant is
+ * in effect. Returns true when the session may proceed.
+ *
+ * - granted                      → proceed
+ * - not-determined               → probe the capture API once so macOS pops
+ *                                  the native prompt and registers the app in
+ *                                  the Screen Recording list (without the
+ *                                  probe the app never shows up there and
+ *                                  authorization is impossible), then guide
+ * - denied / stale grant         → guide dialog (reset option re-grants)
+ *
+ * The grant only applies to freshly started processes, so the dialog tells
+ * the user to restart after toggling.
+ */
+export async function ensureScreenPermission(): Promise<boolean> {
+  if (process.platform !== 'darwin') return true
+  const status = systemPreferences.getMediaAccessStatus('screen')
+  if (status === 'granted') return true
+  if (status === 'not-determined') {
+    await desktopCapturer.getSources({
+      types: ['screen'],
+      thumbnailSize: { width: 1, height: 1 }
+    })
+  }
+  await showScreenPermissionDialog()
+  return false
+}
+
+async function showScreenPermissionDialog(): Promise<void> {
+  const { response } = await dialog.showMessageBox({
+    type: 'warning',
+    message: '需要「屏幕录制」权限',
+    detail:
+      '截图需要屏幕录制权限。若系统弹出「想要录制屏幕」提示，请点「打开系统设置」并打开本应用的开关；' +
+      '否则请前往 系统设置 → 隐私与安全性 → 屏幕录制，打开本应用的开关。\n\n' +
+      '打开开关后需要退出并重新打开本应用，授权才会生效。\n\n' +
+      '若开关已打开仍提示未授权（应用更新后常见），请点「重置后重新授权」。\n\n' +
+      '开发模式下权限归属于启动应用的终端（如 VS Code 或 Terminal）。',
+    buttons: ['打开系统设置', '重置后重新授权', '取消'],
+    defaultId: 0,
+    cancelId: 2
+  })
+  if (response === 0) {
+    void shell.openExternal(SCREEN_CAPTURE_SETTINGS_URL)
+  } else if (response === 1) {
+    resetTccService('ScreenCapture')
+    void shell.openExternal(SCREEN_CAPTURE_SETTINGS_URL)
+  }
 }
 
 /**
