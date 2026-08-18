@@ -26,6 +26,16 @@ pnpm lint         # Lint all apps
 pnpm typecheck    # Type-check all apps
 ```
 
+## Install All in One (macOS)
+
+curl downloads the DMG without quarantine attribute, so no "app is damaged" warning.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ovo-zhou/one/main/install.sh | bash
+```
+
+Or download the DMG manually: https://github.com/ovo-zhou/one/releases
+
 ## Apps
 
 | App | Port | Tech |

@@ -55,3 +55,44 @@ jobs:
           pnpm install:services
           pnpm build
           pnpm exec electron-builder --mac --publish always
+
+      # electron-builder's GitHub publisher can leave artifacts on a separate
+      # DRAFT release (drafts are invisible to unauthenticated users and to
+      # /releases/latest). Rebuild the release deterministically: drop every
+      # release for this tag, then create one published release uploading
+      # artifacts straight from dist/.
+      - name: Finalize release (publish + verify assets)
+        working-directory: apps/electron-app
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          for id in $(gh api "repos/${GITHUB_REPOSITORY}/releases?per_page=100" \
+              --jq ".[] | select(.tag_name == \"${TAG}\") | .id"); do
+            echo "deleting release ${id}"
+            gh api -X DELETE "repos/${GITHUB_REPOSITORY}/releases/${id}"
+          done
+
+          shopt -s nullglob
+          FILES=(dist/*.dmg dist/*.zip dist/*.blockmap dist/*.yml)
+          if [ ${#FILES[@]} -eq 0 ]; then
+            echo "::error::no build artifacts found in dist/"
+            exit 1
+          fi
+          gh release create "${TAG}" --repo "${GITHUB_REPOSITORY}" \
+            --title "${TAG}" --generate-notes "${FILES[@]}"
+
+          # The by-tag endpoint 404s for drafts, so a hit proves the release
+          # is public and carries assets.
+          for i in 1 2 3 4 5 6; do
+            ASSETS="$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${TAG}" \
+              --jq '.assets[].name' 2>/dev/null || true)"
+            if echo "${ASSETS}" | grep -q '\.dmg$'; then
+              echo "release ${TAG} is public with assets:"
+              echo "${ASSETS}"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "::error::release ${TAG} is not publicly visible with dmg assets"
+          exit 1
