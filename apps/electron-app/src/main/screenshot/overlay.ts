@@ -49,9 +49,18 @@ export function ensureOverlayWindow(): BrowserWindow {
     minimizable: false,
     maximizable: false,
     fullscreenable: false,
+    // The overlay must be a passive full-screen surface: without these macOS
+    // keeps invisible system resize zones at the edges/corners, so dragging
+    // near a screen corner would move/resize the overlay instead of starting
+    // a selection.
+    resizable: false,
+    movable: false,
     skipTaskbar: true,
     show: false,
-    backgroundColor: '#000000',
+    // Transparent overlay: it can be shown the instant a session starts —
+    // the live desktop shows through until the renderer paints the frozen
+    // frame, so there is no black flash and no perceived start delay.
+    transparent: true,
     // Without this macOS clamps the frame into the visible work area on show
     // (below the menu bar / beside the Dock), misaligning the frozen frame.
     enableLargerThanScreen: process.platform === 'darwin',
@@ -65,6 +74,13 @@ export function ensureOverlayWindow(): BrowserWindow {
   win.setAlwaysOnTop(true, 'screen-saver')
   win.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
   win.setFullScreen(false)
+  // Exclude the overlay from screen capture. It is shown over the display
+  // BEFORE the frame is captured (blank early show); without this the
+  // capture composites the overlay itself — the whole frame comes back
+  // black. Content protection removes the window from window-list captures;
+  // the blank show additionally runs at opacity 0 (see manager) because
+  // display-level SCStream captures still composite "protected" windows.
+  win.setContentProtection(true)
 
   // macOS ignores bounds changes queued before the window's first show.
   // enableLargerThanScreen removes the work-area clamp; re-assert the expected

@@ -181,7 +181,6 @@ function fontSizeForStroke(strokeWidth: number): number {
 
 interface BaseImage {
   canvas: HTMLCanvasElement
-  ctx: CanvasRenderingContext2D
   scale: number
 }
 
@@ -231,6 +230,11 @@ export default function ScreenshotApp(): React.JSX.Element {
       windowsRef.current = []
       pastRef.current = []
       redoRef.current = []
+      // Clear the previous session's frame: the overlay is transparent now,
+      // so any leftover pixels would visibly cover the live desktop until
+      // the new frozen frame is painted.
+      const dc = canvasRef.current
+      if (dc) dc.getContext('2d')?.clearRect(0, 0, dc.width, dc.height)
       setReady(false)
       setLoadError(null)
       setSel(null)
@@ -247,53 +251,42 @@ export default function ScreenshotApp(): React.JSX.Element {
     })
   }, [])
 
-  // ---- load the captured image (bytes via IPC, drawn from a blob URL) ----
+  // ---- load the captured image (bytes via IPC, decoded off-thread) ----
   useEffect(() => {
     if (!session) return
+    // Blank early show (imageId null): state was reset by the init handler,
+    // the live desktop shows through; the frozen frame arrives via a second
+    // init once the capture completes.
+    if (!session.imageId) return
     let cancelled = false
-    const notifyReady = (): void => {
-      // Double rAF: the handshake must fire only after the first frame that
-      // includes the frozen image has been painted, so main never shows a
-      // black flash.
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          if (!cancelled) void window.api.notifyScreenshotReady()
-        })
-      })
-    }
     void window.api
       .getScreenshotImage(session.imageId)
-      .then((bytes) => {
+      .then(async (bytes) => {
         if (cancelled) return
-        const blob = new Blob([bytes], { type: 'image/jpeg' })
-        const url = URL.createObjectURL(blob)
-        const img = new Image()
-        img.onload = () => {
-          if (cancelled) return
-          const canvas = document.createElement('canvas')
-          canvas.width = img.naturalWidth
-          canvas.height = img.naturalHeight
-          const ctx = canvas.getContext('2d', { willReadFrequently: true })!
-          ctx.drawImage(img, 0, 0)
-          baseRef.current = { canvas, ctx, scale: canvas.width / WIN_W }
-          URL.revokeObjectURL(url)
-          setReady(true)
-          notifyReady()
+        // createImageBitmap decodes on a worker thread; a 5K JPEG decodes
+        // measurably faster than the Image + blob-URL path (which decodes on
+        // the main thread and delays the first paint).
+        const bitmap = await createImageBitmap(new Blob([bytes], { type: 'image/jpeg' }))
+        if (cancelled) {
+          bitmap.close()
+          return
         }
-        img.onerror = () => {
-          if (cancelled) return
-          URL.revokeObjectURL(url)
-          setLoadError(`无法解码捕获的图像`)
-          console.error('[screenshot] image decode failed for', session.imageId)
-          notifyReady()
-        }
-        img.src = url
+        const canvas = document.createElement('canvas')
+        canvas.width = bitmap.width
+        canvas.height = bitmap.height
+        // No willReadFrequently here: it would force software rendering for
+        // every draw on this 5K canvas. The magnifier samples via a small
+        // scratch canvas instead (see readBlock).
+        const ctx = canvas.getContext('2d')!
+        ctx.drawImage(bitmap, 0, 0)
+        bitmap.close()
+        baseRef.current = { canvas, scale: canvas.width / WIN_W }
+        setReady(true)
       })
       .catch((err) => {
         if (cancelled) return
         setLoadError(`获取截图图像失败：${err instanceof Error ? err.message : String(err)}`)
         console.error('[screenshot] getScreenshotImage failed:', err)
-        notifyReady()
       })
     return () => {
       cancelled = true
@@ -819,7 +812,14 @@ export default function ScreenshotApp(): React.JSX.Element {
     const cy = Math.round(py * base.scale)
     const x = Math.max(0, Math.min(base.canvas.width - 9, cx - 4))
     const y = Math.max(0, Math.min(base.canvas.height - 9, cy - 4))
-    const data = base.ctx.getImageData(x, y, 9, 9).data
+    // Sample through a tiny scratch canvas so the big base canvas can stay
+    // GPU-accelerated (no willReadFrequently on a 5K surface).
+    const scratch = document.createElement('canvas')
+    scratch.width = 9
+    scratch.height = 9
+    const sctx = scratch.getContext('2d', { willReadFrequently: true })!
+    sctx.drawImage(base.canvas, x, y, 9, 9, 0, 0, 9, 9)
+    const data = sctx.getImageData(0, 0, 9, 9).data
     const hexes: string[] = []
     for (let i = 0; i < 81; i++) {
       const r = data[i * 4]

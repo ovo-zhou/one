@@ -65,9 +65,25 @@ export async function ensureWindowDetect(): Promise<boolean> {
   return ok
 }
 
-/** Spawns the streaming helper and keeps the newest window list in memory. */
+/**
+ * Pre-warms the helper at app start: ensures the binary exists (dev compiles
+ * it on demand) and spawns the stream so the window cache is already warm
+ * when the first screenshot triggers.
+ */
+export async function warmWindowDetect(): Promise<void> {
+  if (!isWindowDetectAvailable()) return
+  if (!(await ensureWindowDetect())) return
+  startWindowDetect()
+}
+
+/**
+ * Starts the streaming helper and keeps the newest window list in memory.
+ * The helper is persistent (spawned once at app start via warmWindowDetect);
+ * starting again while running is a no-op, so screenshot sessions never wait
+ * for a cold spawn (~50-100ms).
+ */
 export function startWindowDetect(): void {
-  stopWindowDetect()
+  if (child) return
   const bin = binaryPath()
   if (!bin || !existsSync(bin)) return
   child = execFile(bin, ['-stream'])

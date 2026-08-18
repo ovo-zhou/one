@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, systemPreferences } from 'electron'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { registerIpcHandlers, stopAllServices } from './ipc'
 import { setupMenu } from './menu'
@@ -6,7 +6,7 @@ import { setupAutoCheck } from './updater'
 import { disableProxyIfOwned } from './whistle-actions'
 import { APP_ID, APP_NAME, createMainWindow } from './window'
 import { applyScreenshotShortcut, unregisterScreenshotShortcut } from './screenshot/shortcut'
-import { stopWindowDetect } from './screenshot/window-detect'
+import { stopWindowDetect, warmWindowDetect } from './screenshot/window-detect'
 import { cleanupPinImages, closeAllPins } from './screenshot/pin'
 import { destroyOverlayWindow, ensureOverlayWindow, isOverlayWindow } from './screenshot/overlay'
 import { applyTranslateShortcut, unregisterTranslateShortcut } from './translate/shortcut'
@@ -57,9 +57,15 @@ if (!app.requestSingleInstanceLock()) {
 
     // Pre-warm the screenshot overlay renderer shortly after launch so the
     // first screenshot skips the ~300-600ms window cold start. Same for the
-    // translate tooltip window.
+    // translate tooltip window. The window-detect helper stays resident from
+    // here on so screenshots never wait for a cold spawn, and the TCC
+    // screen-capture query is warmed (its first call can take seconds).
     setTimeout(() => {
-      if (!quitting) ensureOverlayWindow()
+      if (!quitting) {
+        ensureOverlayWindow()
+        void warmWindowDetect()
+        if (process.platform === 'darwin') systemPreferences.getMediaAccessStatus('screen')
+      }
     }, 1000)
     setTimeout(() => {
       if (!quitting) ensureTooltipWindow()

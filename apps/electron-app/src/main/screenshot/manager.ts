@@ -17,13 +17,7 @@ import {
 } from './overlay'
 import { createPin } from './pin'
 import { saveDataUrl } from './save'
-import {
-  ensureWindowDetect,
-  startWindowDetect,
-  stopWindowDetect,
-  topWindowAt,
-  windowsNow
-} from './window-detect'
+import { ensureWindowDetect, startWindowDetect, topWindowAt, windowsNow } from './window-detect'
 
 /**
  * Snipaste-style screenshot session.
@@ -45,8 +39,6 @@ type Phase = 'idle' | 'starting' | 'live' | 'editing'
 const POLL_MS = 40
 /** Cursor must dwell on a new display this long before swapping the overlay. */
 const SWITCH_DWELL_MS = 80
-/** Upper bound for the renderer ready handshake before showing anyway. */
-const READY_TIMEOUT_MS = 2000
 /** Upper bound for waiting on the warm renderer's first page load. */
 const LOAD_TIMEOUT_MS = 1500
 
@@ -63,32 +55,16 @@ let lastCursorPoint: { x: number; y: number } | null = null
 let mainWindow: BrowserWindow | null = null
 const sessionIds = new Set<string>()
 
-/** Ready-handshake state: resolver for the pending present + its timeout. */
-let readyResolve: (() => void) | null = null
-let readyTimer: NodeJS.Timeout | null = null
 /** Generation counter to ignore stale presents (session torn down mid-flight). */
 let presentGen = 0
 
 /**
  * Called via IPC when the overlay renderer has decoded the frame and painted
- * its first frame. The overlay is only shown after this, which removes the
- * black flash of the old create-then-load flow.
+ * its first frame. The transparent overlay is already shown at that point
+ * (show no longer waits for the handshake), so this is diagnostics only.
  */
 export function notifyOverlayReady(): void {
-  if (readyTimer) {
-    clearTimeout(readyTimer)
-    readyTimer = null
-  }
-  readyResolve?.()
-  readyResolve = null
-}
-
-function resetReadyHandshake(): void {
-  if (readyTimer) {
-    clearTimeout(readyTimer)
-    readyTimer = null
-  }
-  readyResolve = null
+  // no-op: kept for IPC compatibility with the renderer preload API.
 }
 
 // If the overlay window is closed externally (e.g. Cmd+W) mid-session, tear
@@ -127,16 +103,10 @@ async function showScreenCaptureRepairDialog(detail: string): Promise<void> {
 /** Starts a screenshot session. Returns false if one is already active. */
 export function startScreenshot(): boolean {
   if (phase !== 'idle') return false
+  const t0 = Date.now()
   phase = 'starting'
   void (async () => {
     try {
-      if (phase !== 'starting') return
-      // Standard flow: no capture attempt until the screen-recording grant
-      // is in effect; ensureScreenPermission guides the user otherwise.
-      if (!(await ensureScreenPermission())) {
-        phase = 'idle'
-        return
-      }
       if (phase !== 'starting') return
       if (!(await ensureWindowDetect())) {
         console.warn('[screenshot] window detection unavailable - edge snapping disabled')
@@ -146,12 +116,26 @@ export function startScreenshot(): boolean {
       mainWindow?.hide()
       startWindowDetect()
       phase = 'live'
-      await updateForCursor(true)
+      // Blank early show: the overlay (opacity 0, crosshair cursor) appears
+      // immediately over the live desktop. The permission gate runs AFTER
+      // the show — the first getMediaAccessStatus call can take seconds and
+      // must not delay the first paint — but strictly BEFORE any capture.
+      const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint())
+      currentDisplayId = display.id
+      await presentOverlay(display, null)
+      console.log(`[screenshot] session visible in ${Date.now() - t0}ms`)
       if (phase === 'live') {
         pollTimer = setInterval(() => {
-          void updateForCursor(false)
+          void updateForCursor()
         }, POLL_MS)
       }
+      if (!(await ensureScreenPermission())) {
+        // No grant: guide the user; the session (incl. polling) is torn down
+        // and re-triggering the shortcut restarts the flow after granting.
+        await teardown()
+        return
+      }
+      await switchToDisplay(display)
     } catch (err) {
       console.error('[screenshot] failed to start:', err)
       await teardown()
@@ -169,12 +153,11 @@ export function startScreenshot(): boolean {
 }
 
 /** One poll tick: follows the cursor and broadcasts highlight / edges. */
-async function updateForCursor(initial: boolean): Promise<void> {
+async function updateForCursor(): Promise<void> {
   if (phase === 'idle' || phase === 'starting' || phase === 'editing' || capturing) return
   const cursorPoint = screen.getCursorScreenPoint()
   // Skip redundant work if cursor hasn't moved since last tick.
   if (
-    !initial &&
     lastCursorPoint &&
     cursorPoint.x === lastCursorPoint.x &&
     cursorPoint.y === lastCursorPoint.y
@@ -184,10 +167,6 @@ async function updateForCursor(initial: boolean): Promise<void> {
   lastCursorPoint = cursorPoint
   const display = screen.getDisplayNearestPoint(cursorPoint)
   if (display.id !== currentDisplayId) {
-    if (initial) {
-      await switchToDisplay(display)
-      return
-    }
     const now = Date.now()
     if (pendingSwitch && pendingSwitch.displayId === display.id) {
       if (now - pendingSwitch.since >= SWITCH_DWELL_MS) {
@@ -205,12 +184,13 @@ async function updateForCursor(initial: boolean): Promise<void> {
 }
 
 /**
- * Repositions the persistent overlay onto the captured display, pushes the
- * init payload, waits for the renderer's ready handshake (frame decoded +
- * first paint), then shows. Hides the window first so cross-display switches
- * never show a stale frame at the wrong geometry.
+ * Repositions the persistent overlay onto the target display, pushes the
+ * init payload (blank or with a frozen frame) and shows it. The window is
+ * transparent, so showing is instant: the live desktop (blank) or the
+ * previous frozen frame (display switch) shows through until the renderer
+ * paints the new frame.
  */
-async function presentOverlay(shot: CapturedDisplay): Promise<void> {
+async function presentOverlay(display: Display, shot: CapturedDisplay | null): Promise<void> {
   const gen = ++presentGen
   let win = ensureOverlayWindow()
   if (win.webContents.isCrashed()) {
@@ -232,31 +212,40 @@ async function presentOverlay(shot: CapturedDisplay): Promise<void> {
     if (gen !== presentGen) return
   }
 
-  const bounds = shot.bounds
-  if (win.isVisible()) win.hide()
+  // shot === null: blank early show. The overlay runs at opacity 0 — a
+  // fully transparent Electron surface still composites as a black rectangle
+  // into SCStream display captures, but alphaValue 0 removes the window's
+  // contribution entirely (while input + the crosshair CSS cursor still
+  // work). The frozen-frame present below restores opacity 1.
+  //
+  // Re-presents NEVER hide() an already visible overlay: hiding the key
+  // window while no other window is visible deactivates the app on macOS,
+  // and the follow-up focus() does not reliably restore key status — the
+  // renderer then stops receiving keyboard events (Esc could not close the
+  // session). Opacity 0 blanks the window without unmapping it, so focus
+  // is preserved across the swap.
+  const bounds = shot ? shot.bounds : display.bounds
+  const wasVisible = win.isVisible()
+  if (wasVisible) win.setOpacity(0)
   stageOverlayBounds(bounds)
 
-  resetReadyHandshake()
-  const ready = new Promise<void>((resolve) => {
-    readyResolve = resolve
-    readyTimer = setTimeout(() => {
-      readyResolve = null
-      resolve()
-    }, READY_TIMEOUT_MS)
-  })
   overlay = win
+  win.setOpacity(shot ? 1 : 0)
   win.webContents.send(IPC.screenshotInit, {
-    displayId: shot.index,
-    imageId: shot.id,
+    displayId: shot ? shot.index : display.id,
+    imageId: shot ? shot.id : null,
     width: bounds.width,
     height: bounds.height,
-    scaleFactor: shot.scaleFactor
+    scaleFactor: shot ? shot.scaleFactor : display.scaleFactor
   })
-  await ready
   if (gen !== presentGen || win.isDestroyed()) return
   win.setAlwaysOnTop(true, 'screen-saver')
-  win.show()
-  win.focus()
+  if (!wasVisible) {
+    win.show()
+    win.focus()
+  } else if (!win.isFocused()) {
+    win.focus()
+  }
 }
 
 /** Captures the display and presents the overlay on it (window is reused). */
@@ -278,8 +267,8 @@ async function switchToDisplay(display: Display): Promise<void> {
     lastHighlightSig = null
     lastWindowsSig = null
     lastCursorPoint = null
-    await presentOverlay(shot)
-    console.log(`[screenshot] overlay presented in ${Date.now() - startedAt}ms`)
+    await presentOverlay(display, shot)
+    console.log(`[screenshot] frozen frame presented in ${Date.now() - startedAt}ms`)
     if (phase !== 'live') return
     if (prev && prev.id !== shot.id) {
       sessionIds.delete(prev.id)
@@ -352,9 +341,9 @@ async function teardown(): Promise<void> {
     clearInterval(pollTimer)
     pollTimer = null
   }
-  stopWindowDetect()
+  // The window-detect helper stays resident across sessions (spawned once at
+  // app start) so the next screenshot starts with a warm window cache.
   pendingSwitch = null
-  resetReadyHandshake()
   presentGen++
   // Hide (keep) the overlay for the next session; its renderer stays warm.
   const win = overlay
@@ -376,7 +365,10 @@ async function teardown(): Promise<void> {
 }
 
 export async function cancelScreenshot(): Promise<void> {
-  if (phase !== 'idle') await teardown()
+  if (phase !== 'idle') {
+    await teardown()
+    console.log('[screenshot] session cancelled (Esc)')
+  }
 }
 
 export async function finishScreenshot(payload: ScreenshotFinishPayload): Promise<void> {

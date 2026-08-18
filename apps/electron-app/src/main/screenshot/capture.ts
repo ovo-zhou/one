@@ -92,10 +92,12 @@ function isLikelyBlack(image: Electron.NativeImage): boolean {
 export async function captureOneDisplay(display: Display): Promise<CapturedDisplay> {
   const width = Math.max(1, Math.round(display.bounds.width * display.scaleFactor))
   const height = Math.max(1, Math.round(display.bounds.height * display.scaleFactor))
+  const tSources = Date.now()
   const sources = await desktopCapturer.getSources({
     types: ['screen'],
     thumbnailSize: { width, height }
   })
+  const sourcesMs = Date.now() - tSources
   // macOS (ScreenCaptureKit) sometimes reports empty/mismatched display ids,
   // which silently falls back to the first source (usually the primary
   // display) and makes the overlay content not align with the display under
@@ -126,12 +128,15 @@ export async function captureOneDisplay(display: Display): Promise<CapturedDispl
         '开发模式下权限归属于启动应用的终端（如 VS Code 或 Terminal），请勾选对应程序。'
     )
   }
-  // JPEG encoding is ~10x faster than PNG and avoids disk I/O on the critical path.
-  const buf = Buffer.from(source.thumbnail.toJPEG(90))
+  // JPEG encoding is ~10x faster than PNG and avoids disk I/O on the critical
+  // path. q85 vs q90 shaves encode+decode time with no visible difference.
+  const tJpeg = Date.now()
+  const buf = Buffer.from(source.thumbnail.toJPEG(85))
   const id = makeId()
   bufferStore.set(id, buf)
   console.log(
-    `[screenshot] captured display ${display.id}: ${width}x${height}, jpeg ${buf.length} bytes`
+    `[screenshot] captured display ${display.id}: ${width}x${height}, ` +
+      `jpeg ${buf.length} bytes (sources ${sourcesMs}ms, encode ${Date.now() - tJpeg}ms)`
   )
   return {
     index: display.id,
