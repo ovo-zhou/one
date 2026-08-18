@@ -89,9 +89,12 @@ fi
 # ---------- mount ----------
 
 info "Mounting DMG…"
-MOUNT_POINT="$(hdiutil attach "${DMG_PATH}" -nobrowse -quiet 2>&1 \
+# hdiutil output is TAB-separated; the mount point is the last field of the
+# line containing /Volumes/. NOTE: no -quiet, it would swallow the listing.
+MOUNT_POINT="$(hdiutil attach "${DMG_PATH}" -nobrowse 2>&1 \
   | grep -m1 '/Volumes/' \
-  | sed 's|.* /Volumes/||;s| *$||')"
+  | awk -F'\t' '{print $NF}' \
+  | sed 's|^/Volumes/||;s|[[:space:]]*$||')"
 
 if [[ -z "${MOUNT_POINT}" ]]; then
   error "Failed to mount DMG."
