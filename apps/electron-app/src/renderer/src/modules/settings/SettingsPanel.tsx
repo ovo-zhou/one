@@ -291,24 +291,41 @@ export default function SettingsPanel(): React.JSX.Element {
                       : '未授权'}
                 </span>
                 {accessibility.supported && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={async () => {
-                      await window.api.openTranslateAccessibilitySettings()
-                      setTimeout(() => {
-                        void window.api.getTranslateAccessibilityStatus().then(setAccessibility)
-                      }, 3000)
-                    }}
-                  >
-                    去授权…
-                  </Button>
+                  <>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={async () => {
+                        await window.api.openTranslateAccessibilitySettings()
+                        setTimeout(() => {
+                          void window.api.getTranslateAccessibilityStatus().then(setAccessibility)
+                        }, 3000)
+                      }}
+                    >
+                      去授权…
+                    </Button>
+                    {!accessibility.trusted && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={async () => {
+                          await window.api.resetTranslateAccessibility()
+                          setTimeout(() => {
+                            void window.api.getTranslateAccessibilityStatus().then(setAccessibility)
+                          }, 3000)
+                        }}
+                      >
+                        重置权限…
+                      </Button>
+                    )}
+                  </>
                 )}
               </div>
             </div>
             <p className="text-xs text-muted-foreground">
               任意应用中选中文字后弹出翻译按钮；中文译英文，其他语言译中文。开发模式下权限归属于启动应用的终端（如
-              VS Code 或 Terminal），授权后需重启应用。
+              VS Code 或
+              Terminal）。若系统设置中已勾选仍显示「未授权」（应用更新后常见），点击「重置权限」后在系统设置中重新勾选。
             </p>
           </div>
         </section>

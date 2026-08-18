@@ -5,7 +5,8 @@ import { resizeTooltip } from './tooltip'
 import {
   isAccessibilityTrusted,
   isSelectionWatchAvailable,
-  openAccessibilitySettings
+  openAccessibilitySettings,
+  resetAccessibilityPermission
 } from './selection-watcher'
 import { validateTranslateAccelerator } from './shortcut'
 
@@ -39,4 +40,5 @@ export function registerTranslateIpc(): void {
     trusted: isAccessibilityTrusted()
   }))
   ipcMain.handle(IPC.translateOpenAccessibilitySettings, () => openAccessibilitySettings())
+  ipcMain.handle(IPC.translateResetAccessibility, () => resetAccessibilityPermission())
 }

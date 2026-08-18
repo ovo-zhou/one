@@ -99,7 +99,9 @@ export const IPC = {
   translateValidateShortcut: 'translate:validateShortcut',
   /** Returns whether the macOS accessibility permission is granted. */
   translateAccessibilityStatus: 'translate:accessibilityStatus',
-  translateOpenAccessibilitySettings: 'translate:openAccessibilitySettings'
+  translateOpenAccessibilitySettings: 'translate:openAccessibilitySettings',
+  /** Clears a stale accessibility grant (tccutil reset) and opens Settings. */
+  translateResetAccessibility: 'translate:resetAccessibility'
 } as const
 
 /** Payload for saving a generated test image from the renderer. */
@@ -242,4 +244,6 @@ export interface ElectronApi {
   /** { supported, trusted } for the macOS accessibility permission. */
   getTranslateAccessibilityStatus(): Promise<{ supported: boolean; trusted: boolean }>
   openTranslateAccessibilitySettings(): Promise<void>
+  /** Clear a stale accessibility grant (tccutil reset) and open Settings. */
+  resetTranslateAccessibility(): Promise<void>
 }

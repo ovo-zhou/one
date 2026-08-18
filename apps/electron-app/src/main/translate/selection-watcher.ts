@@ -1,7 +1,7 @@
 import { execFile, type ChildProcess } from 'child_process'
 import { existsSync, readFileSync } from 'fs'
 import { homedir } from 'os'
-import { join } from 'path'
+import { dirname, join } from 'path'
 import { app, dialog, shell, systemPreferences } from 'electron'
 
 /**
@@ -85,18 +85,50 @@ export async function ensureAccessibilityPermission(): Promise<boolean> {
     detail:
       '划词翻译需要辅助功能权限。请前往 系统设置 → 隐私与安全性 → 辅助功能，勾选本应用。\n\n' +
       '开发模式下权限归属于启动应用的终端（如 VS Code 或 Terminal），请勾选对应程序。\n\n' +
-      '注意：新授权可能需要重启应用后才会生效。',
-    buttons: ['打开系统设置', '取消'],
+      '若列表中已勾选本应用仍反复提示未授权，说明旧版本残留的授权已失效：' +
+      '请点击「重置后重新授权」，并在系统设置中重新勾选。',
+    buttons: ['打开系统设置', '重置后重新授权', '取消'],
     defaultId: 0,
-    cancelId: 1
+    cancelId: 2
   })
   if (response === 0) {
     await shell.openExternal(ACCESSIBILITY_SETTINGS_URL)
+  } else if (response === 1) {
+    resetAccessibilityPermission()
   }
   return false
 }
 
 export function openAccessibilitySettings(): void {
+  void shell.openExternal(ACCESSIBILITY_SETTINGS_URL)
+}
+
+/**
+ * Ad-hoc signed builds get a new code hash on every release, so an
+ * accessibility grant from an older install goes stale: System Settings still
+ * shows the app checked, yet AXIsProcessTrusted() keeps returning false.
+ * Clearing the stored grant via tccutil forces a clean re-grant that matches
+ * the currently running binary.
+ */
+export function resetAccessibilityPermission(): void {
+  if (app.isPackaged) {
+    // .../Contents/MacOS/<exe> -> .../Contents/Info.plist
+    const infoPlist = join(dirname(dirname(process.execPath)), 'Info.plist')
+    execFile(
+      'defaults',
+      ['read', infoPlist.replace(/\.plist$/, ''), 'CFBundleIdentifier'],
+      (readErr, stdout) => {
+        const bundleId = readErr ? '' : stdout.trim()
+        if (!bundleId) {
+          console.error('[selectionwatch] could not determine bundle id')
+          return
+        }
+        execFile('tccutil', ['reset', 'Accessibility', bundleId], (err) => {
+          if (err) console.error('[selectionwatch] tccutil reset failed:', err)
+        })
+      }
+    )
+  }
   void shell.openExternal(ACCESSIBILITY_SETTINGS_URL)
 }
 

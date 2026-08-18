@@ -122,7 +122,8 @@ const api = {
       trusted: boolean
     }>,
   openTranslateAccessibilitySettings: () =>
-    ipcRenderer.invoke(IPC.translateOpenAccessibilitySettings)
+    ipcRenderer.invoke(IPC.translateOpenAccessibilitySettings),
+  resetTranslateAccessibility: () => ipcRenderer.invoke(IPC.translateResetAccessibility)
 }
 
 contextBridge.exposeInMainWorld('api', api)

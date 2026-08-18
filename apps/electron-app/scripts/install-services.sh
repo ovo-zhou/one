@@ -25,6 +25,9 @@ fi
 # ---- macOS window-list helper for screenshot window detection ----
 bash "$DIR/scripts/build-windowlist.sh"
 
+# ---- macOS selection watcher for selection-translate (AX API) ----
+bash "$DIR/scripts/build-selectionwatch.sh"
+
 # ---- bundled Node.js runtime ----
 NODE_RUNTIME="$SERVICES_DIR/node-runtime"
 NODE_BIN="$NODE_RUNTIME/bin/node"
