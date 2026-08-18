@@ -1,8 +1,66 @@
 import { useCallback, useEffect, useState } from 'react'
-import type { AppInfo, ScreenshotFormat, TranslateModel } from '../../../../shared/contracts'
+import type {
+  AppInfo,
+  ScreenshotFormat,
+  TranslateModel,
+  UpdaterProgressPayload
+} from '../../../../shared/contracts'
 import { MODULES } from '../registry'
 import { Button } from '../../components/ui/button'
 import { acceleratorFromEvent, prettyAccelerator } from '../../lib/shortcut'
+
+type UpdaterUIState =
+  | { phase: 'idle' }
+  | { phase: 'checking' }
+  | { phase: 'latest' }
+  | { phase: 'unsupported' }
+  | { phase: 'available'; version: string; notes: string | null }
+  | { phase: 'downloading'; percent: number }
+  | { phase: 'installing' }
+  | { phase: 'restarting' }
+  | { phase: 'error'; message: string }
+
+function updaterButtonText(u: UpdaterUIState): string {
+  switch (u.phase) {
+    case 'checking':
+      return '检查中…'
+    case 'downloading':
+      return '下载中…'
+    case 'installing':
+      return '安装中…'
+    case 'restarting':
+      return '即将重启…'
+    case 'error':
+      return '重试'
+    case 'latest':
+      return '检查更新'
+    default:
+      return '检查更新'
+  }
+}
+
+function updaterStatusText(u: UpdaterUIState): string {
+  switch (u.phase) {
+    case 'idle':
+      return ''
+    case 'checking':
+      return '正在检查…'
+    case 'latest':
+      return '已是最新版本 ✓'
+    case 'unsupported':
+      return '仅支持 macOS 安装包版本'
+    case 'available':
+      return `发现新版本 v${u.version}`
+    case 'downloading':
+      return `下载中 ${u.percent}%`
+    case 'installing':
+      return '正在安装…'
+    case 'restarting':
+      return '更新完成，即将重启…'
+    case 'error':
+      return '更新失败'
+  }
+}
 
 function ShortcutRecorder({
   value,
@@ -107,6 +165,43 @@ export default function SettingsPanel(): React.JSX.Element {
     supported: false,
     trusted: false
   })
+  const [updater, setUpdater] = useState<UpdaterUIState>({ phase: 'idle' })
+
+  useEffect(() => {
+    return window.api.onUpdateProgress((p: UpdaterProgressPayload) => {
+      setUpdater(() =>
+        p.phase === 'downloading'
+          ? { phase: 'downloading', percent: p.percent ?? 0 }
+          : p.phase === 'error'
+            ? { phase: 'error', message: p.error ?? '未知错误' }
+            : { phase: p.phase }
+      )
+    })
+  }, [])
+
+  const checkUpdates = useCallback(async (): Promise<void> => {
+    setUpdater({ phase: 'checking' })
+    const result = await window.api.checkForUpdates()
+    if (!result.supported) {
+      setUpdater({ phase: 'unsupported' })
+      return
+    }
+    if (result.error) {
+      setUpdater({ phase: 'error', message: result.error })
+      return
+    }
+    if (result.hasUpdate && result.latestVersion) {
+      setUpdater({ phase: 'available', version: result.latestVersion, notes: result.notes })
+    } else {
+      setUpdater({ phase: 'latest' })
+    }
+  }, [])
+
+  const startUpdate = useCallback(async (): Promise<void> => {
+    setUpdater({ phase: 'downloading', percent: 0 })
+    const ok = await window.api.startUpdate()
+    if (!ok) setUpdater((prev) => (prev.phase === 'downloading' ? { phase: 'idle' } : prev))
+  }, [])
 
   useEffect(() => {
     void window.api.getAppInfo().then(setAppInfo)
@@ -143,6 +238,54 @@ export default function SettingsPanel(): React.JSX.Element {
             <dt className="text-muted-foreground">平台</dt>
             <dd>{appInfo ? appInfo.platform : '—'}</dd>
           </dl>
+          <div className="mt-4 flex flex-col gap-2 border-t pt-4">
+            <div className="flex items-center justify-between gap-4">
+              <span className="shrink-0 text-muted-foreground">软件更新</span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground">{updaterStatusText(updater)}</span>
+                {updater.phase === 'available' ? (
+                  <Button size="sm" onClick={() => void startUpdate()}>
+                    立即更新
+                  </Button>
+                ) : (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={
+                      updater.phase === 'checking' ||
+                      updater.phase === 'unsupported' ||
+                      updater.phase === 'downloading' ||
+                      updater.phase === 'installing' ||
+                      updater.phase === 'restarting' ||
+                      (appInfo ? appInfo.platform !== 'darwin' : false)
+                    }
+                    onClick={() => {
+                      if (updater.phase === 'error') void startUpdate()
+                      else void checkUpdates()
+                    }}
+                  >
+                    {updaterButtonText(updater)}
+                  </Button>
+                )}
+              </div>
+            </div>
+            {updater.phase === 'downloading' && (
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                <div
+                  className="h-full rounded-full bg-primary transition-all"
+                  style={{ width: `${updater.percent}%` }}
+                />
+              </div>
+            )}
+            {updater.phase === 'available' && updater.notes && (
+              <p className="whitespace-pre-wrap text-xs text-muted-foreground">
+                {updater.notes.slice(0, 300)}
+              </p>
+            )}
+            {updater.phase === 'error' && (
+              <p className="text-xs text-destructive">{updater.message}</p>
+            )}
+          </div>
         </section>
 
         <section className="rounded-xl border bg-card p-5">

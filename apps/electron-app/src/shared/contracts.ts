@@ -101,8 +101,37 @@ export const IPC = {
   translateAccessibilityStatus: 'translate:accessibilityStatus',
   translateOpenAccessibilitySettings: 'translate:openAccessibilitySettings',
   /** Clears a stale accessibility grant (tccutil reset) and opens Settings. */
-  translateResetAccessibility: 'translate:resetAccessibility'
+  translateResetAccessibility: 'translate:resetAccessibility',
+  /** Renderer → main: check GitHub Releases for a newer version. */
+  updaterCheck: 'updater:check',
+  /** Renderer → main: download + install the update in place, then relaunch. */
+  updaterStart: 'updater:start',
+  /** Main → renderer: push channel, payload: UpdaterProgressPayload */
+  updaterProgress: 'updater:progress'
 } as const
+
+/** Result of a manual/silent update check. */
+export interface UpdateCheckResult {
+  /** In-app updates only work for packaged macOS builds. */
+  supported: boolean
+  hasUpdate: boolean
+  currentVersion: string
+  latestVersion: string | null
+  /** Release notes (markdown body, truncated). */
+  notes: string | null
+  /** Non-null when the GitHub API call failed. */
+  error: string | null
+}
+
+export type UpdaterPhase = 'downloading' | 'installing' | 'restarting' | 'error'
+
+export interface UpdaterProgressPayload {
+  phase: UpdaterPhase
+  /** 0-100 while downloading; null otherwise. */
+  percent: number | null
+  /** User-facing message when phase === 'error'. */
+  error: string | null
+}
 
 /** Payload for saving a generated test image from the renderer. */
 export interface TestImageSavePayload {
@@ -146,8 +175,8 @@ export interface ScreenshotRect {
 export interface ScreenshotInitPayload {
   /** Electron display id the overlay covers. */
   displayId: number
-  /** Capture buffer id of the frozen frame. */
-  imageId: string
+  /** Capture buffer id of the frozen frame; null for the blank early show. */
+  imageId: string | null
   /** Overlay content size in CSS px (= display bounds size). */
   width: number
   height: number
@@ -246,4 +275,10 @@ export interface ElectronApi {
   openTranslateAccessibilitySettings(): Promise<void>
   /** Clear a stale accessibility grant (tccutil reset) and open Settings. */
   resetTranslateAccessibility(): Promise<void>
+  /** Check GitHub Releases for a newer version (in-app updates: macOS only). */
+  checkForUpdates(): Promise<UpdateCheckResult>
+  /** Download + install the latest release in place, then relaunch. */
+  startUpdate(): Promise<boolean>
+  /** Subscribe to download/install progress; returns unsubscribe. */
+  onUpdateProgress(listener: (payload: UpdaterProgressPayload) => void): () => void
 }

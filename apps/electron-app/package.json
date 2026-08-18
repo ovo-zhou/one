@@ -1,6 +1,6 @@
 {
   "name": "@one/electron-app",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "private": true,
   "description": "All in One - extensible developer assistant",
   "main": "./out/main/index.js",

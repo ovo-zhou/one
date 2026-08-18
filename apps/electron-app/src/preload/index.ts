@@ -10,7 +10,9 @@ import {
   type TestImageSavePayload,
   type TranslateChunkPayload,
   type TranslateDonePayload,
-  type TranslateSelectionPayload
+  type TranslateSelectionPayload,
+  type UpdateCheckResult,
+  type UpdaterProgressPayload
 } from '../shared/contracts'
 
 type StatusListener = (status: ModuleServiceStatus) => void
@@ -123,7 +125,16 @@ const api = {
     }>,
   openTranslateAccessibilitySettings: () =>
     ipcRenderer.invoke(IPC.translateOpenAccessibilitySettings),
-  resetTranslateAccessibility: () => ipcRenderer.invoke(IPC.translateResetAccessibility)
+  resetTranslateAccessibility: () => ipcRenderer.invoke(IPC.translateResetAccessibility),
+  checkForUpdates: () => ipcRenderer.invoke(IPC.updaterCheck) as Promise<UpdateCheckResult>,
+  startUpdate: () => ipcRenderer.invoke(IPC.updaterStart) as Promise<boolean>,
+  onUpdateProgress: (listener: (payload: UpdaterProgressPayload) => void) => {
+    const handler = (_event: unknown, payload: UpdaterProgressPayload): void => listener(payload)
+    ipcRenderer.on(IPC.updaterProgress, handler)
+    return () => {
+      ipcRenderer.removeListener(IPC.updaterProgress, handler)
+    }
+  }
 }
 
 contextBridge.exposeInMainWorld('api', api)

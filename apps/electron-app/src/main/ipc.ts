@@ -15,6 +15,7 @@ import { registerTranslateIpc } from './translate/ipc'
 import { applyTranslateShortcut, unregisterTranslateShortcut } from './translate/shortcut'
 import { applyTranslatePrefs } from './translate/manager'
 import { rebuildAppMenu } from './menu'
+import { checkForUpdates, startInAppUpdate } from './updater'
 
 function broadcastStatus(moduleId: string, payload: ModuleStatusEventPayload['status']): void {
   const event: ModuleStatusEventPayload = { moduleId, status: payload }
@@ -110,6 +111,9 @@ export function registerIpcHandlers(): void {
     if (!service) throw new Error(`Unknown module service: ${moduleId}`)
     await service.stop()
   })
+
+  ipcMain.handle(IPC.updaterCheck, () => checkForUpdates())
+  ipcMain.handle(IPC.updaterStart, () => startInAppUpdate({ notify: true }))
 
   ipcMain.handle(IPC.testImageSave, async (_event, payload: TestImageSavePayload) => {
     const ext = payload.format === 'jpeg' ? 'jpg' : payload.format
