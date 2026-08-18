@@ -21,7 +21,9 @@ import ApplicationServices.HIServices
 
 let args = CommandLine.arguments
 let once = args.contains("--once")
-let pollIntervalUs: useconds_t = once ? 0 : 200_000
+// 100ms keeps the perceived latency from selection to pill low; a single
+// AXSelectedText query costs well under 1ms so the CPU impact is negligible.
+let pollIntervalUs: useconds_t = once ? 0 : 100_000
 
 func emit(_ line: String) {
   FileHandle.standardOutput.write((line + "\n").data(using: .utf8)!)

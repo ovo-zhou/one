@@ -31,7 +31,9 @@ export function ensureTooltipWindow(): BrowserWindow {
     width: 120,
     height: 40,
     frame: false,
-    hasShadow: true,
+    // Window-level shadow would draw a gray box around the tiny dot pill;
+    // the card paints its own CSS shadow (shadow-xl) instead.
+    hasShadow: false,
     resizable: false,
     minimizable: false,
     maximizable: false,
