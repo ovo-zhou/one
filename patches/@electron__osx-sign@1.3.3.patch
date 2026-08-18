@@ -1,0 +1,49 @@
+diff --git a/dist/cjs/util.js b/dist/cjs/util.js
+index 77e64b56872bc65bcb0f60ecfbec84eb3da02c6f..16b3a9618ece6b5572519f08eae830f222bdcced 100644
+--- a/dist/cjs/util.js
++++ b/dist/cjs/util.js
+@@ -151,7 +151,13 @@ async function walkAsync(dirPath) {
+     (0, exports.debugLog)('Walking... ' + dirPath);
+     async function _walkAsync(dirPath) {
+         const children = await fs.readdir(dirPath);
+-        return await Promise.all(children.map(async (child) => {
++        // Patched: iterate children sequentially instead of Promise.all.
++        // The unbounded concurrent fan-out opened one fd per file (via
++        // isBinaryFile) with the matching closes still queued behind, which
++        // exhausts the process fd limit (EMFILE) on bundles with tens of
++        // thousands of files.
++        const results = [];
++        for (const child of children) {
+             const filePath = path.resolve(dirPath, child);
+             const stat = await fs.stat(filePath);
+             if (stat.isFile()) {
+@@ -159,9 +165,10 @@ async function walkAsync(dirPath) {
+                     case '.cstemp': // Temporary file generated from past codesign
+                         (0, exports.debugLog)('Removing... ' + filePath);
+                         await fs.remove(filePath);
+-                        return null;
++                        results.push(null);
++                        continue;
+                     default:
+-                        return await getFilePathIfBinary(filePath);
++                        results.push(await getFilePathIfBinary(filePath));
+                 }
+             }
+             else if (stat.isDirectory() && !stat.isSymbolicLink()) {
+@@ -171,10 +178,13 @@ async function walkAsync(dirPath) {
+                     case '.framework': // Framework
+                         walkResult.push(filePath);
+                 }
+-                return walkResult;
++                results.push(walkResult);
+             }
+-            return null;
+-        }));
++            else {
++                results.push(null);
++            }
++        }
++        return results;
+     }
+     const allPaths = await _walkAsync(dirPath);
+     return compactFlattenedList(allPaths);
