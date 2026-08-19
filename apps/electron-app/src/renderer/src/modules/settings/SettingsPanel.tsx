@@ -232,7 +232,7 @@ export default function SettingsPanel(): React.JSX.Element {
           <h2 className="mb-3 text-sm font-semibold">关于</h2>
           <dl className="grid grid-cols-[6rem_1fr] gap-y-2 text-sm">
             <dt className="text-muted-foreground">应用</dt>
-            <dd>All in One</dd>
+            <dd>faker</dd>
             <dt className="text-muted-foreground">版本</dt>
             <dd>{appInfo ? appInfo.version : '—'}</dd>
             <dt className="text-muted-foreground">平台</dt>

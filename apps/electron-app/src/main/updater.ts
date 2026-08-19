@@ -18,10 +18,10 @@ import { IPC, type UpdateCheckResult, type UpdaterProgressPayload } from '../sha
  */
 
 const REPO = 'ovo-zhou/one'
-const APP_BUNDLE = 'All in One.app'
+const APP_BUNDLE = 'faker.app'
 const RELEASES_API = `https://api.github.com/repos/${REPO}/releases/latest`
 const RELEASES_PAGE = `https://github.com/${REPO}/releases/latest`
-const UA = 'all-in-one-updater'
+const UA = 'faker-updater'
 
 const execFileP = promisify(execFile)
 
@@ -129,7 +129,7 @@ function dmgArch(): string {
 function pickDmgAsset(release: ReleaseInfo): ReleaseAsset | null {
   const arch = dmgArch()
   return (
-    release.assets?.find((a) => a.name === `all-in-one-${latestVersion(release)}-${arch}.dmg`) ??
+    release.assets?.find((a) => a.name === `faker-${latestVersion(release)}-${arch}.dmg`) ??
     release.assets?.find((a) => a.name.endsWith(`-${arch}.dmg`)) ??
     null
   )
@@ -139,7 +139,7 @@ function latestVersion(release: ReleaseInfo): string {
   return (release.tag_name ?? '').replace(/^v/, '')
 }
 
-/** Path of the running .app bundle, e.g. /Applications/All in One.app. */
+/** Path of the running .app bundle, e.g. /Applications/faker.app. */
 function currentAppBundlePath(): string | null {
   const exe = app.getPath('exe')
   const marker = '/Contents/'

@@ -1,5 +1,5 @@
-appId: com.one.allinone
-productName: All in One
+appId: com.one.faker
+productName: faker
 directories:
   buildResources: build
 files:
@@ -29,9 +29,9 @@ extraResources:
     filter:
       - '!*.swift'
 win:
-  executableName: all-in-one
+  executableName: faker
 nsis:
-  artifactName: all-in-one-${version}-setup.${ext}
+  artifactName: faker-${version}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
@@ -47,12 +47,12 @@ mac:
   extendInfo:
     - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
   notarize: false
-  artifactName: all-in-one-${version}-${arch}.${ext}
+  artifactName: faker-${version}-${arch}.${ext}
   target:
     - dmg
     - zip
 linux:
-  artifactName: all-in-one-${version}-${arch}.${ext}
+  artifactName: faker-${version}-${arch}.${ext}
   target:
     - AppImage
     - deb

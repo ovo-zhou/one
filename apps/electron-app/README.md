@@ -1,4 +1,4 @@
-# All in One (electron-app)
+# faker (electron-app)
 
 可扩展的开发助手桌面端（Electron + React），内置模块：
 
@@ -41,11 +41,11 @@ macOS 应用未做正式签名公证，首次打开会提示"无法验证开发�
 
 1. 双击打开 → 弹窗点 **"好"**（或"取消"均可）
 2. 打开 **系统设置 → 隐私与安全性**，底部出现
-   **"已阻止使用 All in One"** → 点 **"仍要打开"**
+   **"已阻止使用 faker"** → 点 **"仍要打开"**
 3. 输入开机密码 / Touch ID 确认 → 应用正常启动，之后不再提示
 
 若提示"**已损坏**"（部分 macOS 版本对无签名应用）：终端执行
 
 ```bash
-xattr -cr "/Applications/All in One.app"
+xattr -cr "/Applications/faker.app"
 ```
