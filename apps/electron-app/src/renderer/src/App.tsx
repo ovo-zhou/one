@@ -11,7 +11,7 @@ import type { ModuleServiceStatus } from '../../shared/contracts'
 const ENABLED = getEnabledModules()
 const WEB_IDS = ENABLED.filter((m) => m.kind === 'web').map((m) => m.id)
 const IDLE: ModuleServiceStatus = { phase: 'idle', url: null, error: null }
-const APP_NAME = 'faker'
+const APP_NAME = 'Faceless'
 
 export default function App(): React.JSX.Element {
   const [activeId, setActiveId] = useState<string | null>(null)

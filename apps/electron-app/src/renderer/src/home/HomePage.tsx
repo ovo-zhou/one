@@ -67,7 +67,7 @@ export function HomePage({ modules, phases, onOpen }: HomePageProps): React.JSX.
         </Button>
       )}
       <div className="flex flex-1 flex-col items-center justify-center gap-10 p-10">
-        <h1 className="text-2xl font-semibold tracking-tight">faker</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Faceless</h1>
         <div className="grid w-full max-w-xl grid-cols-[repeat(auto-fit,minmax(10rem,1fr))] gap-4">
           {modules
             .filter((m) => m.id !== 'settings')

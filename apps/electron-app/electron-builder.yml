@@ -1,5 +1,5 @@
-appId: com.one.faker
-productName: faker
+appId: com.one.faceless
+productName: Faceless
 directories:
   buildResources: build
 files:
@@ -29,9 +29,9 @@ extraResources:
     filter:
       - '!*.swift'
 win:
-  executableName: faker
+  executableName: faceless
 nsis:
-  artifactName: faker-${version}-setup.${ext}
+  artifactName: faceless-${version}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
@@ -47,12 +47,12 @@ mac:
   extendInfo:
     - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
   notarize: false
-  artifactName: faker-${version}-${arch}.${ext}
+  artifactName: faceless-${version}-${arch}.${ext}
   target:
     - dmg
     - zip
 linux:
-  artifactName: faker-${version}-${arch}.${ext}
+  artifactName: faceless-${version}-${arch}.${ext}
   target:
     - AppImage
     - deb

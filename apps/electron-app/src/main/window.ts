@@ -3,8 +3,8 @@ import { BrowserWindow, shell } from 'electron'
 import { is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
-export const APP_ID = 'com.one.faker'
-export const APP_NAME = 'faker'
+export const APP_ID = 'com.one.faceless'
+export const APP_NAME = 'Faceless'
 
 let mainWindow: BrowserWindow | null = null
 

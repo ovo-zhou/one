@@ -33,7 +33,7 @@ interface RawProxyConf {
 
 /** Ask macOS for an administrator password via a native GUI dialog. */
 function osascriptSudo(cmd: string, callback: (err: Error | null, stdout?: string) => void): void {
-  const script = `do shell script "${cmd.replace(/"/g, '\\"')}" with administrator privileges with prompt "faker 需要修改系统代理设置"`
+  const script = `do shell script "${cmd.replace(/"/g, '\\"')}" with administrator privileges with prompt "Faceless 需要修改系统代理设置"`
   execFile('osascript', ['-e', script], (err, stdout) =>
     callback(
       err instanceof Error ? err : err ? new Error(String(err)) : null,

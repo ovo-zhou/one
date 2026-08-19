@@ -1,8 +1,8 @@
 {
-  "name": "faker-services",
+  "name": "faceless-services",
   "version": "0.1.0",
   "private": true,
-  "description": "Bundled service runtimes for faker (installed flat via npm, copied to extraResources)",
+  "description": "Bundled service runtimes for Faceless (installed flat via npm, copied to extraResources)",
   "dependencies": {
     "@deepseek-ai/dsh": "0.1.0-rc.6",
     "set-global-proxy": "0.4.2",
