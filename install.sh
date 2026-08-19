@@ -3,7 +3,7 @@
 set -euo pipefail
 
 REPO="ovo-zhou/one"
-APP_NAME="All in One"
+APP_NAME="Faceless"
 APP_BUNDLE="${APP_NAME}.app"
 INSTALL_DIR="/Applications"
 
@@ -60,7 +60,7 @@ if [[ -z "$VERSION" ]]; then
   exit 1
 fi
 
-DMG_FILENAME="all-in-one-${VERSION}-${DMG_ARCH}.dmg"
+DMG_FILENAME="faceless-${VERSION}-${DMG_ARCH}.dmg"
 DMG_URL="https://github.com/${REPO}/releases/download/v${VERSION}/${DMG_FILENAME}"
 
 info "Latest version: ${VERSION}"
