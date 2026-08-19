@@ -262,11 +262,8 @@ export async function startInAppUpdate(options: { notify: boolean }): Promise<bo
 
     broadcast({ phase: 'installing', percent: null, error: null })
     mountPoint = await mountDmg(dmgPath)
-    // Support both old ("All in One.app") and new ("faker.app") bundle names
-    // so that older clients can still auto-update across the rename.
-    const srcAppCandidates = [join(mountPoint, APP_BUNDLE), join(mountPoint, 'All in One.app')]
-    const srcApp = srcAppCandidates.find((p) => existsSync(p))
-    if (!srcApp) throw new Error(`安装包内未找到 ${APP_BUNDLE}`)
+    const srcApp = join(mountPoint, APP_BUNDLE)
+    if (!existsSync(srcApp)) throw new Error(`安装包内未找到 ${APP_BUNDLE}`)
     await replaceAppBundle(srcApp)
 
     broadcast({ phase: 'restarting', percent: null, error: null })
