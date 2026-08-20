@@ -18,7 +18,10 @@ if [ -d "$SERVICES_DIR/node_modules" ] && [ "$FORCE" != "--force" ]; then
   echo "services node_modules exists, skipping deps (use --force to reinstall)"
 else
   rm -rf "$SERVICES_DIR/node_modules" "$SERVICES_DIR/package-lock.json"
-  npm install --prefix "$SERVICES_DIR" --omit=dev --no-audit --no-fund
+  # Whistle's dependency graph can exceed Node's default 2 GB heap on CI.
+  # Keep this scoped to the install rather than changing the app runtime.
+  NODE_OPTIONS="${NODE_OPTIONS:-} --max-old-space-size=4096" \
+    npm install --prefix "$SERVICES_DIR" --omit=dev --no-audit --no-fund
   echo "services installed at $SERVICES_DIR/node_modules"
 fi
 
