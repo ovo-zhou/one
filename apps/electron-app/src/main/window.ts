@@ -20,6 +20,9 @@ export function createMainWindow(): BrowserWindow {
     minHeight: 480,
     show: false,
     title: APP_NAME,
+    // Use the bundled mark for the development window and non-macOS desktop
+    // integrations. Packaged macOS builds use build/icon.icns via electron-builder.
+    icon,
     autoHideMenuBar: true,
     // mac: hide the native title but keep traffic lights; the renderer draws
     // its own draggable title bar (see shell/TitleBar.tsx). Traffic lights
@@ -30,7 +33,6 @@ export function createMainWindow(): BrowserWindow {
           trafficLightPosition: { x: 16, y: 12 }
         }
       : {}),
-    ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: true,
