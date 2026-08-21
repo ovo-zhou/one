@@ -1,7 +1,7 @@
 import { app, dialog, Notification, shell, webContents } from 'electron'
 import { execFile } from 'node:child_process'
 import { createWriteStream, existsSync } from 'node:fs'
-import { mkdtemp, readdir, rm } from 'node:fs/promises'
+import { mkdtemp, mkdir, readdir, rename, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { basename, dirname, join } from 'node:path'
 import { Readable, Transform } from 'node:stream'
@@ -25,6 +25,12 @@ const APP_BUNDLE = 'Faceless.app'
 const RELEASES_API = `https://api.github.com/repos/${REPO}/releases/latest`
 const RELEASES_PAGE = `https://github.com/${REPO}/releases/latest`
 const UA = 'faceless-updater'
+
+// Where the old bundle is moved (renamed, never unlinked) during an update.
+// It lives on the same volume as /Applications, so the rename is instant and
+// works even though the still-running old process holds files inside it. The
+// new app instance removes it on next launch (see cleanupStaleBackups).
+const UPDATE_TRASH_DIR = join(tmpdir(), 'faceless-update-trash')
 
 const execFileP = promisify(execFile)
 
@@ -229,11 +235,18 @@ async function replaceAppBundle(srcApp: string): Promise<void> {
     await execFileP('mv', [backup, appPath]).catch(() => {})
     throw err
   }
-  // The live main process still runs from `backup`; its own binary can't be
-  // unlinked while running, so a full removal here is expected to fail. The
-  // leftover .old bundle is removed on the next launch (cleanupStaleBackups).
-  // Best-effort only — a failure here must not fail the already-applied update.
-  await rm(backup, { recursive: true, force: true }).catch(() => {})
+  // The live (old) process still runs from `backup` and keeps its own
+  // Contents/Resources (asar, bundled node runtime, …) open, so `rm` of that
+  // directory would fail with ENOTEMPTY. Instead rename it into a trash dir on
+  // the same volume — a rename never touches file contents, so it succeeds even
+  // with open handles. The new app instance deletes the trash on next launch.
+  try {
+    await mkdir(UPDATE_TRASH_DIR, { recursive: true })
+    await rename(backup, join(UPDATE_TRASH_DIR, basename(backup)))
+  } catch {
+    // Worst case the .old stays next to the app; cleanupStaleBackups still
+    // removes sibling .old-* dirs, and the update itself already succeeded.
+  }
 }
 
 /**
@@ -268,16 +281,21 @@ export async function cleanupStaleBackups(): Promise<void> {
   if (!appPath) return
   const parent = dirname(appPath)
   const base = basename(appPath)
+  const tasks: Promise<unknown>[] = []
   try {
     const entries = await readdir(parent)
-    await Promise.allSettled(
-      entries
-        .filter((name) => name.startsWith(`${base}.old-`))
-        .map((name) => rm(join(parent, name), { recursive: true, force: true }))
-    )
+    for (const name of entries) {
+      if (name.startsWith(`${base}.old-`)) {
+        tasks.push(rm(join(parent, name), { recursive: true, force: true }))
+      }
+    }
   } catch {
     /* best-effort */
   }
+  // Remove the trash dir left by a previous update. The old process that owned
+  // the open files is gone by the time we run, so these unlinks now succeed.
+  tasks.push(rm(UPDATE_TRASH_DIR, { recursive: true, force: true }))
+  await Promise.allSettled(tasks)
 }
 
 /**
