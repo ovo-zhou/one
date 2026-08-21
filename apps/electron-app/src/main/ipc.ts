@@ -132,9 +132,9 @@ export function registerIpcHandlers(): void {
   })
 }
 
-/** Stops all running module services. Call on will-quit. */
-export function stopAllServices(): void {
-  for (const service of getAllServices()) {
-    void service.stop()
-  }
+/** Stops all running module services. Awaitable so callers can wait for the
+ *  child process trees to actually exit (e.g. before an in-app update swaps
+ *  the .app bundle). */
+export async function stopAllServices(): Promise<void> {
+  await Promise.allSettled(getAllServices().map((service) => service.stop()))
 }

@@ -1,13 +1,16 @@
 import { app, dialog, Notification, shell, webContents } from 'electron'
 import { execFile } from 'node:child_process'
 import { createWriteStream, existsSync } from 'node:fs'
-import { mkdtemp, rm } from 'node:fs/promises'
+import { mkdtemp, readdir, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { basename, dirname, join } from 'node:path'
 import { Readable, Transform } from 'node:stream'
 import { pipeline } from 'node:stream/promises'
 import { promisify } from 'node:util'
 import { IPC, type UpdateCheckResult, type UpdaterProgressPayload } from '../shared/contracts'
+import { stopAllServices } from './ipc'
+import { stopSelectionWatcher } from './translate/selection-watcher'
+import { stopWindowDetect } from './screenshot/window-detect'
 
 /**
  * Unsigned-app updater for macOS: mirrors install.sh — fetch the latest DMG
@@ -226,7 +229,55 @@ async function replaceAppBundle(srcApp: string): Promise<void> {
     await execFileP('mv', [backup, appPath]).catch(() => {})
     throw err
   }
-  await rm(backup, { recursive: true, force: true })
+  // The live main process still runs from `backup`; its own binary can't be
+  // unlinked while running, so a full removal here is expected to fail. The
+  // leftover .old bundle is removed on the next launch (cleanupStaleBackups).
+  // Best-effort only — a failure here must not fail the already-applied update.
+  await rm(backup, { recursive: true, force: true }).catch(() => {})
+}
+
+/**
+ * Stop every child process the app spawned from its own bundle (service
+ * runtimes, whistle proxy, screenshot/translate helpers). Required before
+ * swapping the .app during an update: those children keep files open inside
+ * Contents/Resources, and an `rm` of the renamed .old bundle would otherwise
+ * fail with ENOTEMPTY.
+ */
+async function stopChildProcesses(): Promise<void> {
+  await Promise.allSettled([stopAllServices()])
+  try {
+    stopSelectionWatcher()
+  } catch {
+    /* not running — ignore */
+  }
+  try {
+    stopWindowDetect()
+  } catch {
+    /* not running — ignore */
+  }
+}
+
+/**
+ * Remove stale `.old-<timestamp>` app bundles left beside the running app by
+ * interrupted or in-app updates. Safe to call on startup: the live app runs
+ * from the real bundle, not a `.old` one. Best-effort — a still-living old
+ * process (e.g. during relaunch overlap) is simply skipped until next launch.
+ */
+export async function cleanupStaleBackups(): Promise<void> {
+  const appPath = currentAppBundlePath()
+  if (!appPath) return
+  const parent = dirname(appPath)
+  const base = basename(appPath)
+  try {
+    const entries = await readdir(parent)
+    await Promise.allSettled(
+      entries
+        .filter((name) => name.startsWith(`${base}.old-`))
+        .map((name) => rm(join(parent, name), { recursive: true, force: true }))
+    )
+  } catch {
+    /* best-effort */
+  }
 }
 
 /**
@@ -264,6 +315,9 @@ export async function startInAppUpdate(options: { notify: boolean }): Promise<bo
     mountPoint = await mountDmg(dmgPath)
     const srcApp = join(mountPoint, APP_BUNDLE)
     if (!existsSync(srcApp)) throw new Error(`安装包内未找到 ${APP_BUNDLE}`)
+    // Stop children spawned from the current bundle so the renamed .old
+    // directory can be removed (otherwise rm fails with ENOTEMPTY).
+    await stopChildProcesses()
     await replaceAppBundle(srcApp)
 
     broadcast({ phase: 'restarting', percent: null, error: null })
