@@ -4,7 +4,7 @@
   "private": true,
   "description": "Bundled service runtimes for Faceless (installed flat via npm, copied to extraResources)",
   "dependencies": {
-    "@deepseek-ai/dsh": "0.1.0-rc.6",
+    "@deepseek-ai/dsh": "0.1.0-rc.8",
     "set-global-proxy": "0.4.2",
     "whistle": "2.10.9"
   }
