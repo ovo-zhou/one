@@ -15,7 +15,7 @@ export class DshService extends LocalWebService {
   protected readonly binName = 'dsh'
 
   protected binArgs(): string[] {
-    return ['web', '--port', '0']
+    return ['web', '--port', '0', '--no-open']
   }
 
   protected binEnv(): NodeJS.ProcessEnv {

@@ -111,7 +111,9 @@ async function main() {
   await writeFile(path.join(APP, 'build', 'icon.png'), png[512])
   await writeFile(path.join(APP, 'resources', 'icon.png'), png[512])
 
-  console.log('icons generated: build/icon.icns, build/icon.ico, build/icon.png, resources/icon.png')
+  console.log(
+    'icons generated: build/icon.icns, build/icon.ico, build/icon.png, resources/icon.png'
+  )
 }
 
 main().catch((err) => {

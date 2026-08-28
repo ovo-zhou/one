@@ -40,7 +40,7 @@ mac:
   # signing entirely and produce a bundle Gatekeeper rejects as "damaged").
   # Unsigned downloads degrade to a "cannot verify developer" prompt
   # (right-click -> Open) instead of the "app is damaged" Gatekeeper error.
-  identity: "-"
+  identity: '-'
   hardenedRuntime: false
   entitlements: build/entitlements.mac.plist
   entitlementsInherit: build/entitlements.mac.plist

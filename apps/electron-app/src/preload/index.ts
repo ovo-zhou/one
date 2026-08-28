@@ -2,6 +2,7 @@ import { contextBridge, ipcRenderer } from 'electron'
 import {
   IPC,
   type ModuleServiceStatus,
+  type MultiWinTab,
   type PrefsPatch,
   type ScreenshotFinishPayload,
   type ScreenshotInitPayload,
@@ -128,6 +129,31 @@ const api = {
   resetTranslateAccessibility: () => ipcRenderer.invoke(IPC.translateResetAccessibility),
   checkForUpdates: () => ipcRenderer.invoke(IPC.updaterCheck) as Promise<UpdateCheckResult>,
   startUpdate: () => ipcRenderer.invoke(IPC.updaterStart) as Promise<boolean>,
+  multiwinStart: (tabs: MultiWinTab[]) =>
+    ipcRenderer.invoke(IPC.multiwinStart, tabs) as Promise<void>,
+  multiwinStop: () => ipcRenderer.invoke(IPC.multiwinStop) as Promise<void>,
+  multiwinAdd: (tab: MultiWinTab) => ipcRenderer.invoke(IPC.multiwinAdd, tab) as Promise<void>,
+  multiwinRemove: (id: string) => ipcRenderer.invoke(IPC.multiwinRemove, id) as Promise<void>,
+  multiwinSetActive: (id: string) => ipcRenderer.invoke(IPC.multiwinSetActive, id) as Promise<void>,
+  multiwinSetDevtools: (id: string, on: boolean) =>
+    ipcRenderer.invoke(IPC.multiwinSetDevtools, id, on) as Promise<void>,
+  multiwinReload: (id: string) => ipcRenderer.invoke(IPC.multiwinReload, id) as Promise<void>,
+  multiwinLayout: (info: { sidebarOpen: boolean; sidebarW: number }) =>
+    ipcRenderer.invoke(IPC.multiwinLayout, info) as Promise<void>,
+  multiwinSetVisible: (visible: boolean) =>
+    ipcRenderer.invoke(IPC.multiwinSetVisible, visible) as Promise<void>,
+  onMultiwinStatus: (
+    listener: (payload: { id: string; status: 'loading' | 'ready' | 'error' }) => void
+  ): (() => void) => {
+    const handler = (
+      _event: unknown,
+      payload: { id: string; status: 'loading' | 'ready' | 'error' }
+    ): void => listener(payload)
+    ipcRenderer.on(IPC.multiwinStatus, handler)
+    return () => {
+      ipcRenderer.removeListener(IPC.multiwinStatus, handler)
+    }
+  },
   onUpdateProgress: (listener: (payload: UpdaterProgressPayload) => void) => {
     const handler = (_event: unknown, payload: UpdaterProgressPayload): void => listener(payload)
     ipcRenderer.on(IPC.updaterProgress, handler)

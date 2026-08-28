@@ -1,15 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import JsonView from '@uiw/react-json-view'
-import {
-  Braces,
-  Check,
-  ChevronsDownUp,
-  ChevronsUpDown,
-  ClipboardPaste,
-  Copy,
-  Eraser,
-  Minimize2
-} from 'lucide-react'
+import { Check, ChevronsDownUp, ChevronsUpDown, ClipboardPaste, Copy, Eraser } from 'lucide-react'
 import { Button } from '../../components/ui/button'
 import { cn } from '../../lib/utils'
 
@@ -54,13 +45,15 @@ function CopyButton({
   copiedLabel,
   onCopy,
   icon,
-  variant = 'ghost'
+  variant = 'ghost',
+  disabled = false
 }: {
   label: string
   copiedLabel: string
   onCopy: () => string | Promise<string>
   icon: React.ReactNode
   variant?: 'ghost' | 'outline'
+  disabled?: boolean
 }): React.JSX.Element {
   const [copied, setCopied] = useState(false)
   const timer = useRef<ReturnType<typeof setTimeout>>(null)
@@ -76,7 +69,7 @@ function CopyButton({
     <Button
       size="xs"
       variant={variant}
-      disabled={copied}
+      disabled={copied || disabled}
       onClick={async () => {
         const text = await onCopy()
         if (!text) return
@@ -96,7 +89,7 @@ const LEVELS = [1, 2, 3] as const
 
 export default function JsonPanel(): React.JSX.Element {
   const [text, setText] = useState('')
-  const [expandMode, setExpandMode] = useState<ExpandMode>(2)
+  const [expandMode, setExpandMode] = useState<ExpandMode>('all')
 
   const parsed = useMemo(() => {
     const trimmed = text.trim()
@@ -128,14 +121,6 @@ export default function JsonPanel(): React.JSX.Element {
 
   return (
     <div className="flex h-full flex-1 flex-col gap-4 overflow-auto p-6">
-      <div className="flex items-center gap-3">
-        <Braces className="size-5 text-muted-foreground" />
-        <h1 className="text-lg font-semibold tracking-tight">JSON 工具</h1>
-        <span className="text-xs text-muted-foreground">
-          输入即解析 · 双击 key 复制路径 · 悬停复制值
-        </span>
-      </div>
-
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 lg:grid-cols-2">
         <section className="flex min-h-72 flex-col rounded-xl border bg-card">
           <div className="flex items-center gap-1.5 border-b px-3 py-2">
@@ -144,11 +129,17 @@ export default function JsonPanel(): React.JSX.Element {
               <ClipboardPaste />
               粘贴
             </Button>
-            <Button size="xs" variant="ghost" onClick={() => setText('')}>
+            <Button size="xs" variant="ghost" onClick={() => setText('')} disabled={!text.trim()}>
               <Eraser />
               清空
             </Button>
-            <CopyButton label="复制" copiedLabel="已复制" icon={<Copy />} onCopy={() => text} />
+            <CopyButton
+              label="复制"
+              copiedLabel="已复制"
+              icon={<Copy />}
+              onCopy={() => text}
+              disabled={!text.trim()}
+            />
           </div>
           <textarea
             value={text}
@@ -175,19 +166,21 @@ export default function JsonPanel(): React.JSX.Element {
             <span className="mr-auto text-xs font-medium text-muted-foreground">解析结果</span>
             <Button
               size="icon-xs"
-              variant="ghost"
+              variant={expandMode === 'all' ? 'default' : 'ghost'}
               aria-label="全部展开"
               title="全部展开"
               onClick={() => setExpandMode('all')}
+              disabled={!text.trim() || !!parsed.error}
             >
               <ChevronsUpDown />
             </Button>
             <Button
               size="icon-xs"
-              variant="ghost"
+              variant={expandMode === 'none' ? 'default' : 'ghost'}
               aria-label="全部收起"
               title="全部收起"
               onClick={() => setExpandMode('none')}
+              disabled={!text.trim() || !!parsed.error}
             >
               <ChevronsDownUp />
             </Button>
@@ -197,21 +190,17 @@ export default function JsonPanel(): React.JSX.Element {
                 size="xs"
                 variant={expandMode === n ? 'default' : 'ghost'}
                 onClick={() => setExpandMode(n)}
+                disabled={!text.trim() || !!parsed.error}
               >
                 {n} 层
               </Button>
             ))}
             <CopyButton
-              label="格式化"
+              label="复制"
               copiedLabel="已复制"
               icon={<Copy />}
               onCopy={() => format(2)}
-            />
-            <CopyButton
-              label="压缩"
-              copiedLabel="已复制"
-              icon={<Minimize2 />}
-              onCopy={() => format(0)}
+              disabled={!text.trim() || !!parsed.error}
             />
           </div>
           <div className="min-h-0 flex-1 overflow-auto p-3">
