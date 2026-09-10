@@ -26,6 +26,7 @@ export interface OSWindow {
 let child: ChildProcess | null = null
 let cache: OSWindow[] = []
 let lastLine = ''
+let ensuring: Promise<boolean> | null = null
 
 export function isWindowDetectAvailable(): boolean {
   return process.platform === 'darwin'
@@ -53,16 +54,26 @@ function buildBinary(): Promise<boolean> {
  * Makes sure the helper binary exists. In dev it is compiled on first use
  * (swiftc must be available); in packaged builds it ships in extraResources.
  */
-export async function ensureWindowDetect(): Promise<boolean> {
-  if (!isWindowDetectAvailable()) return false
+export function ensureWindowDetect(): Promise<boolean> {
+  if (!isWindowDetectAvailable()) return Promise.resolve(false)
   const bin = binaryPath()
-  if (existsSync(bin)) return true
-  if (app.isPackaged) return false
-  const ok = await buildBinary()
-  if (!ok) {
-    console.error('[windowlist] build failed (swiftc unavailable?) - window detection disabled')
+  if (existsSync(bin)) return Promise.resolve(true)
+  if (app.isPackaged) return Promise.resolve(false)
+  if (!ensuring) {
+    ensuring = buildBinary()
+      .then((ok) => {
+        if (!ok) {
+          console.error(
+            '[windowlist] build failed (swiftc unavailable?) - window detection disabled'
+          )
+        }
+        return ok
+      })
+      .finally(() => {
+        ensuring = null
+      })
   }
-  return ok
+  return ensuring
 }
 
 /**

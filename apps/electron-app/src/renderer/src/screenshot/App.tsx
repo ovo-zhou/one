@@ -212,6 +212,7 @@ export default function ScreenshotApp(): React.JSX.Element {
 
   const pastRef = useRef<Shape[][]>([])
   const redoRef = useRef<Shape[][]>([])
+  const magnifierScratchRef = useRef<HTMLCanvasElement | null>(null)
 
   const strokeWidth = STROKE_WIDTHS[Math.min(size, STROKE_WIDTHS.length - 1)]
 
@@ -263,10 +264,10 @@ export default function ScreenshotApp(): React.JSX.Element {
       .getScreenshotImage(session.imageId)
       .then(async (bytes) => {
         if (cancelled) return
-        // createImageBitmap decodes on a worker thread; a 5K JPEG decodes
-        // measurably faster than the Image + blob-URL path (which decodes on
-        // the main thread and delays the first paint).
-        const bitmap = await createImageBitmap(new Blob([bytes], { type: 'image/jpeg' }))
+        // createImageBitmap decodes on a worker thread; a 5K PNG decodes
+        // without blocking the overlay's main thread like Image + blob-URL.
+        // This preserves the lossless frame received from the main process.
+        const bitmap = await createImageBitmap(new Blob([bytes], { type: 'image/png' }))
         if (cancelled) {
           bitmap.close()
           return
@@ -808,15 +809,21 @@ export default function ScreenshotApp(): React.JSX.Element {
   const readBlock = useCallback((px: number, py: number): string[] | null => {
     const base = baseRef.current
     if (!base) return null
-    const cx = Math.round(px * base.scale)
-    const cy = Math.round(py * base.scale)
+    // Magnifier already converts the cursor's CSS coordinates to physical
+    // image pixels using SF. Scaling again here made Retina coordinates grow
+    // by SF² and clamp to the image edge, leaving the reported color stale.
+    const cx = Math.round(px)
+    const cy = Math.round(py)
     const x = Math.max(0, Math.min(base.canvas.width - 9, cx - 4))
     const y = Math.max(0, Math.min(base.canvas.height - 9, cy - 4))
-    // Sample through a tiny scratch canvas so the big base canvas can stay
-    // GPU-accelerated (no willReadFrequently on a 5K surface).
-    const scratch = document.createElement('canvas')
-    scratch.width = 9
-    scratch.height = 9
+    // Reuse one tiny scratch canvas: allocating a canvas on every mousemove
+    // causes needless garbage collection while the magnifier is visible.
+    const scratch = magnifierScratchRef.current ?? document.createElement('canvas')
+    magnifierScratchRef.current = scratch
+    if (scratch.width !== 9 || scratch.height !== 9) {
+      scratch.width = 9
+      scratch.height = 9
+    }
     const sctx = scratch.getContext('2d', { willReadFrequently: true })!
     sctx.drawImage(base.canvas, x, y, 9, 9, 0, 0, 9, 9)
     const data = sctx.getImageData(0, 0, 9, 9).data

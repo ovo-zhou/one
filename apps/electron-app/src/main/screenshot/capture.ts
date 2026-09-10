@@ -12,8 +12,9 @@ export interface CapturedDisplay {
   id: string
 }
 
-/** In-memory JPEG buffers keyed by capture id. Avoids disk I/O on the critical path. */
+/** In-memory PNG buffers keyed by capture id. Avoids disk I/O on the critical path. */
 const bufferStore = new Map<string, Buffer>()
+let screenPermissionStatus: string | null = null
 
 function makeId(): string {
   return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`
@@ -36,7 +37,7 @@ function makeId(): string {
  */
 export async function ensureScreenPermission(): Promise<boolean> {
   if (process.platform !== 'darwin') return true
-  const status = systemPreferences.getMediaAccessStatus('screen')
+  const status = getScreenPermissionStatus()
   if (status === 'granted') return true
   if (status === 'not-determined') {
     await desktopCapturer.getSources({
@@ -46,6 +47,24 @@ export async function ensureScreenPermission(): Promise<boolean> {
   }
   await showScreenPermissionDialog()
   return false
+}
+
+/** Caches the process-stable macOS permission result outside the screenshot path. */
+export function warmScreenPermissionStatus(): void {
+  if (process.platform === 'darwin')
+    screenPermissionStatus = systemPreferences.getMediaAccessStatus('screen')
+}
+
+/** macOS screen-recording grants only take effect after restarting this process. */
+export function hasScreenPermission(): boolean {
+  return process.platform !== 'darwin' || getScreenPermissionStatus() === 'granted'
+}
+
+function getScreenPermissionStatus(): string {
+  if (screenPermissionStatus === null) {
+    screenPermissionStatus = systemPreferences.getMediaAccessStatus('screen')
+  }
+  return screenPermissionStatus
 }
 
 async function showScreenPermissionDialog(): Promise<void> {
@@ -128,15 +147,16 @@ export async function captureOneDisplay(display: Display): Promise<CapturedDispl
         '开发模式下权限归属于启动应用的终端（如 VS Code 或 Terminal），请勾选对应程序。'
     )
   }
-  // JPEG encoding is ~10x faster than PNG and avoids disk I/O on the critical
-  // path. q85 vs q90 shaves encode+decode time with no visible difference.
-  const tJpeg = Date.now()
-  const buf = Buffer.from(source.thumbnail.toJPEG(85))
+  // A screenshot must preserve text and pixel edges. Keeping the captured
+  // frame as PNG avoids JPEG's irreversible blur before the user copies or
+  // saves it; the buffer remains in memory, so there is still no disk I/O.
+  const tEncode = Date.now()
+  const buf = source.thumbnail.toPNG()
   const id = makeId()
   bufferStore.set(id, buf)
   console.log(
     `[screenshot] captured display ${display.id}: ${width}x${height}, ` +
-      `jpeg ${buf.length} bytes (sources ${sourcesMs}ms, encode ${Date.now() - tJpeg}ms)`
+      `png ${buf.length} bytes (sources ${sourcesMs}ms, encode ${Date.now() - tEncode}ms)`
   )
   return {
     index: display.id,

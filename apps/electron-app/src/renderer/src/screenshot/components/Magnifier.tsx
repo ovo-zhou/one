@@ -20,7 +20,7 @@ export function Magnifier({ x, y, winW, winH, sf, readBlock }: MagnifierProps): 
   const px = Math.round(x * sf)
   const py = Math.round(y * sf)
   const block = readBlock(px, py)
-  const centerHex = block?.[(GRID * GRID) / 2] ?? '#000000'
+  const centerHex = block?.[Math.floor((GRID * GRID) / 2)] ?? '#000000'
 
   useEffect(() => {
     const canvas = canvasRef.current

@@ -1,11 +1,12 @@
 import type { BrowserWindow, Display } from 'electron'
-import { clipboard, dialog, nativeImage, screen, shell, systemPreferences } from 'electron'
+import { clipboard, dialog, nativeImage, screen, shell } from 'electron'
 import { IPC, type ScreenshotFinishPayload, type ScreenshotRect } from '../../shared/contracts'
 import { getMainWindow } from '../window'
 import { resetTccService, SCREEN_CAPTURE_SETTINGS_URL } from '../tcc'
 import {
   captureOneDisplay,
   ensureScreenPermission,
+  hasScreenPermission,
   removeCapturedBuffer,
   type CapturedDisplay
 } from './capture'
@@ -17,7 +18,7 @@ import {
 } from './overlay'
 import { createPin } from './pin'
 import { saveDataUrl } from './save'
-import { ensureWindowDetect, startWindowDetect, topWindowAt, windowsNow } from './window-detect'
+import { topWindowAt, warmWindowDetect, windowsNow } from './window-detect'
 
 /**
  * Snipaste-style screenshot session.
@@ -108,13 +109,13 @@ export function startScreenshot(): boolean {
   void (async () => {
     try {
       if (phase !== 'starting') return
-      if (!(await ensureWindowDetect())) {
-        console.warn('[screenshot] window detection unavailable - edge snapping disabled')
-      }
       if (phase !== 'starting') return
+      // Window detection is optional enhancement. Compile/start it in the
+      // background so a first screenshot never waits for Swift or a helper
+      // process before the overlay appears.
+      void warmWindowDetect()
       mainWindow = getMainWindow()
       mainWindow?.hide()
-      startWindowDetect()
       phase = 'live'
       // Blank early show: the overlay (opacity 0, crosshair cursor) appears
       // immediately over the live desktop; the frozen frame replaces the
@@ -128,10 +129,7 @@ export function startScreenshot(): boolean {
       // but strictly BEFORE any capture. On failure the session is torn
       // down FIRST so the guide dialog is never trapped under the
       // always-on-top overlay; the user re-triggers after granting.
-      if (
-        process.platform === 'darwin' &&
-        systemPreferences.getMediaAccessStatus('screen') !== 'granted'
-      ) {
+      if (!hasScreenPermission()) {
         await teardown()
         await ensureScreenPermission()
         return

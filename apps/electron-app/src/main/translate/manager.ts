@@ -24,7 +24,7 @@ import { streamTranslation } from './deepseek'
  * Selection-translate session manager.
  *
  * The Swift watcher streams selection changes; a debounce waits for the
- * selection to stabilize (~400ms of quiet) before presenting the pill. While
+ * selection to stabilize (600ms of quiet) before presenting the pill. While
  * the tooltip is visible, new selections are ignored to avoid feedback loops
  * with our own focused window (dismiss on blur first, then select again).
  *
@@ -34,25 +34,19 @@ import { streamTranslation } from './deepseek'
  */
 
 /** Selection must be quiet this long before the dot appears. */
-const DEBOUNCE_MS = 200
+const DEBOUNCE_MS = 600
 /** Max characters sent to the API. */
 const MAX_TEXT = 2000
 /** Dot fallback size before the renderer reports its measured size. */
 const PILL_SIZE = { width: 24, height: 24 }
 /** Permission re-check interval while the watcher should be running. */
 const PERM_POLL_MS = 10_000
-/** Closing a card suppresses a same-text pill re-show for this long. */
-const PILL_ECHO_SUPPRESS_MS = 5_000
 
 let debounceTimer: NodeJS.Timeout | null = null
 let lastSelection: SelectionEvent | null = null
 let visible = false
 let abortController: AbortController | null = null
 let permPollTimer: NodeJS.Timeout | null = null
-/** Last shown pill text (echo suppression bookkeeping). */
-let lastPillText: string | null = null
-let pillSuppressedText: string | null = null
-let pillSuppressedAt = 0
 
 export function isTranslateTooltipVisible(): boolean {
   return visible
@@ -105,19 +99,12 @@ function onWatcherSelection(sel: SelectionEvent | null): void {
     if (!stable || visible) return
     const text = sanitize(stable.text)
     if (!text) return
-    // Echo suppression: closing a card often re-fires a selection event for
-    // the very same text (focus returns to the source app). Without bounds
-    // such events anchor at the cursor; never re-show the dot for them.
-    if (text === pillSuppressedText && Date.now() - pillSuppressedAt < PILL_ECHO_SUPPRESS_MS) {
-      return
-    }
     showPill(text, anchorOf(stable))
   }, DEBOUNCE_MS)
 }
 
 function showPill(text: string, anchor: { x: number; y: number }): void {
   ensureTooltipWindow()
-  lastPillText = text
   const payload: TranslateSelectionPayload = {
     text,
     targetLang: detectTargetLang(text),
@@ -215,11 +202,6 @@ export function dismissTooltip(): void {
   cancelTranslation()
   hideTooltip()
   visible = false
-  // Suppress a same-text pill echo right after closing a card.
-  if (lastPillText) {
-    pillSuppressedText = lastPillText
-    pillSuppressedAt = Date.now()
-  }
 }
 
 /** App startup wiring: apply prefs and pre-warm the tooltip renderer. */

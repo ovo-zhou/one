@@ -1,4 +1,4 @@
-import { app, BrowserWindow, systemPreferences } from 'electron'
+import { app, BrowserWindow } from 'electron'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { registerIpcHandlers, stopAllServices } from './ipc'
 import { setupMenu } from './menu'
@@ -7,6 +7,7 @@ import { disableProxyIfOwned } from './whistle-actions'
 import { APP_ID, APP_NAME, createMainWindow } from './window'
 import { applyScreenshotShortcut, unregisterScreenshotShortcut } from './screenshot/shortcut'
 import { stopWindowDetect, warmWindowDetect } from './screenshot/window-detect'
+import { warmScreenPermissionStatus } from './screenshot/capture'
 import { cleanupPinImages, closeAllPins } from './screenshot/pin'
 import { destroyOverlayWindow, ensureOverlayWindow, isOverlayWindow } from './screenshot/overlay'
 import { applyTranslateShortcut, unregisterTranslateShortcut } from './translate/shortcut'
@@ -61,17 +62,18 @@ if (!app.requestSingleInstanceLock()) {
     // (relaunch overlap) and blocked the first pass.
     setTimeout(() => void cleanupStaleBackups(), 5_000)
 
-    // Pre-warm the screenshot overlay renderer shortly after launch so the
-    // first screenshot skips the ~300-600ms window cold start. Same for the
-    // translate tooltip window. The window-detect helper stays resident from
-    // here on so screenshots never wait for a cold spawn, and the TCC
-    // screen-capture query is warmed (its first call can take seconds).
+    // Start screenshot-specific warm-up on the next turn instead of waiting
+    // a full second: an early shortcut now has a ready overlay and a running
+    // window helper. Keep the TCC query delayed so it cannot make app launch
+    // feel slower; its result is cached for all screenshot sessions.
     setTimeout(() => {
       if (!quitting) {
         ensureOverlayWindow()
         void warmWindowDetect()
-        if (process.platform === 'darwin') systemPreferences.getMediaAccessStatus('screen')
       }
+    }, 0)
+    setTimeout(() => {
+      if (!quitting) warmScreenPermissionStatus()
     }, 1000)
     setTimeout(() => {
       if (!quitting) ensureTooltipWindow()
