@@ -2,6 +2,8 @@ import { app, dialog, ipcMain, webContents } from 'electron'
 import { writeFile } from 'fs/promises'
 import {
   IPC,
+  type ApiRequestPayload,
+  type ApiRequestResponse,
   type AppInfo,
   type ModuleStatusEventPayload,
   type MultiWinTab,
@@ -31,6 +33,44 @@ function broadcastStatus(moduleId: string, payload: ModuleStatusEventPayload['st
  * close (macOS red button) but resets when the app fully quits.
  */
 let activeModuleId: string | null = null
+
+function validateApiRequest(payload: unknown): ApiRequestPayload {
+  if (!payload || typeof payload !== 'object') throw new Error('Invalid API request')
+  const request = payload as Partial<ApiRequestPayload>
+  if (typeof request.url !== 'string' || typeof request.method !== 'string') {
+    throw new Error('Invalid API request')
+  }
+
+  const url = new URL(request.url)
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+    throw new Error('Only HTTP and HTTPS requests are supported')
+  }
+  if (!/^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/.test(request.method)) {
+    throw new Error('Invalid HTTP method')
+  }
+  if (!Array.isArray(request.headers) || !request.headers.every(isHeader)) {
+    throw new Error('Invalid request headers')
+  }
+  if (request.body !== null && !(request.body instanceof ArrayBuffer)) {
+    throw new Error('Invalid request body')
+  }
+
+  return {
+    url: url.toString(),
+    method: request.method,
+    headers: request.headers,
+    body: request.body
+  }
+}
+
+function isHeader(value: unknown): value is [string, string] {
+  return (
+    Array.isArray(value) &&
+    value.length === 2 &&
+    typeof value[0] === 'string' &&
+    typeof value[1] === 'string'
+  )
+}
 
 /** Registers all main-process IPC handlers. Call once after app ready. */
 export function registerIpcHandlers(): void {
@@ -90,6 +130,22 @@ export function registerIpcHandlers(): void {
   ipcMain.handle(IPC.appGetActiveModule, () => activeModuleId)
   ipcMain.handle(IPC.appSetActiveModule, (_event, moduleId: string | null) => {
     activeModuleId = moduleId
+  })
+
+  ipcMain.handle(IPC.apiRequest, async (_event, payload: unknown): Promise<ApiRequestResponse> => {
+    const request = validateApiRequest(payload)
+    const response = await fetch(request.url, {
+      method: request.method,
+      headers: request.headers,
+      body: request.body
+    })
+    return {
+      url: response.url,
+      status: response.status,
+      statusText: response.statusText,
+      headers: Array.from(response.headers.entries()),
+      body: await response.arrayBuffer()
+    }
   })
 
   ipcMain.handle(IPC.moduleGetStatus, (_event, moduleId: string) => {

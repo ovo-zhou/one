@@ -1,11 +1,13 @@
 packages:
   - "apps/*"
 allowBuilds:
+  core-js: true
   electron: true
   electron-builder: true
   electron-winstaller: true
   esbuild: true
   protobufjs: true
   sharp: true
+  vue-demi: true
 patchedDependencies:
   '@electron/osx-sign@1.3.3': patches/@electron__osx-sign@1.3.3.patch

@@ -153,7 +153,7 @@ export default function TranslateApp(): React.JSX.Element {
     // window edge gets clipped (the window is the clip rect), which is what
     // made the dot look square with a border before.
     return (
-      <div ref={rootRef} className="flex size-[24px] items-center justify-center">
+      <div ref={rootRef} className="flex size-6 items-center justify-center">
         <button
           type="button"
           onClick={() => {
@@ -162,7 +162,7 @@ export default function TranslateApp(): React.JSX.Element {
           }}
           aria-label="翻译"
           title="翻译"
-          className="group flex size-[24px] cursor-pointer items-center justify-center rounded-full outline-none"
+          className="group flex size-6 cursor-pointer items-center justify-center rounded-full outline-none"
         >
           <span className="block size-3.5 rounded-full bg-red-500 ring-[1.5px] ring-white/70 transition-transform duration-150 group-hover:scale-[1.35] group-active:scale-110" />
         </button>
@@ -199,10 +199,10 @@ export default function TranslateApp(): React.JSX.Element {
             </div>
           )}
           {(mode === 'streaming' || mode === 'done') && (
-            <p className="whitespace-pre-wrap break-words text-sm leading-relaxed select-text">
+            <p className="whitespace-pre-wrap wrap-break-words text-sm leading-relaxed select-text">
               {result}
               {mode === 'streaming' && (
-                <span className="ml-0.5 inline-block h-3.5 w-[2px] animate-pulse bg-foreground align-middle" />
+                <span className="ml-0.5 inline-block h-3.5 w-0.5 animate-pulse bg-foreground align-middle" />
               )}
             </p>
           )}

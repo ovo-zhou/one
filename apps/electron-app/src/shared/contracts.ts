@@ -44,6 +44,8 @@ export interface Prefs {
   systemProxyEnabledByApp: boolean
   /** URLs entered in the multi-window config modal, most recent first. */
   multiwinUrlHistory: string[]
+  /** API-client saved request snapshots, most recent first. */
+  apiClientSnapshots: ApiClientSnapshot[]
   screenshot: ScreenshotPrefs
   translate: TranslatePrefs
 }
@@ -83,6 +85,8 @@ export const IPC = {
   screenshotPinResize: 'screenshot:pinResize',
   screenshotPinOpacity: 'screenshot:pinOpacity',
   testImageSave: 'testImage:save',
+  /** Renderer → main: send an API-client request outside Chromium CORS restrictions. */
+  apiRequest: 'api:request',
   /** Main → tooltip: a stable text selection was made; show the pill. */
   translateSelection: 'translate:selection',
   /** Tooltip → main: run a streaming translation for the given text. */
@@ -160,6 +164,41 @@ export interface TestImageSavePayload {
   format: TestImageFormat
   /** Encoded image bytes, e.g. ArrayBuffer from canvas.toBlob(). */
   data: ArrayBuffer
+}
+
+/** A user-authored HTTP request sent through the main process, outside renderer CORS. */
+export interface ApiRequestPayload {
+  url: string
+  method: string
+  headers: Array<[string, string]>
+  body: ArrayBuffer | null
+}
+
+/** A serializable fetch response returned to the API-client renderer. */
+export interface ApiRequestResponse {
+  url: string
+  status: number
+  statusText: string
+  headers: Array<[string, string]>
+  body: ArrayBuffer
+}
+
+/**
+ * A saved API-client request snapshot. `id` is a UUID generated at save time
+ * and is the only stable identity — titles and URLs may repeat or change.
+ */
+export interface ApiClientSnapshot {
+  id: string
+  title: string
+  method: string
+  /** Protocol prefix, 'https://' or 'http://'. */
+  protocol: string
+  /** URL without the protocol prefix, as shown in the request bar. */
+  url: string
+  headers: Array<[string, string]>
+  body: string
+  createdAt: number
+  updatedAt: number
 }
 
 export interface ModuleStatusEventPayload {
@@ -276,6 +315,8 @@ export interface ElectronApi {
   screenshotPinSetOpacity(pinId: number, opacity: number): Promise<void>
   /** Shows a save dialog and writes the image; returns the path or null on cancel. */
   saveTestImage(payload: TestImageSavePayload): Promise<string | null>
+  /** Sends an http(s) request in main so API tools are not limited by renderer CORS. */
+  sendApiRequest(payload: ApiRequestPayload): Promise<ApiRequestResponse>
   /** Tooltip: selection push from main (drives the pill). */
   onTranslateSelection(listener: (payload: TranslateSelectionPayload) => void): () => void
   /** Tooltip: starts a streaming translation; deltas arrive via onTranslateChunk. */

@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync } from 'fs'
 import { join } from 'path'
 import { app } from 'electron'
-import type { Prefs, PrefsPatch, TranslateModel } from '../shared/contracts'
+import type { ApiClientSnapshot, Prefs, PrefsPatch, TranslateModel } from '../shared/contracts'
 
 export const DEFAULT_SCREENSHOT_SHORTCUT = 'Control+Command+A'
 export const DEFAULT_TRANSLATE_SHORTCUT = 'Alt+Shift+T'
@@ -10,9 +10,13 @@ export const DEFAULT_TRANSLATE_MODEL: TranslateModel = 'deepseek-v4-flash'
 /** Max URLs kept in the multi-window history (most recent first). */
 const MAX_URL_HISTORY = 50
 
+/** Max API-client snapshots kept in prefs (most recent first). */
+const MAX_API_SNAPSHOTS = 200
+
 const DEFAULT_PREFS: Prefs = {
   systemProxyEnabledByApp: false,
   multiwinUrlHistory: [],
+  apiClientSnapshots: [],
   screenshot: {
     shortcut: DEFAULT_SCREENSHOT_SHORTCUT,
     format: 'png',
@@ -29,6 +33,39 @@ const DEFAULT_PREFS: Prefs = {
 
 function isTranslateModel(v: unknown): v is TranslateModel {
   return v === 'deepseek-v4-flash' || v === 'deepseek-v4-pro'
+}
+
+function isSnapshotHeader(value: unknown): value is [string, string] {
+  return (
+    Array.isArray(value) &&
+    value.length === 2 &&
+    typeof value[0] === 'string' &&
+    typeof value[1] === 'string'
+  )
+}
+
+function parseSnapshot(value: unknown): ApiClientSnapshot | null {
+  if (!value || typeof value !== 'object') return null
+  const s = value as Record<string, unknown>
+  if (typeof s.id !== 'string' || !s.id.trim()) return null
+  if (typeof s.title !== 'string') return null
+  if (typeof s.method !== 'string' || !s.method.trim()) return null
+  if (s.protocol !== 'https://' && s.protocol !== 'http://') return null
+  if (typeof s.url !== 'string') return null
+  if (!Array.isArray(s.headers) || !s.headers.every(isSnapshotHeader)) return null
+  if (typeof s.body !== 'string') return null
+  const createdAt = typeof s.createdAt === 'number' ? s.createdAt : Date.now()
+  return {
+    id: s.id,
+    title: s.title,
+    method: s.method,
+    protocol: s.protocol,
+    url: s.url,
+    headers: s.headers,
+    body: s.body,
+    createdAt,
+    updatedAt: typeof s.updatedAt === 'number' ? s.updatedAt : createdAt
+  }
 }
 
 let cache: Prefs | null = null
@@ -48,6 +85,11 @@ function load(): Prefs {
       next.multiwinUrlHistory = raw.multiwinUrlHistory.filter(
         (u): u is string => typeof u === 'string' && u.trim().length > 0
       )
+    }
+    if (Array.isArray(raw.apiClientSnapshots)) {
+      next.apiClientSnapshots = raw.apiClientSnapshots
+        .map(parseSnapshot)
+        .filter((s): s is ApiClientSnapshot => s !== null)
     }
     const s = raw.screenshot
     if (s && typeof s === 'object') {
@@ -92,6 +134,7 @@ export function getPrefs(): Prefs {
   return {
     ...cache,
     multiwinUrlHistory: [...cache.multiwinUrlHistory],
+    apiClientSnapshots: cache.apiClientSnapshots.map((s) => ({ ...s })),
     screenshot: { ...cache.screenshot },
     translate: { ...cache.translate }
   }
@@ -116,6 +159,12 @@ export function setPrefs(patch: PrefsPatch): Prefs {
       if (urls.length >= MAX_URL_HISTORY) break
     }
     next.multiwinUrlHistory = urls
+  }
+  if (Array.isArray(patch.apiClientSnapshots)) {
+    next.apiClientSnapshots = patch.apiClientSnapshots
+      .map(parseSnapshot)
+      .filter((s): s is ApiClientSnapshot => s !== null)
+      .slice(0, MAX_API_SNAPSHOTS)
   }
   const sp = patch.screenshot
   if (sp) {
@@ -154,6 +203,7 @@ export function setPrefs(patch: PrefsPatch): Prefs {
   return {
     ...cache,
     multiwinUrlHistory: [...cache.multiwinUrlHistory],
+    apiClientSnapshots: cache.apiClientSnapshots.map((s) => ({ ...s })),
     screenshot: { ...cache.screenshot },
     translate: { ...cache.translate }
   }

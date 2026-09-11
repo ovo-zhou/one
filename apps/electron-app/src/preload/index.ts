@@ -1,6 +1,8 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import {
   IPC,
+  type ApiRequestPayload,
+  type ApiRequestResponse,
   type ModuleServiceStatus,
   type MultiWinTab,
   type PrefsPatch,
@@ -90,6 +92,8 @@ const api = {
   screenshotPinSetOpacity: (pinId: number, opacity: number) =>
     ipcRenderer.invoke(IPC.screenshotPinOpacity, pinId, opacity),
   saveTestImage: (payload: TestImageSavePayload) => ipcRenderer.invoke(IPC.testImageSave, payload),
+  sendApiRequest: (payload: ApiRequestPayload) =>
+    ipcRenderer.invoke(IPC.apiRequest, payload) as Promise<ApiRequestResponse>,
   onTranslateSelection: (listener: (payload: TranslateSelectionPayload) => void) => {
     const handler = (_event: unknown, payload: TranslateSelectionPayload): void => listener(payload)
     ipcRenderer.on(IPC.translateSelection, handler)
