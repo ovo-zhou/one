@@ -270,10 +270,10 @@ export default function TestImagePanel(): React.JSX.Element {
   }, [cfg, fileBase, saving, transparent])
 
   return (
-    <div className="flex h-full flex-1 overflow-hidden p-6">
-      <div className="flex h-full w-full flex-col gap-4 lg:flex-row">
+    <div className="flex h-full flex-1 overflow-hidden p-2">
+      <div className="flex h-full w-full flex-col gap-2 lg:flex-row">
         {/* Config panel */}
-        <section className="flex w-full flex-col gap-4 lg:w-80 lg:shrink-0 lg:overflow-y-auto">
+        <section className="flex w-full flex-col gap-2 lg:w-80 lg:shrink-0 lg:overflow-y-auto">
           <div className="flex flex-col gap-4 rounded-xl border bg-card p-4">
             <Field label="尺寸（px，1–8000）">
               <span className="flex items-center gap-2">
@@ -507,7 +507,7 @@ export default function TestImagePanel(): React.JSX.Element {
               </Dialog.Portal>
             </Dialog.Root>
           </div>
-          <div className="flex flex-1 items-center justify-center overflow-auto p-6">
+          <div className="flex flex-1 items-center justify-center overflow-auto p-2">
             <canvas
               ref={previewRef}
               className={cn(

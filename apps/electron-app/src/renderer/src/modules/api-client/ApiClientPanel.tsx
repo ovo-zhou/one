@@ -1,21 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
-import {
-  Check,
-  ChevronDown,
-  ChevronRight,
-  Import,
-  Plus,
-  RotateCcw,
-  Save,
-  Send,
-  Trash2
-} from 'lucide-react'
+import { Check, ChevronDown, Import, Plus, RotateCcw, Save, Send, Trash2 } from 'lucide-react'
 import { Autocomplete } from '@base-ui/react/autocomplete'
 import { Dialog } from '@base-ui/react/dialog'
 import { Input } from '@base-ui/react/input'
 import { Select } from '@base-ui/react/select'
 import type { ApiClientSnapshot, ApiRequestResponse } from '../../../../shared/contracts'
 import { Button } from '../../components/ui/button'
+import { Switch } from '../../components/ui/switch'
+import { JsonInputEditor } from '../json/JsonPanel'
 import { parseCurl } from './curl'
 import './api-client.css'
 
@@ -294,8 +286,100 @@ X-XSS-Protection
   .trim()
   .split('\n')
 
-type Header = { id: number; key: string; value: string }
-type AutoHeader = { key: string; value: string }
+const BROWSER_REQUEST_HEADER_NAME_SET = new Set([
+  'Accept',
+  'Accept-Encoding',
+  'Accept-Language',
+  'Access-Control-Request-Headers',
+  'Access-Control-Request-Method',
+  'Authorization',
+  'Cache-Control',
+  'Connection',
+  'Content-Encoding',
+  'Content-Length',
+  'Content-Type',
+  'Cookie',
+  'Host',
+  'If-Match',
+  'If-Modified-Since',
+  'If-None-Match',
+  'If-Range',
+  'If-Unmodified-Since',
+  'Origin',
+  'Pragma',
+  'Priority',
+  'Range',
+  'Referer',
+  'Sec-Fetch-Dest',
+  'Sec-Fetch-Mode',
+  'Sec-Fetch-Site',
+  'Sec-Fetch-User',
+  'TE',
+  'Transfer-Encoding',
+  'Upgrade',
+  'User-Agent',
+  'X-Api-Key',
+  'X-CSRF-Token',
+  'X-Forwarded-For',
+  'X-Forwarded-Host',
+  'X-Forwarded-Proto',
+  'X-HTTP-Method-Override',
+  'X-Real-IP',
+  'X-Requested-With'
+])
+
+const BROWSER_REQUEST_HEADER_NAMES = [
+  ...new Set([
+    ...HTTP_HEADER_NAMES.filter((headerName) => BROWSER_REQUEST_HEADER_NAME_SET.has(headerName)),
+    'DNT',
+    'Sec-CH-UA',
+    'Sec-CH-UA-Mobile',
+    'Sec-CH-UA-Platform',
+    'Upgrade-Insecure-Requests'
+  ])
+].sort()
+
+const HEADER_VALUE_SUGGESTIONS: Record<string, string[]> = {
+  accept: ['*/*', 'application/json', 'application/json, text/plain, */*', 'text/html'],
+  'accept-encoding': ['gzip, deflate, br, zstd', 'gzip, deflate', 'identity'],
+  'accept-language': ['zh-CN,zh;q=0.9,en;q=0.8', 'en-US,en;q=0.9', '*'],
+  'access-control-request-headers': ['authorization, content-type', 'content-type'],
+  'access-control-request-method': ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+  authorization: ['Bearer ', 'Basic '],
+  'cache-control': ['no-cache', 'no-store', 'max-age=0'],
+  connection: ['keep-alive', 'close'],
+  'content-type': [
+    'application/json',
+    'application/x-www-form-urlencoded',
+    'multipart/form-data',
+    'text/plain'
+  ],
+  dnt: ['1', '0'],
+  origin: ['https://'],
+  pragma: ['no-cache'],
+  range: ['bytes=0-'],
+  referer: ['https://'],
+  'sec-fetch-dest': ['empty', 'document', 'image', 'script', 'style'],
+  'sec-fetch-mode': ['cors', 'navigate', 'no-cors', 'same-origin', 'websocket'],
+  'sec-fetch-site': ['cross-site', 'same-origin', 'same-site', 'none'],
+  'sec-fetch-user': ['?1'],
+  te: ['trailers'],
+  upgrade: ['websocket'],
+  'upgrade-insecure-requests': ['1'],
+  'user-agent': ['node'],
+  'x-requested-with': ['XMLHttpRequest']
+}
+
+const INITIAL_HEADERS: ReadonlyArray<readonly [string, string]> = [
+  ['Connection', 'keep-alive'],
+  ['Accept', '*/*'],
+  ['Accept-Language', '*'],
+  ['Sec-Fetch-Mode', 'cors'],
+  ['User-Agent', 'node'],
+  ['Accept-Encoding', 'gzip, deflate']
+]
+
+type Header = { id: string; key: string; value: string }
 type Protocol = (typeof PROTOCOLS)[number]
 
 interface ResponseView extends ApiRequestResponse {
@@ -312,37 +396,50 @@ function decodeResponse(response: ApiRequestResponse): ResponseView {
   }
 }
 
-function HeaderNameInput({
+let nextHeaderId = 0
+
+function createHeader(key = '', value = ''): Header {
+  nextHeaderId += 1
+  return { id: `${Date.now()}-${nextHeaderId}`, key, value }
+}
+
+function headersFromPairs(headers: ReadonlyArray<readonly [string, string]>): Header[] {
+  return headers.map(([key, value]) => createHeader(key, value))
+}
+
+function HeaderAutocompleteInput({
   value,
-  onValueChange
+  onValueChange,
+  items,
+  placeholder,
+  ariaLabel
 }: {
   value: string
   onValueChange: (value: string) => void
+  items: readonly string[]
+  placeholder: string
+  ariaLabel: string
 }): React.JSX.Element {
   return (
-    <Autocomplete.Root items={HTTP_HEADER_NAMES} value={value} onValueChange={onValueChange}>
+    <Autocomplete.Root items={items} value={value} onValueChange={onValueChange}>
       <Autocomplete.InputGroup className="api-header-name-input-group">
         <Autocomplete.Input
           className="api-header-name-input"
-          placeholder="Key"
-          aria-label="Header 名称"
+          placeholder={placeholder}
+          aria-label={ariaLabel}
         />
-        <Autocomplete.Trigger className="api-header-name-trigger" aria-label="选择 Header 名称">
+        <Autocomplete.Trigger className="api-header-name-trigger" aria-label={`选择${ariaLabel}`}>
           <ChevronDown />
         </Autocomplete.Trigger>
       </Autocomplete.InputGroup>
       <Autocomplete.Portal>
         <Autocomplete.Positioner className="api-header-name-positioner">
           <Autocomplete.Popup className="api-header-name-popup">
-            <Autocomplete.Empty className="api-header-name-empty">无匹配字段</Autocomplete.Empty>
+            <Autocomplete.Empty className="api-header-name-empty">无匹配选项</Autocomplete.Empty>
             <Autocomplete.List className="api-header-name-list">
-              {(headerName: string) => (
-                <Autocomplete.Item
-                  className="api-header-name-item"
-                  key={headerName}
-                  value={headerName}
-                >
-                  {headerName}
+              {(item: string) => (
+                <Autocomplete.Item className="api-header-name-item" key={item} value={item}>
+                  {item}
                 </Autocomplete.Item>
               )}
             </Autocomplete.List>
@@ -357,12 +454,12 @@ export default function ApiClientPanel(): React.JSX.Element {
   const [method, setMethod] = useState<(typeof METHODS)[number]>('GET')
   const [protocol, setProtocol] = useState<Protocol>('https://')
   const [url, setUrl] = useState('')
-  const [headers, setHeaders] = useState<Header[]>([])
+  const [headers, setHeaders] = useState<Header[]>(() => headersFromPairs(INITIAL_HEADERS))
   const [body, setBody] = useState('')
   const [response, setResponse] = useState<ResponseView | null>(null)
+  const [showJsonResponse, setShowJsonResponse] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [sending, setSending] = useState(false)
-  const [autoHeadersExpanded, setAutoHeadersExpanded] = useState(false)
   const [curlDialogOpen, setCurlDialogOpen] = useState(false)
   const [curlCommand, setCurlCommand] = useState('')
   const [curlError, setCurlError] = useState<string | null>(null)
@@ -385,36 +482,6 @@ export default function ApiClientPanel(): React.JSX.Element {
     [headers]
   )
 
-  const autoHeaders = useMemo<AutoHeader[]>(() => {
-    const manualHeaderNames = new Set(requestHeaders.map(([key]) => key.toLowerCase()))
-    const hasBody = !['GET', 'HEAD'].includes(method) && Boolean(body)
-    let host: string | null = null
-
-    try {
-      host = new URL(requestUrl).host
-    } catch {
-      // The send action remains disabled until the URL is valid.
-    }
-
-    const generated: Array<AutoHeader | null> = [
-      host ? { key: 'Host', value: host } : null,
-      { key: 'Connection', value: 'keep-alive' },
-      { key: 'Accept', value: '*/*' },
-      { key: 'Accept-Language', value: '*' },
-      { key: 'Sec-Fetch-Mode', value: 'cors' },
-      { key: 'User-Agent', value: 'node' },
-      { key: 'Accept-Encoding', value: 'gzip, deflate' },
-      hasBody
-        ? { key: 'Content-Length', value: String(new TextEncoder().encode(body).byteLength) }
-        : null
-    ]
-
-    return generated.filter(
-      (header): header is AutoHeader =>
-        header !== null && !manualHeaderNames.has(header.key.toLowerCase())
-    )
-  }, [body, method, requestHeaders, requestUrl])
-
   const canSend = useMemo(() => {
     try {
       const parsed = new URL(requestUrl)
@@ -434,7 +501,7 @@ export default function ApiClientPanel(): React.JSX.Element {
     setUrl(value)
   }
 
-  const updateHeader = (id: number, field: 'key' | 'value', value: string): void => {
+  const updateHeader = (id: string, field: 'key' | 'value', value: string): void => {
     setHeaders((items) =>
       items.map((item) => (item.id === id ? { ...item, [field]: value } : item))
     )
@@ -457,9 +524,7 @@ export default function ApiClientPanel(): React.JSX.Element {
       setMethod(imported.method as (typeof METHODS)[number])
       setProtocol(`${importedUrl.protocol}//` as Protocol)
       setUrl(`${importedUrl.host}${importedUrl.pathname}${importedUrl.search}`)
-      setHeaders(
-        imported.headers.map(([key, value], index) => ({ id: Date.now() + index, key, value }))
-      )
+      setHeaders(headersFromPairs(imported.headers))
       setBody(imported.body)
       setError(null)
       setResponse(null)
@@ -537,13 +602,10 @@ export default function ApiClientPanel(): React.JSX.Element {
     )
     setProtocol(snapshot.protocol === 'http://' ? 'http://' : 'https://')
     setUrl(snapshot.url)
-    setHeaders(
-      snapshot.headers.map(([key, value], index) => ({ id: Date.now() + index, key, value }))
-    )
+    setHeaders(headersFromPairs(snapshot.headers))
     setBody(snapshot.body)
     setResponse(null)
     setError(null)
-    setAutoHeadersExpanded(false)
     setActiveSnapshotId(snapshot.id)
   }
 
@@ -556,11 +618,10 @@ export default function ApiClientPanel(): React.JSX.Element {
     setMethod('GET')
     setProtocol('https://')
     setUrl('')
-    setHeaders([])
+    setHeaders(headersFromPairs(INITIAL_HEADERS))
     setBody('')
     setResponse(null)
     setError(null)
-    setAutoHeadersExpanded(false)
     setCurlDialogOpen(false)
     setCurlCommand('')
     setCurlError(null)
@@ -573,6 +634,7 @@ export default function ApiClientPanel(): React.JSX.Element {
     setSending(true)
     setError(null)
     setResponse(null)
+    setShowJsonResponse(true)
 
     try {
       const encodedBody = new TextEncoder().encode(body)
@@ -772,9 +834,7 @@ export default function ApiClientPanel(): React.JSX.Element {
                 <Button
                   size="xs"
                   variant="ghost"
-                  onClick={() =>
-                    setHeaders((items) => [...items, { id: Date.now(), key: '', value: '' }])
-                  }
+                  onClick={() => setHeaders((items) => [...items, createHeader()])}
                 >
                   <Plus /> 添加
                 </Button>
@@ -785,15 +845,19 @@ export default function ApiClientPanel(): React.JSX.Element {
                 ) : (
                   headers.map((header) => (
                     <div className="api-header-row" key={header.id}>
-                      <HeaderNameInput
+                      <HeaderAutocompleteInput
                         value={header.key}
                         onValueChange={(value) => updateHeader(header.id, 'key', value)}
+                        items={BROWSER_REQUEST_HEADER_NAMES}
+                        placeholder="Key"
+                        ariaLabel="Header 名称"
                       />
-                      <Input
+                      <HeaderAutocompleteInput
                         value={header.value}
                         onValueChange={(value) => updateHeader(header.id, 'value', value)}
+                        items={HEADER_VALUE_SUGGESTIONS[header.key.trim().toLowerCase()] ?? []}
                         placeholder="Value"
-                        aria-label="Header 值"
+                        ariaLabel="Header 值"
                       />
                       <Button
                         size="icon"
@@ -808,52 +872,18 @@ export default function ApiClientPanel(): React.JSX.Element {
                     </div>
                   ))
                 )}
-                <div className="api-auto-headers">
-                  <Button
-                    className="api-auto-headers-toggle"
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => setAutoHeadersExpanded((expanded) => !expanded)}
-                  >
-                    {autoHeadersExpanded ? <ChevronDown /> : <ChevronRight />}
-                    自动添加 ({autoHeaders.length})<span>由请求运行时生成</span>
-                  </Button>
-                  {autoHeadersExpanded && (
-                    <div className="api-auto-headers-list">
-                      {autoHeaders.map((header) => (
-                        <div className="api-auto-header-row" key={header.key}>
-                          <Input
-                            aria-label={`自动 Header 名称：${header.key}`}
-                            readOnly
-                            value={header.key}
-                          />
-                          <Input
-                            aria-label={`自动 Header 值：${header.key}`}
-                            readOnly
-                            value={header.value}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
               </div>
             </section>
 
             <section>
-              <div className="api-section-title">
-                <span>JSON Body</span>
-                {['GET', 'HEAD'].includes(method) && (
-                  <span className="api-hint">该方法不会发送 Body</span>
-                )}
-              </div>
-              <textarea
+              <JsonInputEditor
                 value={body}
-                onChange={(event) => setBody(event.target.value)}
+                onValueChange={setBody}
+                label=""
                 placeholder={'{\n  "name": "Ada"\n}'}
-                spellCheck={false}
-                aria-label="JSON Body"
+                ariaLabel="JSON Body"
                 disabled={['GET', 'HEAD'].includes(method)}
+                className="api-json-body-editor"
               />
             </section>
           </div>
@@ -869,14 +899,37 @@ export default function ApiClientPanel(): React.JSX.Element {
                 {response.status} {response.statusText}
               </span>
             )}
+            {response && (
+              <label className="api-response-view-toggle">
+                <span>JSON 预览</span>
+                <Switch
+                  checked={showJsonResponse}
+                  onCheckedChange={setShowJsonResponse}
+                  aria-label="切换 JSON 响应预览"
+                />
+              </label>
+            )}
           </div>
-          {error ? (
-            <p className="api-error">{error}</p>
-          ) : response ? (
-            <pre>{response.bodyText || '(空响应)'}</pre>
-          ) : (
-            <p className="api-empty">发送请求后在这里查看状态和响应内容</p>
-          )}
+          <div className="api-response-content">
+            {error ? (
+              <p className="api-error">{error}</p>
+            ) : response ? (
+              showJsonResponse ? (
+                <JsonInputEditor
+                  value={response.bodyText}
+                  onValueChange={() => {}}
+                  label=""
+                  readOnly
+                  ariaLabel="JSON 响应"
+                  className="api-json-response-editor"
+                />
+              ) : (
+                <pre>{response.bodyText || '(空响应)'}</pre>
+              )
+            ) : (
+              <p className="api-empty">发送请求后在这里查看状态和响应内容</p>
+            )}
+          </div>
         </section>
       </div>
 

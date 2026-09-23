@@ -2,9 +2,8 @@
   display: flex;
   min-height: 0;
   flex: 1;
-  gap: 1rem;
-  overflow: auto;
-  padding: 1.5rem;
+  overflow: hidden;
+  background: var(--background);
 }
 
 .api-workspace {
@@ -12,7 +11,7 @@
   min-width: 0;
   flex: 1;
   grid-template-rows: auto minmax(0, 1fr);
-  gap: 1rem;
+  overflow: hidden;
 }
 
 .api-sidebar {
@@ -21,15 +20,13 @@
   flex-shrink: 0;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  background: var(--card);
+  border-right: 1px solid var(--border);
+  background: var(--sidebar);
 }
 
 .api-sidebar-header {
   display: flex;
-  padding: 0.5rem;
-  border-bottom: 1px solid var(--border);
+  padding: 0.75rem;
 }
 
 .api-new-request-button {
@@ -42,7 +39,7 @@
   align-content: start;
   gap: 0.25rem;
   overflow-y: auto;
-  padding: 0.5rem;
+  padding: 0 0.5rem 0.75rem;
 }
 
 .api-sidebar-item {
@@ -117,21 +114,22 @@
 .api-request-card,
 .api-response-card {
   overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
+  border: 0;
+  border-radius: 0;
+}
+
+.api-request-card {
   background: var(--card);
 }
 
 .api-request-bar {
   display: flex;
   gap: 0.5rem;
-  padding: 0.75rem;
-  border-bottom: 1px solid var(--border);
+  padding: 0.5rem;
 }
 
 .api-request-bar input,
-.api-header-row input,
-.api-editor-grid textarea {
+.api-header-row input {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--background);
@@ -262,10 +260,18 @@
 .api-editor-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0.5rem;
+  padding: 0.5rem;
 }
 
-.api-editor-grid > section + section {
-  border-left: 1px solid var(--border);
+.api-editor-grid > section {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--background);
 }
 
 .api-section-title,
@@ -274,13 +280,16 @@
   min-height: 2.75rem;
   align-items: center;
   gap: 0.5rem;
-  padding: 0 0.75rem;
-  border-bottom: 1px solid var(--border);
+  padding: 0 1rem;
   font-size: 0.875rem;
   font-weight: 600;
 }
 
 .api-section-title > :first-child {
+  margin-right: auto;
+}
+
+.api-response-title > :first-child {
   margin-right: auto;
 }
 
@@ -293,7 +302,7 @@
 
 .api-headers {
   min-height: 8rem;
-  padding: 0.75rem;
+  padding: 0 0.75rem 0.75rem;
 }
 
 .api-header-row {
@@ -310,45 +319,6 @@
   min-width: 0;
   height: 2rem;
   padding: 0 0.5rem;
-  font-size: 0.8rem;
-}
-
-.api-auto-headers {
-  margin-top: 0.75rem;
-  border-top: 1px solid var(--border);
-  padding-top: 0.5rem;
-}
-
-.api-auto-headers-toggle {
-  width: 100%;
-  justify-content: flex-start;
-  color: var(--muted-foreground);
-}
-
-.api-auto-headers-toggle span {
-  margin-left: auto;
-  font-weight: 400;
-}
-
-.api-auto-headers-list {
-  display: grid;
-  gap: 0.5rem;
-  padding-top: 0.5rem;
-}
-
-.api-auto-header-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 0.5rem;
-}
-
-.api-auto-header-row input {
-  min-width: 0;
-  height: 2rem;
-  padding: 0 0.5rem;
-  border-color: var(--border);
-  background: var(--muted);
-  color: var(--muted-foreground);
   font-size: 0.8rem;
 }
 
@@ -435,13 +405,30 @@
   color: var(--muted-foreground);
 }
 
-.api-editor-grid textarea {
+.api-json-body-editor {
+  min-height: 12rem;
+}
+
+.api-json-body-editor textarea {
   display: block;
-  width: calc(100% - 1.5rem);
+  width: 100%;
   min-height: 8rem;
-  margin: 0.75rem;
-  padding: 0.75rem;
-  resize: vertical;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.api-response-view-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
+.api-json-response-editor textarea {
+  min-height: 10rem;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.8rem;
   line-height: 1.5;
@@ -451,6 +438,26 @@
   display: flex;
   min-height: 14rem;
   flex-direction: column;
+  margin: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  padding: 0;
+}
+
+.api-response-title {
+  min-height: 2.75rem;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+}
+
+.api-response-content {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  margin: 0;
+  overflow: hidden;
+  background: transparent;
 }
 
 .api-status {
@@ -463,7 +470,7 @@
   color: var(--destructive);
 }
 
-.api-response-card pre {
+.api-response-content pre {
   min-height: 0;
   flex: 1;
   margin: 0;
@@ -476,7 +483,7 @@
   word-break: break-word;
 }
 
-.api-response-card > .api-empty,
+.api-response-content > .api-empty,
 .api-error {
   padding: 1rem;
 }
@@ -569,7 +576,7 @@
 @media (max-width: 760px) {
   .api-client-panel {
     flex-direction: column;
-    padding: 1rem;
+    padding: 0;
   }
 
   .api-sidebar {
@@ -585,10 +592,5 @@
 
   .api-request-bar input {
     flex-basis: calc(100% - 6.5rem);
-  }
-
-  .api-editor-grid > section + section {
-    border-top: 1px solid var(--border);
-    border-left: 0;
   }
 }
