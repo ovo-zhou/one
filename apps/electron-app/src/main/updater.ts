@@ -1,4 +1,4 @@
-import { app, dialog, Notification, shell, webContents } from 'electron'
+import { app, Notification, webContents } from 'electron'
 import { execFile } from 'node:child_process'
 import { createWriteStream, existsSync } from 'node:fs'
 import { mkdtemp, mkdir, readdir, rename, rm } from 'node:fs/promises'
@@ -23,7 +23,6 @@ import { stopWindowDetect } from './screenshot/window-detect'
 const REPO = 'ovo-zhou/one'
 const APP_BUNDLE = 'Faceless.app'
 const RELEASES_API = `https://api.github.com/repos/${REPO}/releases/latest`
-const RELEASES_PAGE = `https://github.com/${REPO}/releases/latest`
 const UA = 'faceless-updater'
 
 // Where the old bundle is moved (renamed, never unlinked) during an update.
@@ -366,60 +365,22 @@ export async function startInAppUpdate(options: { notify: boolean }): Promise<bo
   }
 }
 
-// ---------- menu / startup entry points ----------
+// ---------- startup entry point ----------
 
-/** Menu entry: check, then confirm and run the in-app update (browser fallback). */
-export function manualCheckForUpdate(): void {
-  void (async () => {
-    if (!updateSupported()) {
-      void dialog.showMessageBox({
-        type: 'warning',
-        message: '无法应用内更新',
-        detail: '应用内更新仅支持 macOS 安装包版本。开发模式请参考 README 手动更新。'
-      })
-      return
-    }
-    const check = await checkForUpdates()
-    if (check.error || !check.latestVersion) {
-      void dialog.showMessageBox({
-        type: 'warning',
-        message: '检查更新失败',
-        detail: `${check.error ?? '未知错误'}\n\n也可以直接访问发布页：${RELEASES_PAGE}`
-      })
-      return
-    }
-    if (!check.hasUpdate) {
-      void dialog.showMessageBox({
-        type: 'info',
-        message: '已是最新版本',
-        detail: `当前版本 v${check.currentVersion}`
-      })
-      return
-    }
-    const result = await dialog.showMessageBox({
-      type: 'info',
-      message: `发现新版本 v${check.latestVersion}`,
-      detail: `当前版本 v${check.currentVersion}\n\n${(check.notes ?? '').slice(0, 500)}`,
-      buttons: ['立即更新', '前往下载页', '稍后再说'],
-      defaultId: 0,
-      cancelId: 2
-    })
-    if (result.response === 0) {
-      await startInAppUpdate({ notify: true })
-    } else if (result.response === 1) {
-      void shell.openExternal(RELEASES_PAGE)
-    }
-  })()
-}
-
-/** Silent check shortly after launch; auto-updates in place when a release exists. */
+/** Silent check shortly after launch; the renderer surfaces available updates in Settings. */
 export function setupAutoCheck(): void {
   setTimeout(() => {
     void (async () => {
       if (!updateSupported()) return
       const check = await checkForUpdates()
       if (check.hasUpdate && check.latestVersion) {
-        await startInAppUpdate({ notify: true })
+        broadcast({
+          phase: 'available',
+          percent: null,
+          error: null,
+          version: check.latestVersion,
+          notes: check.notes
+        })
       }
     })()
   }, 8_000)

@@ -111,7 +111,7 @@ export const IPC = {
   updaterCheck: 'updater:check',
   /** Renderer → main: download + install the update in place, then relaunch. */
   updaterStart: 'updater:start',
-  /** Main → renderer: push channel, payload: UpdaterProgressPayload */
+  /** Main → renderer: update availability and install progress. */
   updaterProgress: 'updater:progress',
   /** Renderer → main: open the multi-window session with the given tabs. */
   multiwinStart: 'multiwin:start',
@@ -148,7 +148,7 @@ export interface UpdateCheckResult {
   error: string | null
 }
 
-export type UpdaterPhase = 'downloading' | 'installing' | 'restarting' | 'error'
+export type UpdaterPhase = 'available' | 'downloading' | 'installing' | 'restarting' | 'error'
 
 export interface UpdaterProgressPayload {
   phase: UpdaterPhase
@@ -156,6 +156,10 @@ export interface UpdaterProgressPayload {
   percent: number | null
   /** User-facing message when phase === 'error'. */
   error: string | null
+  /** Present when phase === 'available'. */
+  version?: string
+  /** Release notes when phase === 'available'. */
+  notes?: string | null
 }
 
 /** Payload for saving a generated test image from the renderer. */

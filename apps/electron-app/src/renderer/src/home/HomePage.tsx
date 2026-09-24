@@ -69,10 +69,11 @@ interface HomePageProps {
     kind: 'react' | 'web'
   }[]
   phases: Record<string, ModuleStatusDot['phase']>
+  hasUpdate: boolean
   onOpen: (moduleId: string) => void
 }
 
-export function HomePage({ modules, phases, onOpen }: HomePageProps): React.JSX.Element {
+export function HomePage({ modules, phases, hasUpdate, onOpen }: HomePageProps): React.JSX.Element {
   const [version, setVersion] = useState<string | null>(null)
 
   useEffect(() => {
@@ -84,15 +85,22 @@ export function HomePage({ modules, phases, onOpen }: HomePageProps): React.JSX.
       {/* Mac shows settings in the custom title bar (App.tsx); elsewhere use
           the in-page button since TitleBar returns null. */}
       {!IS_MAC && (
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label="设置"
-          className="absolute top-3 right-3 z-10"
-          onClick={() => onOpen('settings')}
-        >
-          <Settings />
-        </Button>
+        <span className="absolute top-3 right-3 z-10">
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={hasUpdate ? '设置（有可用更新）' : '设置'}
+            onClick={() => onOpen('settings')}
+          >
+            <Settings />
+          </Button>
+          {hasUpdate && (
+            <span
+              aria-label="有可用更新"
+              className="pointer-events-none absolute top-0.5 right-0.5 size-1.5 rounded-full bg-destructive ring-2 ring-background"
+            />
+          )}
+        </span>
       )}
 
       {/* Ambient aurora glow behind the hero. */}

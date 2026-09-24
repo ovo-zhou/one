@@ -3,6 +3,7 @@ import type { ModuleServiceStatus } from '../../../shared/contracts'
 import { Button } from '../components/ui/button'
 
 interface WebPanelProps {
+  moduleId: string
   name: string
   status: ModuleServiceStatus
   onActivate: () => void
@@ -12,8 +13,17 @@ interface WebPanelProps {
  * Generic embed for modules backed by a local web service: shows startup /
  * error states and mounts the service UI in an iframe once ready.
  */
-export function WebPanel({ name, status, onActivate }: WebPanelProps): React.JSX.Element {
+export function WebPanel({ moduleId, name, status, onActivate }: WebPanelProps): React.JSX.Element {
   if (status.phase === 'ready' && status.url) {
+    // DSH authenticates its first page load with a SameSite=Strict cookie. It
+    // must therefore be a top-level guest page, rather than a cross-site iframe
+    // under the packaged app's file:// renderer origin.
+    if (moduleId === 'dsh') {
+      return (
+        <webview src={status.url} title={name} className="h-full w-full flex-1 bg-background" />
+      )
+    }
+
     return (
       <iframe
         src={status.url}

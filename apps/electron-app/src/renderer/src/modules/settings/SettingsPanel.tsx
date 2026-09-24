@@ -170,11 +170,13 @@ export default function SettingsPanel(): React.JSX.Element {
   useEffect(() => {
     return window.api.onUpdateProgress((p: UpdaterProgressPayload) => {
       setUpdater(() =>
-        p.phase === 'downloading'
-          ? { phase: 'downloading', percent: p.percent ?? 0 }
-          : p.phase === 'error'
-            ? { phase: 'error', message: p.error ?? '未知错误' }
-            : { phase: p.phase }
+        p.phase === 'available'
+          ? { phase: 'available', version: p.version ?? '', notes: p.notes ?? null }
+          : p.phase === 'downloading'
+            ? { phase: 'downloading', percent: p.percent ?? 0 }
+            : p.phase === 'error'
+              ? { phase: 'error', message: p.error ?? '未知错误' }
+              : { phase: p.phase }
       )
     })
   }, [])
@@ -202,6 +204,10 @@ export default function SettingsPanel(): React.JSX.Element {
     const ok = await window.api.startUpdate()
     if (!ok) setUpdater((prev) => (prev.phase === 'downloading' ? { phase: 'idle' } : prev))
   }, [])
+
+  useEffect(() => {
+    void checkUpdates()
+  }, [checkUpdates])
 
   useEffect(() => {
     void window.api.getAppInfo().then(setAppInfo)

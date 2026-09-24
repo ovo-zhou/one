@@ -1,5 +1,4 @@
 import { app, dialog, Menu } from 'electron'
-import { manualCheckForUpdate } from './updater'
 import { getPrefs } from './prefs'
 import { startScreenshot } from './screenshot/manager'
 import { triggerTranslateShortcut } from './translate/manager'
@@ -75,13 +74,6 @@ function buildTemplate(): MenuTemplate {
         ...whistleItems,
         { type: 'separator' },
         { role: 'services' },
-        { type: 'separator' },
-        {
-          label: '检查更新…',
-          click: () => {
-            manualCheckForUpdate()
-          }
-        },
         { type: 'separator' },
         { role: 'hide' },
         { role: 'hideOthers' },

@@ -22,6 +22,7 @@ export default function App(): React.JSX.Element {
   const [activeId, setActiveId] = useState<string | null>(null)
   const [multiWinConfigs, setMultiWinConfigs] = useState<MultiWinConfig[]>([])
   const [showMultiWinModal, setShowMultiWinModal] = useState(false)
+  const [hasUpdate, setHasUpdate] = useState(false)
   const statuses = useModuleStatuses(WEB_IDS)
   // multiwin renders exclusively via the overlay below; its registry entry
   // exists only for the home grid, so exclude it from the primary area.
@@ -39,6 +40,12 @@ export default function App(): React.JSX.Element {
       if (moduleId && getModule(moduleId)) {
         setActiveId(moduleId)
       }
+    })
+  }, [])
+
+  useEffect(() => {
+    return window.api.onUpdateProgress((payload) => {
+      if (payload.phase === 'available') setHasUpdate(true)
     })
   }, [])
 
@@ -94,22 +101,35 @@ export default function App(): React.JSX.Element {
         onHome={titleModule ? goHome : undefined}
         right={
           !titleModule ? (
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label="设置"
-              className="size-7"
-              onClick={() => openModule('settings')}
-            >
-              <Settings className="size-4" />
-            </Button>
+            <span className="relative">
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label={hasUpdate ? '设置（有可用更新）' : '设置'}
+                className="size-7"
+                onClick={() => openModule('settings')}
+              >
+                <Settings className="size-4" />
+              </Button>
+              {hasUpdate && (
+                <span
+                  aria-label="有可用更新"
+                  className="absolute top-0.5 right-0.5 size-1.5 rounded-full bg-destructive ring-2 ring-background"
+                />
+              )}
+            </span>
           ) : undefined
         }
       />
       <div className="relative flex min-h-0 flex-1 flex-col">
         {activeModule ? (
           webModule ? (
-            <WebPanel name={webModule.name} status={status} onActivate={() => activate?.()} />
+            <WebPanel
+              moduleId={webModule.id}
+              name={webModule.name}
+              status={status}
+              onActivate={() => activate?.()}
+            />
           ) : reactModule ? (
             <Suspense
               fallback={
@@ -122,7 +142,7 @@ export default function App(): React.JSX.Element {
             </Suspense>
           ) : null
         ) : (
-          <HomePage modules={ENABLED} phases={phases} onOpen={openModule} />
+          <HomePage modules={ENABLED} phases={phases} hasUpdate={hasUpdate} onOpen={openModule} />
         )}
 
         {showMultiWinPanel && (
