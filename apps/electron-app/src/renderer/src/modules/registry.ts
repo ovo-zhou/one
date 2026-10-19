@@ -1,14 +1,5 @@
 import { lazy, type LazyExoticComponent, type ComponentType } from 'react'
-import {
-  Bot,
-  Braces,
-  ImagePlus,
-  Monitor,
-  Send,
-  Settings,
-  Waypoints,
-  type LucideIcon
-} from 'lucide-react'
+import { Bot, Braces, ImagePlus, Send, Settings, Waypoints, type LucideIcon } from 'lucide-react'
 import type { ModuleServiceStatus } from '../../../shared/contracts'
 
 export type ModuleStatusDot = Pick<ModuleServiceStatus, 'phase'>
@@ -66,16 +57,6 @@ export const MODULES: AppModule[] = [
     enabled: true,
     kind: 'react',
     Component: lazy(() => import('./testimage/TestImagePanel'))
-  },
-  {
-    id: 'multiwin',
-    name: '窗口多开',
-    description: '匿名窗口多开',
-    icon: Monitor,
-    order: 15,
-    enabled: true,
-    kind: 'react',
-    Component: lazy(() => import('./multiwin/MultiWindowPanel'))
   },
   {
     id: 'api-client',

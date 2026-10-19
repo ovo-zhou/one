@@ -6,7 +6,6 @@ import {
   type ApiRequestResponse,
   type AppInfo,
   type ModuleStatusEventPayload,
-  type MultiWinTab,
   type PrefsPatch,
   type TestImageSavePayload
 } from '../shared/contracts'
@@ -19,7 +18,6 @@ import { applyTranslateShortcut, unregisterTranslateShortcut } from './translate
 import { applyTranslatePrefs } from './translate/manager'
 import { rebuildAppMenu } from './menu'
 import { checkForUpdates, startInAppUpdate } from './updater'
-import { multiWinManager } from './multiwin/manager'
 
 function broadcastStatus(moduleId: string, payload: ModuleStatusEventPayload['status']): void {
   const event: ModuleStatusEventPayload = { moduleId, status: payload }
@@ -172,34 +170,6 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle(IPC.updaterCheck, () => checkForUpdates())
   ipcMain.handle(IPC.updaterStart, () => startInAppUpdate({ notify: true }))
-
-  ipcMain.handle(IPC.multiwinStart, (_event, tabs: MultiWinTab[]) => {
-    multiWinManager.start(tabs)
-  })
-  ipcMain.handle(IPC.multiwinStop, () => {
-    multiWinManager.stop()
-  })
-  ipcMain.handle(IPC.multiwinAdd, (_event, tab: MultiWinTab) => {
-    multiWinManager.add(tab)
-  })
-  ipcMain.handle(IPC.multiwinRemove, (_event, id: string) => {
-    multiWinManager.remove(id)
-  })
-  ipcMain.handle(IPC.multiwinSetActive, (_event, id: string) => {
-    multiWinManager.setActive(id)
-  })
-  ipcMain.handle(IPC.multiwinSetDevtools, (_event, id: string, on: boolean) => {
-    multiWinManager.setDevtools(id, on)
-  })
-  ipcMain.handle(IPC.multiwinReload, (_event, id: string) => {
-    multiWinManager.reload(id)
-  })
-  ipcMain.handle(IPC.multiwinLayout, (_event, info: { sidebarOpen: boolean; sidebarW: number }) => {
-    multiWinManager.layout(info)
-  })
-  ipcMain.handle(IPC.multiwinSetVisible, (_event, visible: boolean) => {
-    multiWinManager.setVisible(visible)
-  })
 
   ipcMain.handle(IPC.testImageSave, async (_event, payload: TestImageSavePayload) => {
     const ext = payload.format === 'jpeg' ? 'jpg' : payload.format

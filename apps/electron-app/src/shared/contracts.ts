@@ -42,8 +42,6 @@ export interface TranslatePrefs {
 export interface Prefs {
   /** Whether the system proxy was enabled by this app (cleanup on quit). */
   systemProxyEnabledByApp: boolean
-  /** URLs entered in the multi-window config modal, most recent first. */
-  multiwinUrlHistory: string[]
   /** API-client saved request snapshots, most recent first. */
   apiClientSnapshots: ApiClientSnapshot[]
   screenshot: ScreenshotPrefs
@@ -112,27 +110,7 @@ export const IPC = {
   /** Renderer → main: download + install the update in place, then relaunch. */
   updaterStart: 'updater:start',
   /** Main → renderer: update availability and install progress. */
-  updaterProgress: 'updater:progress',
-  /** Renderer → main: open the multi-window session with the given tabs. */
-  multiwinStart: 'multiwin:start',
-  /** Renderer → main: tear down the multi-window session (close all tabs). */
-  multiwinStop: 'multiwin:stop',
-  /** Renderer → main: append a tab. */
-  multiwinAdd: 'multiwin:add',
-  /** Renderer → main: remove a tab by id. */
-  multiwinRemove: 'multiwin:remove',
-  /** Renderer → main: switch the active (visible) tab. */
-  multiwinSetActive: 'multiwin:setActive',
-  /** Renderer → main: toggle a tab's DevTools. */
-  multiwinSetDevtools: 'multiwin:setDevtools',
-  /** Renderer → main: reload a tab's page. */
-  multiwinReload: 'multiwin:reload',
-  /** Renderer → main: content-area layout changed (sidebar width/visibility). */
-  multiwinLayout: 'multiwin:layout',
-  /** Renderer → main: show/hide the whole session (e.g. navigating away). */
-  multiwinSetVisible: 'multiwin:setVisible',
-  /** Main → renderer: push channel, payload: MultiWinStatusPayload */
-  multiwinStatus: 'multiwin:status'
+  updaterProgress: 'updater:progress'
 } as const
 
 /** Result of a manual/silent update check. */
@@ -347,33 +325,4 @@ export interface ElectronApi {
   startUpdate(): Promise<boolean>
   /** Subscribe to download/install progress; returns unsubscribe. */
   onUpdateProgress(listener: (payload: UpdaterProgressPayload) => void): () => void
-  /** Open the multi-window session; each tab becomes its own child window. */
-  multiwinStart(tabs: MultiWinTab[]): Promise<void>
-  /** Tear down the multi-window session. */
-  multiwinStop(): Promise<void>
-  /** Append a tab (own child window). */
-  multiwinAdd(tab: MultiWinTab): Promise<void>
-  /** Remove a tab by id. */
-  multiwinRemove(id: string): Promise<void>
-  /** Make a tab the active (visible) one. */
-  multiwinSetActive(id: string): Promise<void>
-  /** Toggle a tab's DevTools (docked inside its own window). */
-  multiwinSetDevtools(id: string, on: boolean): Promise<void>
-  /** Reload a tab's page. */
-  multiwinReload(id: string): Promise<void>
-  /** Notify the session of content-area layout changes (sidebar width). */
-  multiwinLayout(info: { sidebarOpen: boolean; sidebarW: number }): Promise<void>
-  /** Show/hide all session windows without tearing the session down. */
-  multiwinSetVisible(visible: boolean): Promise<void>
-  /** Subscribe to per-tab load status; returns unsubscribe. */
-  onMultiwinStatus(
-    listener: (payload: { id: string; status: 'loading' | 'ready' | 'error' }) => void
-  ): () => void
-}
-
-/** A multi-window tab description shared with the main process. */
-export interface MultiWinTab {
-  id: string
-  url: string
-  devtools: boolean
 }

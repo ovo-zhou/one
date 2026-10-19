@@ -7,15 +7,11 @@ export const DEFAULT_SCREENSHOT_SHORTCUT = 'Control+Command+A'
 export const DEFAULT_TRANSLATE_SHORTCUT = 'Alt+Shift+T'
 export const DEFAULT_TRANSLATE_MODEL: TranslateModel = 'deepseek-v4-flash'
 
-/** Max URLs kept in the multi-window history (most recent first). */
-const MAX_URL_HISTORY = 50
-
 /** Max API-client snapshots kept in prefs (most recent first). */
 const MAX_API_SNAPSHOTS = 200
 
 const DEFAULT_PREFS: Prefs = {
   systemProxyEnabledByApp: false,
-  multiwinUrlHistory: [],
   apiClientSnapshots: [],
   screenshot: {
     shortcut: DEFAULT_SCREENSHOT_SHORTCUT,
@@ -81,11 +77,6 @@ function load(): Prefs {
     if (typeof raw.systemProxyEnabledByApp === 'boolean') {
       next.systemProxyEnabledByApp = raw.systemProxyEnabledByApp
     }
-    if (Array.isArray(raw.multiwinUrlHistory)) {
-      next.multiwinUrlHistory = raw.multiwinUrlHistory.filter(
-        (u): u is string => typeof u === 'string' && u.trim().length > 0
-      )
-    }
     if (Array.isArray(raw.apiClientSnapshots)) {
       next.apiClientSnapshots = raw.apiClientSnapshots
         .map(parseSnapshot)
@@ -133,7 +124,6 @@ export function getPrefs(): Prefs {
   if (!cache) cache = load()
   return {
     ...cache,
-    multiwinUrlHistory: [...cache.multiwinUrlHistory],
     apiClientSnapshots: cache.apiClientSnapshots.map((s) => ({ ...s })),
     screenshot: { ...cache.screenshot },
     translate: { ...cache.translate }
@@ -144,21 +134,6 @@ export function setPrefs(patch: PrefsPatch): Prefs {
   const next = getPrefs()
   if (typeof patch.systemProxyEnabledByApp === 'boolean') {
     next.systemProxyEnabledByApp = patch.systemProxyEnabledByApp
-  }
-  if (Array.isArray(patch.multiwinUrlHistory)) {
-    // Dedupe (case-insensitive), trim, cap the history length.
-    const seen = new Set<string>()
-    const urls: string[] = []
-    for (const raw of patch.multiwinUrlHistory) {
-      const url = raw.trim()
-      if (!url) continue
-      const key = url.toLowerCase()
-      if (seen.has(key)) continue
-      seen.add(key)
-      urls.push(url)
-      if (urls.length >= MAX_URL_HISTORY) break
-    }
-    next.multiwinUrlHistory = urls
   }
   if (Array.isArray(patch.apiClientSnapshots)) {
     next.apiClientSnapshots = patch.apiClientSnapshots
@@ -202,7 +177,6 @@ export function setPrefs(patch: PrefsPatch): Prefs {
   writeFileSync(prefsPath(), JSON.stringify(cache, null, 2))
   return {
     ...cache,
-    multiwinUrlHistory: [...cache.multiwinUrlHistory],
     apiClientSnapshots: cache.apiClientSnapshots.map((s) => ({ ...s })),
     screenshot: { ...cache.screenshot },
     translate: { ...cache.translate }
