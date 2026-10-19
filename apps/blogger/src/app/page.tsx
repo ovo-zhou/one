@@ -52,11 +52,6 @@ export default async function Home() {
                   </Text>
                 </Anchor>
               ))}
-              <Anchor href="/locker" underline="never" c="inherit" className="page-pill">
-                <Text size="sm" fw={600}>
-                  文件快递柜
-                </Text>
-              </Anchor>
             </Flex>
           </Stack>
         </Box>

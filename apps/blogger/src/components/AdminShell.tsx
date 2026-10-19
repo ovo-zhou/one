@@ -21,7 +21,6 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   Newspaper,
   FileText,
-  Package,
   Menu as MenuIcon,
   CircleUser,
   ChevronDown,
@@ -56,13 +55,6 @@ function SidebarContent({ collapsed, onNavigate }: { collapsed: boolean; onNavig
         leftSection={<FileText size={18} />}
         active={pathname.startsWith("/admin/pages")}
         onClick={() => handleClick("/admin/pages")}
-      />
-      <NavLink
-        className={navClass}
-        label={collapsed ? undefined : "快递柜管理"}
-        leftSection={<Package size={18} />}
-        active={pathname.startsWith("/admin/locker")}
-        onClick={() => handleClick("/admin/locker")}
       />
     </Stack>
   );
