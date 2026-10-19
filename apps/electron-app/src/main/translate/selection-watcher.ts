@@ -1,6 +1,5 @@
 import { execFile, type ChildProcess } from 'child_process'
-import { existsSync, readFileSync } from 'fs'
-import { homedir } from 'os'
+import { existsSync } from 'fs'
 import { join } from 'path'
 import { app, dialog, shell, systemPreferences } from 'electron'
 import { resetTccService } from '../tcc'
@@ -197,16 +196,4 @@ export async function captureSelectionOnce(): Promise<SelectionEvent | null> {
       resolve(result)
     })
   })
-}
-
-/** Reads DEEPSEEK_API_KEY from the dsh CLI credentials file, if present. */
-export function readDshApiKey(): string | null {
-  try {
-    const file = join(homedir(), '.dsh', '.credentials.yaml')
-    if (!existsSync(file)) return null
-    const m = readFileSync(file, 'utf-8').match(/^DEEPSEEK_API_KEY:\s*(\S+)\s*$/m)
-    return m ? m[1] : null
-  } catch {
-    return null
-  }
 }

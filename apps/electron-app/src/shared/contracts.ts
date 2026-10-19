@@ -32,7 +32,7 @@ export interface TranslatePrefs {
   enabled: boolean
   /** Pop the tooltip automatically on selection (needs accessibility). */
   autoPopup: boolean
-  /** Empty = reuse the DeepSeek key from the dsh CLI (~/.dsh/.credentials.yaml). */
+  /** Dedicated DeepSeek API key for translation. Empty = translation unavailable. */
   apiKey: string
   model: TranslateModel
   /** Fallback accelerator: query the current selection and translate it. */

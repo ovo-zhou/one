@@ -1,19 +1,11 @@
 import { getPrefs } from '../prefs'
-import { readDshApiKey } from './selection-watcher'
 
 /**
- * DeepSeek chat-completions streaming client. The API key resolves from
- * prefs (translate.apiKey) first, falling back to the dsh CLI credentials
- * (~/.dsh/.credentials.yaml) so both features share one login.
+ * DeepSeek chat-completions streaming client using the translation API key
+ * configured in prefs (translate.apiKey).
  */
 
 const API_URL = 'https://api.deepseek.com/chat/completions'
-
-export function resolveApiKey(): string | null {
-  const own = getPrefs().translate.apiKey
-  if (own) return own
-  return readDshApiKey()
-}
 
 function systemPrompt(targetEn: boolean): string {
   return targetEn
@@ -35,11 +27,9 @@ export async function streamTranslation(
   signal: AbortSignal,
   cb: StreamCallbacks
 ): Promise<string> {
-  const apiKey = resolveApiKey()
+  const apiKey = getPrefs().translate.apiKey.trim()
   if (!apiKey) {
-    throw new Error(
-      '未配置 DeepSeek API Key：请到 设置 → 翻译 填写，或先在 DeepSeek Harness 模块登录'
-    )
+    throw new Error('未配置划词翻译 API Key：请到 设置 → 翻译 填写 DeepSeek API Key')
   }
 
   let response: Response

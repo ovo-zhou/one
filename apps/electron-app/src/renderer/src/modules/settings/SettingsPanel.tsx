@@ -415,7 +415,7 @@ export default function SettingsPanel(): React.JSX.Element {
                   <input
                     type="password"
                     value={trApiKey}
-                    placeholder="留空则复用 DeepSeek Harness 的 Key"
+                    placeholder="填写划词翻译专用的 DeepSeek API Key"
                     onChange={(e) => setTrApiKey(e.target.value)}
                     onBlur={() => {
                       void window.api.setPrefs({ translate: { apiKey: trApiKey } })
@@ -425,8 +425,7 @@ export default function SettingsPanel(): React.JSX.Element {
                 </div>
               </div>
               <p className="text-xs text-muted-foreground">
-                留空时自动读取 ~/.dsh/.credentials.yaml 中的 DEEPSEEK_API_KEY（与 DeepSeek Harness
-                模块共用登录）。
+                单独配置划词翻译使用的 DeepSeek API Key，留空时无法翻译。
               </p>
             </div>
             <div className="flex items-center justify-between gap-4">
