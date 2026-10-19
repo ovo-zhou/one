@@ -7,8 +7,8 @@ dist/
 .env.local
 .env.*.local
 .DS_Store
-apps/electron-app/resources/windowlist/windowlist
-apps/electron-app/resources/selectionwatch/selectionwatch
+apps/faceless/resources/windowlist/windowlist
+apps/faceless/resources/selectionwatch/selectionwatch
 
 # pnpm store (local, created by pnpm installs)
 .pnpm-store/

@@ -14,7 +14,7 @@ const MAX_RESTARTS = 3
  */
 export function resolveServicesNode(): string {
   const candidates = [
-    // Dev: apps/electron-app/resources/services/node-runtime (out/main -> ../../)
+    // Dev: apps/faceless/resources/services/node-runtime (out/main -> ../../)
     join(__dirname, '../../resources/services/node-runtime/bin/node'),
     // Packaged: <resources>/services/node-runtime
     join(process.resourcesPath, 'services/node-runtime/bin/node')
@@ -101,7 +101,7 @@ export abstract class LocalWebService extends BaseModuleService {
   protected resolveEntry(): string {
     const pkgDir = join('node_modules', this.packageName)
     const candidates = [
-      // Dev: apps/electron-app/resources/services (out/main/index.js -> ../../)
+      // Dev: apps/faceless/resources/services (out/main/index.js -> ../../)
       join(__dirname, '../../resources/services', pkgDir),
       // Packaged: <resources>/services
       join(process.resourcesPath, 'services', pkgDir)
@@ -110,7 +110,7 @@ export abstract class LocalWebService extends BaseModuleService {
       if (existsSync(root)) return join(realpathSync(root), this.packageBinEntry)
     }
     throw new Error(
-      `${this.binName} package not found. Run \`pnpm install:services\` in apps/electron-app first.`
+      `${this.binName} package not found. Run \`pnpm install:services\` in apps/faceless first.`
     )
   }
 

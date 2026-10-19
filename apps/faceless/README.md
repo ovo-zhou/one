@@ -1,4 +1,4 @@
-# Faceless (electron-app)
+# Faceless
 
 可扩展的开发助手桌面端（Electron + React），内置模块：
 
@@ -11,7 +11,7 @@
 
 ```bash
 pnpm install
-pnpm dev:electron-app   # monorepo 根目录执行
+pnpm dev:faceless   # monorepo 根目录执行
 ```
 
 ## 打包
@@ -20,8 +20,8 @@ macOS 签名会扫描内置服务依赖，打包前需提高当前终端的文�
 
 ```bash
 ulimit -n 10240
-pnpm --filter @one/electron-app build:mac
-# 产物在 apps/electron-app/dist/
+pnpm --filter @one/faceless build:mac
+# 产物在 apps/faceless/dist/
 ```
 
 打包时 `scripts/install-services.sh` 会把 dsh / whistle 等服务依赖

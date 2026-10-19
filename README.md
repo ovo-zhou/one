@@ -9,7 +9,8 @@ one/
 ├── apps/
 │   ├── nextjs/         # Next.js 15 App Router
 │   ├── vite-react/     # Vite 6 + React 19
-│   └── node-service/   # Express REST API
+│   ├── node-service/   # Express REST API
+│   └── faceless/       # Faceless desktop app (Electron + React)
 ├── tsconfig.base.json  # Base TypeScript config
 ├── eslint.config.mjs   # ESLint flat config
 ├── turbo.json          # Turborepo pipeline
@@ -20,13 +21,14 @@ one/
 
 ```bash
 pnpm install
-pnpm dev          # Start all apps in dev mode
-pnpm build        # Build all apps
-pnpm lint         # Lint all apps
-pnpm typecheck    # Type-check all apps
+pnpm dev           # Start all apps in dev mode
+pnpm dev:faceless  # Start Faceless in dev mode
+pnpm build         # Build all apps
+pnpm lint          # Lint all apps
+pnpm typecheck     # Type-check all apps
 ```
 
-## Install All in One (macOS)
+## Install Faceless (macOS)
 
 curl downloads the DMG without quarantine attribute, so no "app is damaged" warning.
 
@@ -43,3 +45,4 @@ Or download the DMG manually: https://github.com/ovo-zhou/one/releases
 | nextjs | 3000 | Next.js 15 + React 19 |
 | vite-react | 3001 | Vite 6 + React 19 |
 | node-service | 3002 | Express 5 |
+| Faceless | — | Electron + React |

@@ -27,9 +27,9 @@ jobs:
       # electron-builder publishes artifacts to the wrong release.
       - name: Verify tag matches app version
         run: |
-          APP_VERSION="$(node -p "require('./apps/electron-app/package.json').version")"
+          APP_VERSION="$(node -p "require('./apps/faceless/package.json').version")"
           if [ "v${APP_VERSION}" != "${GITHUB_REF_NAME}" ]; then
-            echo "::error::tag ${GITHUB_REF_NAME} does not match app version ${APP_VERSION}. Bump apps/electron-app/package.json first."
+            echo "::error::tag ${GITHUB_REF_NAME} does not match app version ${APP_VERSION}. Bump apps/faceless/package.json first."
             exit 1
           fi
 
@@ -45,7 +45,7 @@ jobs:
             --title "${GITHUB_REF_NAME}" --generate-notes
 
       - name: Build & publish (mac)
-        working-directory: apps/electron-app
+        working-directory: apps/faceless
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -62,7 +62,7 @@ jobs:
       # release for this tag, then create one published release uploading
       # artifacts straight from dist/.
       - name: Finalize release (publish + verify assets)
-        working-directory: apps/electron-app
+        working-directory: apps/faceless
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |

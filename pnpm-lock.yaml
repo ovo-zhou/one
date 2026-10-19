@@ -145,7 +145,7 @@ importers:
         specifier: ^5.7.0
         version: 5.7.2
 
-  apps/electron-app:
+  apps/faceless:
     dependencies:
       '@base-ui/react':
         specifier: ^1.6.0

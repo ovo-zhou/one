@@ -7,7 +7,7 @@
     "dev:blogger": "turbo dev --filter=@one/blogger",
     "dev:vite-react": "turbo dev --filter=@one/vite-react",
     "dev:node-service": "turbo dev --filter=@one/node-service",
-    "dev:electron-app": "turbo dev --filter=@one/electron-app",
+    "dev:faceless": "turbo dev --filter=@one/faceless",
     "build": "turbo build",
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
