@@ -7,6 +7,8 @@
 
 ## 开发
 
+使用 Node.js 24，与发布 CI 保持一致。
+
 ```bash
 pnpm install
 pnpm dev:electron-app   # monorepo 根目录执行
@@ -14,7 +16,10 @@ pnpm dev:electron-app   # monorepo 根目录执行
 
 ## 打包
 
+macOS 签名会扫描内置服务依赖，打包前需提高当前终端的文件打开数上限。
+
 ```bash
+ulimit -n 10240
 pnpm --filter @one/electron-app build:mac
 # 产物在 apps/electron-app/dist/
 ```

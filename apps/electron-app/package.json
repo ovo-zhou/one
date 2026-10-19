@@ -1,6 +1,6 @@
 {
   "name": "@one/electron-app",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "private": true,
   "description": "Faceless - extensible developer assistant",
   "main": "./out/main/index.js",

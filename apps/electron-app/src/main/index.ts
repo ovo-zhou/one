@@ -2,7 +2,7 @@ import { app, BrowserWindow } from 'electron'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { registerIpcHandlers, stopAllServices } from './ipc'
 import { setupMenu } from './menu'
-import { cleanupStaleBackups, setupAutoCheck } from './updater'
+import { setupAutoCheck } from './updater'
 import { disableProxyIfOwned } from './whistle-actions'
 import { APP_ID, APP_NAME, createMainWindow } from './window'
 import { applyScreenshotShortcut, unregisterScreenshotShortcut } from './screenshot/shortcut'
@@ -55,12 +55,6 @@ if (!app.requestSingleInstanceLock()) {
     setupMenu()
     setupAutoCheck()
     createMainWindow()
-
-    // Clear any .old-<timestamp> bundle left by a previous in-app update.
-    void cleanupStaleBackups()
-    // Retry shortly after, in case the previous app instance was still alive
-    // (relaunch overlap) and blocked the first pass.
-    setTimeout(() => void cleanupStaleBackups(), 5_000)
 
     // Start screenshot-specific warm-up on the next turn instead of waiting
     // a full second: an early shortcut now has a ready overlay and a running

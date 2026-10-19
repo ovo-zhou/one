@@ -6,6 +6,7 @@ import "highlight.js/styles/github-dark.css";
 
 import { MantineProvider, Container } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
+import { Analytics } from "@vercel/analytics/next";
 import ThemeToggle from "../components/ThemeToggle";
 import { theme } from "../lib/theme";
 
@@ -35,6 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </Container>
           <ThemeToggle />
         </MantineProvider>
+        <Analytics />
       </body>
     </html>
   );

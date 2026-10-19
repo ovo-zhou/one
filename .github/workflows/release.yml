@@ -17,7 +17,7 @@ jobs:
 
       - uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version: 24
           cache: pnpm
 
       - name: Install dependencies
@@ -49,8 +49,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # GitHub macOS runners default to a 256 fd soft limit; ad-hoc signing
-          # reads every bundled file and hits EMFILE. Raise to the hard limit.
+          # Allow the signing scanner to open the bundled service files
+          # without hitting the runner's default file descriptor limit.
           ulimit -n 10240
           pnpm install:services
           pnpm build

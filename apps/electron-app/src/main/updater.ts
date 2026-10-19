@@ -1,7 +1,7 @@
 import { app, Notification, webContents } from 'electron'
 import { execFile } from 'node:child_process'
 import { createWriteStream, existsSync } from 'node:fs'
-import { mkdtemp, mkdir, readdir, rename, rm } from 'node:fs/promises'
+import { mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { basename, dirname, join } from 'node:path'
 import { Readable, Transform } from 'node:stream'
@@ -14,8 +14,8 @@ import { stopWindowDetect } from './screenshot/window-detect'
 
 /**
  * Unsigned-app updater for macOS: mirrors install.sh — fetch the latest DMG
- * from GitHub Releases, mount it, replace the running .app bundle (with
- * rollback), then relaunch. Copies made by the app itself carry no quarantine
+ * from GitHub Releases, mount and validate it, remove the running .app bundle,
+ * install the new bundle, then relaunch. Copies made by the app itself carry no quarantine
  * attribute, so Gatekeeper is never involved. electron-updater requires a
  * signed app on macOS (Squirrel.Mac), hence this custom flow.
  */
@@ -24,12 +24,6 @@ const REPO = 'ovo-zhou/one'
 const APP_BUNDLE = 'Faceless.app'
 const RELEASES_API = `https://api.github.com/repos/${REPO}/releases/latest`
 const UA = 'faceless-updater'
-
-// Where the old bundle is moved (renamed, never unlinked) during an update.
-// It lives on the same volume as /Applications, so the rename is instant and
-// works even though the still-running old process holds files inside it. The
-// new app instance removes it on next launch (see cleanupStaleBackups).
-const UPDATE_TRASH_DIR = join(tmpdir(), 'faceless-update-trash')
 
 const execFileP = promisify(execFile)
 
@@ -214,46 +208,30 @@ async function bundleVersion(appPath: string): Promise<string | null> {
 }
 
 /**
- * Replaces the running .app with the one from the mounted DMG:
- * mv old → backup (same volume, instant), cp new in place, rm backup.
- * Any failure after the mv restores the backup.
+ * Removes the current .app and installs the validated bundle from the DMG.
  */
-async function replaceAppBundle(srcApp: string): Promise<void> {
+async function replaceAppBundle(srcApp: string, expectedVersion: string): Promise<void> {
   const appPath = currentAppBundlePath()
   if (!appPath || !existsSync(appPath)) throw new Error('未找到当前应用安装位置')
-  const backup = `${appPath}.old-${Date.now()}`
 
-  await execFileP('mv', [appPath, backup])
   try {
+    await rm(appPath, { recursive: true, force: true })
     await execFileP('cp', ['-R', srcApp, appPath])
     const installed = await bundleVersion(appPath)
-    if (!existsSync(join(appPath, 'Contents', 'Info.plist')) || !installed) {
+    if (installed !== expectedVersion) {
       throw new Error('新版本安装校验失败')
     }
   } catch (err) {
-    await execFileP('mv', [backup, appPath]).catch(() => {})
-    throw err
-  }
-  // The live (old) process still runs from `backup` and keeps its own
-  // Contents/Resources (asar, bundled node runtime, …) open, so `rm` of that
-  // directory would fail with ENOTEMPTY. Instead rename it into a trash dir on
-  // the same volume — a rename never touches file contents, so it succeeds even
-  // with open handles. The new app instance deletes the trash on next launch.
-  try {
-    await mkdir(UPDATE_TRASH_DIR, { recursive: true })
-    await rename(backup, join(UPDATE_TRASH_DIR, basename(backup)))
-  } catch {
-    // Worst case the .old stays next to the app; cleanupStaleBackups still
-    // removes sibling .old-* dirs, and the update itself already succeeded.
+    const detail = err instanceof Error ? err.message : String(err)
+    throw new Error(`安装失败，请前往发布页手动下载并重新安装。${detail}`)
   }
 }
 
 /**
  * Stop every child process the app spawned from its own bundle (service
  * runtimes, whistle proxy, screenshot/translate helpers). Required before
- * swapping the .app during an update: those children keep files open inside
- * Contents/Resources, and an `rm` of the renamed .old bundle would otherwise
- * fail with ENOTEMPTY.
+ * deleting the .app during an update: those children keep files open inside
+ * Contents/Resources and can interfere with removal.
  */
 async function stopChildProcesses(): Promise<void> {
   await Promise.allSettled([stopAllServices()])
@@ -267,34 +245,6 @@ async function stopChildProcesses(): Promise<void> {
   } catch {
     /* not running — ignore */
   }
-}
-
-/**
- * Remove stale `.old-<timestamp>` app bundles left beside the running app by
- * interrupted or in-app updates. Safe to call on startup: the live app runs
- * from the real bundle, not a `.old` one. Best-effort — a still-living old
- * process (e.g. during relaunch overlap) is simply skipped until next launch.
- */
-export async function cleanupStaleBackups(): Promise<void> {
-  const appPath = currentAppBundlePath()
-  if (!appPath) return
-  const parent = dirname(appPath)
-  const base = basename(appPath)
-  const tasks: Promise<unknown>[] = []
-  try {
-    const entries = await readdir(parent)
-    for (const name of entries) {
-      if (name.startsWith(`${base}.old-`)) {
-        tasks.push(rm(join(parent, name), { recursive: true, force: true }))
-      }
-    }
-  } catch {
-    /* best-effort */
-  }
-  // Remove the trash dir left by a previous update. The old process that owned
-  // the open files is gone by the time we run, so these unlinks now succeed.
-  tasks.push(rm(UPDATE_TRASH_DIR, { recursive: true, force: true }))
-  await Promise.allSettled(tasks)
 }
 
 /**
@@ -332,10 +282,12 @@ export async function startInAppUpdate(options: { notify: boolean }): Promise<bo
     mountPoint = await mountDmg(dmgPath)
     const srcApp = join(mountPoint, APP_BUNDLE)
     if (!existsSync(srcApp)) throw new Error(`安装包内未找到 ${APP_BUNDLE}`)
-    // Stop children spawned from the current bundle so the renamed .old
-    // directory can be removed (otherwise rm fails with ENOTEMPTY).
+    const version = latestVersion(release)
+    if ((await bundleVersion(srcApp)) !== version) {
+      throw new Error(`安装包版本校验失败，期望版本为 ${version}`)
+    }
     await stopChildProcesses()
-    await replaceAppBundle(srcApp)
+    await replaceAppBundle(srcApp, version)
 
     broadcast({ phase: 'restarting', percent: null, error: null })
     if (useNotify) notify('更新完成', '即将重启应用…')
