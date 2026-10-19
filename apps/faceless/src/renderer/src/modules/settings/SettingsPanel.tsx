@@ -20,6 +20,20 @@ type UpdaterUIState =
   | { phase: 'restarting' }
   | { phase: 'error'; message: string }
 
+async function getUpdateState(): Promise<UpdaterUIState> {
+  try {
+    const result = await window.api.checkForUpdates()
+    if (!result.supported) return { phase: 'unsupported' }
+    if (result.error) return { phase: 'error', message: result.error }
+    if (result.hasUpdate && result.latestVersion) {
+      return { phase: 'available', version: result.latestVersion, notes: result.notes }
+    }
+    return { phase: 'latest' }
+  } catch (err) {
+    return { phase: 'error', message: err instanceof Error ? err.message : String(err) }
+  }
+}
+
 function updaterButtonText(u: UpdaterUIState): string {
   switch (u.phase) {
     case 'checking':
@@ -165,7 +179,7 @@ export default function SettingsPanel(): React.JSX.Element {
     supported: false,
     trusted: false
   })
-  const [updater, setUpdater] = useState<UpdaterUIState>({ phase: 'idle' })
+  const [updater, setUpdater] = useState<UpdaterUIState>({ phase: 'checking' })
 
   useEffect(() => {
     return window.api.onUpdateProgress((p: UpdaterProgressPayload) => {
@@ -183,20 +197,7 @@ export default function SettingsPanel(): React.JSX.Element {
 
   const checkUpdates = useCallback(async (): Promise<void> => {
     setUpdater({ phase: 'checking' })
-    const result = await window.api.checkForUpdates()
-    if (!result.supported) {
-      setUpdater({ phase: 'unsupported' })
-      return
-    }
-    if (result.error) {
-      setUpdater({ phase: 'error', message: result.error })
-      return
-    }
-    if (result.hasUpdate && result.latestVersion) {
-      setUpdater({ phase: 'available', version: result.latestVersion, notes: result.notes })
-    } else {
-      setUpdater({ phase: 'latest' })
-    }
+    setUpdater(await getUpdateState())
   }, [])
 
   const startUpdate = useCallback(async (): Promise<void> => {
@@ -206,8 +207,14 @@ export default function SettingsPanel(): React.JSX.Element {
   }, [])
 
   useEffect(() => {
-    void checkUpdates()
-  }, [checkUpdates])
+    let active = true
+    void getUpdateState().then((next) => {
+      if (active) setUpdater(next)
+    })
+    return () => {
+      active = false
+    }
+  }, [])
 
   useEffect(() => {
     void window.api.getAppInfo().then(setAppInfo)

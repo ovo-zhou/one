@@ -8,6 +8,12 @@ import eslintPluginReactRefresh from 'eslint-plugin-react-refresh'
 export default defineConfig(
   { ignores: ['**/node_modules', '**/dist', '**/out', 'scripts/*.js'] },
   tseslint.configs.recommended,
+  {
+    files: ['**/*.{js,mjs,cjs}'],
+    rules: {
+      '@typescript-eslint/explicit-function-return-type': 'off'
+    }
+  },
   eslintPluginReact.configs.flat.recommended,
   eslintPluginReact.configs.flat['jsx-runtime'],
   {
