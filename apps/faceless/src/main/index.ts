@@ -2,7 +2,7 @@ import { app, BrowserWindow } from 'electron'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { registerIpcHandlers, stopAllServices } from './ipc'
 import { setupMenu } from './menu'
-import { setupAutoCheck } from './updater'
+import { confirmUpdateStartup, setupAutoCheck } from './updater'
 import { disableProxyIfOwned } from './whistle-actions'
 import { APP_ID, APP_NAME, createMainWindow } from './window'
 import { applyScreenshotShortcut, unregisterScreenshotShortcut } from './screenshot/shortcut'
@@ -54,7 +54,10 @@ if (!app.requestSingleInstanceLock()) {
     registerIpcHandlers()
     setupMenu()
     setupAutoCheck()
-    createMainWindow()
+    const mainWindow = createMainWindow()
+    mainWindow.webContents.once('did-finish-load', () => {
+      void confirmUpdateStartup()
+    })
 
     // Start screenshot-specific warm-up on the next turn instead of waiting
     // a full second: an early shortcut now has a ready overlay and a running
@@ -104,7 +107,7 @@ app.on('before-quit', (event) => {
   quitting = true
   event.preventDefault()
   void disableProxyIfOwned().finally(async () => {
-    stopAllServices()
+    await stopAllServices()
     unregisterScreenshotShortcut()
     unregisterTranslateShortcut()
     teardownTranslate()

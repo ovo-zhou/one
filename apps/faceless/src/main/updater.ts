@@ -1,21 +1,22 @@
 import { app, Notification, webContents } from 'electron'
-import { execFile } from 'node:child_process'
+import { execFile, spawn } from 'node:child_process'
 import { createWriteStream, existsSync } from 'node:fs'
-import { mkdtemp, rm } from 'node:fs/promises'
+import { mkdtemp, open, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { basename, dirname, join } from 'node:path'
 import { Readable, Transform } from 'node:stream'
 import { pipeline } from 'node:stream/promises'
 import { promisify } from 'node:util'
 import { IPC, type UpdateCheckResult, type UpdaterProgressPayload } from '../shared/contracts'
+import { UPDATE_INSTALLER_SCRIPT } from './update-installer'
 import { stopAllServices } from './ipc'
 import { stopSelectionWatcher } from './translate/selection-watcher'
 import { stopWindowDetect } from './screenshot/window-detect'
 
 /**
  * Unsigned-app updater for macOS: mirrors install.sh — fetch the latest DMG
- * from GitHub Releases, mount and validate it, remove the running .app bundle,
- * install the new bundle, then relaunch. Copies made by the app itself carry no quarantine
+ * from GitHub Releases, stage and validate it, then hand off installation
+ * to an independent process that waits for the app to exit. Copies made by the app itself carry no quarantine
  * attribute, so Gatekeeper is never involved. electron-updater requires a
  * signed app on macOS (Squirrel.Mac), hence this custom flow.
  */
@@ -207,23 +208,51 @@ async function bundleVersion(appPath: string): Promise<string | null> {
   }
 }
 
-/**
- * Removes the current .app and installs the validated bundle from the DMG.
- */
-async function replaceAppBundle(srcApp: string, expectedVersion: string): Promise<void> {
+/** Prepare on the same volume, so the installer can swap directories by rename. */
+async function stageAppBundle(srcApp: string, expectedVersion: string): Promise<string> {
   const appPath = currentAppBundlePath()
   if (!appPath || !existsSync(appPath)) throw new Error('未找到当前应用安装位置')
-
+  const staging = await mkdtemp(join(dirname(appPath), '.faceless-update-'))
   try {
-    await rm(appPath, { recursive: true, force: true })
-    await execFileP('cp', ['-R', srcApp, appPath])
-    const installed = await bundleVersion(appPath)
-    if (installed !== expectedVersion) {
+    const stagedApp = join(staging, APP_BUNDLE)
+    await execFileP('/usr/bin/ditto', [srcApp, stagedApp])
+    if ((await bundleVersion(stagedApp)) !== expectedVersion) {
       throw new Error('新版本安装校验失败')
     }
+    return staging
   } catch (err) {
-    const detail = err instanceof Error ? err.message : String(err)
-    throw new Error(`安装失败，请前往发布页手动下载并重新安装。${detail}`)
+    await rm(staging, { recursive: true, force: true }).catch(() => {})
+    throw err
+  }
+}
+
+/** The system shell and script survive replacement of the Electron bundle. */
+async function startInstaller(staging: string): Promise<void> {
+  const appPath = currentAppBundlePath()
+  if (!appPath) throw new Error('未找到当前应用安装位置')
+  const script = join(staging, 'install.sh')
+  await writeFile(script, UPDATE_INSTALLER_SCRIPT, { mode: 0o700 })
+  const log = await open(join(app.getPath('userData'), 'update-install.log'), 'a', 0o600)
+  const child = spawn('/bin/bash', [script, appPath, staging, String(process.pid)], {
+    detached: true,
+    cwd: '/',
+    stdio: ['ignore', log.fd, log.fd]
+  })
+  try {
+    await new Promise<void>((resolve, reject) => {
+      child.once('spawn', resolve)
+      child.once('error', reject)
+    })
+    child.unref()
+    for (let attempt = 0; attempt < 100; attempt++) {
+      if (existsSync(join(staging, 'ready'))) return
+      if (child.exitCode !== null) break
+      await new Promise((resolve) => setTimeout(resolve, 100))
+    }
+    child.kill()
+    throw new Error('无法启动独立安装进程，已取消更新')
+  } finally {
+    await log.close()
   }
 }
 
@@ -248,7 +277,7 @@ async function stopChildProcesses(): Promise<void> {
 }
 
 /**
- * Full in-app update: download DMG → replace bundle → relaunch.
+ * Full in-app update: download → stage → start installer → quit.
  * Progress is broadcast to all renderers and (optionally) macOS notifications.
  */
 export async function startInAppUpdate(options: { notify: boolean }): Promise<boolean> {
@@ -259,6 +288,8 @@ export async function startInAppUpdate(options: { notify: boolean }): Promise<bo
   const { notify: useNotify } = options
   let tmpDir: string | null = null
   let mountPoint: string | null = null
+  let staging: string | null = null
+  let handedOff = false
 
   try {
     const release = await fetchLatestRelease()
@@ -286,11 +317,7 @@ export async function startInAppUpdate(options: { notify: boolean }): Promise<bo
     if ((await bundleVersion(srcApp)) !== version) {
       throw new Error(`安装包版本校验失败，期望版本为 ${version}`)
     }
-    await stopChildProcesses()
-    await replaceAppBundle(srcApp, version)
-
-    broadcast({ phase: 'restarting', percent: null, error: null })
-    if (useNotify) notify('更新完成', '即将重启应用…')
+    staging = await stageAppBundle(srcApp, version)
 
     await execFileP('hdiutil', ['detach', mountPoint, '-quiet']).catch(() => {})
     mountPoint = null
@@ -299,10 +326,14 @@ export async function startInAppUpdate(options: { notify: boolean }): Promise<bo
       tmpDir = null
     }
 
-    app.relaunch()
-    // Graceful quit runs the before-quit cleanup chain (services, proxy, …);
-    // force-exit after 5s in case a child hangs the shutdown.
-    setTimeout(() => app.exit(0), 5_000)
+    await stopChildProcesses()
+    await startInstaller(staging)
+    broadcast({ phase: 'restarting', percent: null, error: null })
+    if (useNotify) notify('正在安装更新', '应用退出后将安装并重新打开…')
+    await writeFile(join(staging, 'install'), '')
+    handedOff = true
+    // Normal shutdown also resets the proxy and tears down helpers. The installer
+    // aborts without changing the app if shutdown fails to finish in time.
     app.quit()
     return true
   } catch (err) {
@@ -313,11 +344,31 @@ export async function startInAppUpdate(options: { notify: boolean }): Promise<bo
   } finally {
     if (mountPoint) await execFileP('hdiutil', ['detach', mountPoint, '-quiet']).catch(() => {})
     if (tmpDir) await rm(tmpDir, { recursive: true, force: true }).catch(() => {})
-    updating = false
+    if (staging && !handedOff) {
+      await rm(staging, { recursive: true, force: true }).catch(() => {})
+    }
+    updating = handedOff
   }
 }
 
 // ---------- startup entry point ----------
+
+/** Acknowledge only a sibling installer directory prepared by our updater. */
+export async function confirmUpdateStartup(): Promise<void> {
+  const prefix = '--faceless-update-ready='
+  const staging = process.argv.find((arg) => arg.startsWith(prefix))?.slice(prefix.length)
+  const appPath = currentAppBundlePath()
+  if (
+    !staging ||
+    !appPath ||
+    dirname(staging) !== dirname(appPath) ||
+    !basename(staging).startsWith('.faceless-update-') ||
+    !existsSync(join(staging, 'install'))
+  ) {
+    return
+  }
+  await writeFile(join(staging, 'launched'), '', { flag: 'wx' }).catch(() => {})
+}
 
 /** Silent check shortly after launch; the renderer surfaces available updates in Settings. */
 export function setupAutoCheck(): void {
