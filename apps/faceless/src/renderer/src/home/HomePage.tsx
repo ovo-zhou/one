@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { ArrowUpRight, Settings, Sparkles } from 'lucide-react'
+import { Settings, Sparkles } from 'lucide-react'
 import { Button } from '../components/ui/button'
 import { StatusBadge } from '../shell/StatusBadge'
 import { IS_MAC } from '../shell/TitleBar'
@@ -35,7 +35,7 @@ export function ModuleCard({
     <button
       type="button"
       onClick={onOpen}
-      className="group relative flex flex-col gap-4 rounded-2xl border border-border/60 bg-card/80 p-5 text-left outline-none backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-ring/40 hover:shadow-[0_12px_32px_-12px_rgb(0_0_0/20%)] focus-visible:ring-3 focus-visible:ring-ring/30 active:translate-y-0"
+      className="group relative flex cursor-pointer flex-col gap-4 rounded-2xl border border-border/60 bg-card/80 p-5 text-left outline-none backdrop-blur-sm transition-colors duration-200 hover:border-ring/40 focus-visible:ring-3 focus-visible:ring-ring/30"
     >
       {phase && (
         <span className="absolute top-3.5 right-3.5">
@@ -43,14 +43,13 @@ export function ModuleCard({
         </span>
       )}
       <span
-        className={`flex size-11 shrink-0 items-center justify-center rounded-xl transition-all duration-200 group-hover:scale-105 ${accent}`}
+        className={`flex size-11 shrink-0 items-center justify-center rounded-xl transition-colors duration-200 ${accent}`}
       >
         <Icon className="size-5" />
       </span>
       <span className="flex flex-col gap-1.5">
         <span className="flex items-center gap-1 text-sm font-medium text-card-foreground">
           {name}
-          <ArrowUpRight className="size-3.5 text-muted-foreground opacity-0 transition-all duration-200 group-hover:translate-x-0.5 group-hover:opacity-100" />
         </span>
         <span className="line-clamp-2 min-h-8 pr-4 text-xs leading-4 text-muted-foreground">
           {description}

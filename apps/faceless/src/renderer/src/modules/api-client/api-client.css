@@ -8,9 +8,10 @@
 
 .api-workspace {
   display: grid;
+  min-height: 0;
   min-width: 0;
   flex: 1;
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: repeat(2, minmax(0, 1fr));
   overflow: hidden;
 }
 
@@ -119,11 +120,15 @@
 }
 
 .api-request-card {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
   background: var(--card);
 }
 
 .api-request-bar {
   display: flex;
+  flex-shrink: 0;
   gap: 0.5rem;
   padding: 0.5rem;
 }
@@ -259,13 +264,17 @@
 
 .api-editor-grid {
   display: grid;
+  min-height: 0;
+  flex: 1;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-auto-rows: minmax(0, 1fr);
   gap: 0.5rem;
   padding: 0.5rem;
 }
 
 .api-editor-grid > section {
   display: flex;
+  min-height: 0;
   min-width: 0;
   flex-direction: column;
   overflow: hidden;
@@ -278,6 +287,7 @@
 .api-response-title {
   display: flex;
   min-height: 2.75rem;
+  flex-shrink: 0;
   align-items: center;
   gap: 0.5rem;
   padding: 0 1rem;
@@ -301,7 +311,9 @@
 }
 
 .api-headers {
-  min-height: 8rem;
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
   padding: 0 0.75rem 0.75rem;
 }
 
@@ -406,13 +418,13 @@
 }
 
 .api-json-body-editor {
-  min-height: 12rem;
+  min-height: 0;
 }
 
 .api-json-body-editor textarea {
   display: block;
   width: 100%;
-  min-height: 8rem;
+  min-height: 0;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.8rem;
   line-height: 1.5;
@@ -428,7 +440,7 @@
 }
 
 .api-json-response-editor textarea {
-  min-height: 10rem;
+  min-height: 0;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.8rem;
   line-height: 1.5;
@@ -436,7 +448,7 @@
 
 .api-response-card {
   display: flex;
-  min-height: 14rem;
+  min-height: 0;
   flex-direction: column;
   margin: 0.5rem;
   border: 1px solid var(--border);
