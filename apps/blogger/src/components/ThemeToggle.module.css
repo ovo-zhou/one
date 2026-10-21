@@ -1,0 +1,13 @@
+/* ===== 主题切换按钮（玻璃胶囊）===== */
+.button {
+  background: color-mix(in srgb, var(--mantine-color-body) 60%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--mantine-color-default-border) 70%, transparent) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.14) !important;
+  transition: box-shadow 200ms ease, transform 150ms ease, border-color 200ms ease !important;
+}
+
+.button:hover {
+  border-color: var(--mantine-color-primary-5) !important;
+  box-shadow: 0 0 24px color-mix(in srgb, var(--brand-glow) 55%, transparent) !important;
+  transform: translateY(-2px);
+}

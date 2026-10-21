@@ -1,0 +1,7 @@
+.backLink {
+  transition: color 150ms ease;
+}
+
+.backLink:hover {
+  color: var(--mantine-color-primary-6);
+}

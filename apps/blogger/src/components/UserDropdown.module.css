@@ -1,0 +1,12 @@
+.link {
+  background-image: linear-gradient(90deg, var(--brand-from), var(--brand-to));
+  background-size: 0% 2px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 250ms ease, color 250ms ease;
+}
+
+.link:hover {
+  color: var(--mantine-color-primary-6);
+  background-size: 100% 2px;
+}

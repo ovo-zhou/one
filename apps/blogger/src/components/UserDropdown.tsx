@@ -1,5 +1,6 @@
 "use client";
 
+import classes from "./UserDropdown.module.css";
 import { useState } from "react";
 import { Menu, Modal, Text, Button, Group } from "@mantine/core";
 import { LogOut } from "lucide-react";
@@ -15,7 +16,7 @@ export default function UserDropdown({ name }: UserDropdownProps) {
     <>
       <Menu trigger="click" position="bottom-start">
         <Menu.Target>
-          <Text component="span" className="user-link">
+          <Text component="span" className={classes.link} pb={2} style={{ cursor: "pointer" }}>
             {name}
           </Text>
         </Menu.Target>

@@ -1,0 +1,37 @@
+/* ===== 极光背景层 ===== */
+.blob {
+  filter: blur(80px);
+  will-change: transform;
+  animation: aurora-drift 14s ease-in-out infinite alternate;
+}
+
+.blob2 {
+  animation-duration: 18s;
+  animation-delay: -4s;
+}
+
+.blob3 {
+  animation-duration: 16s;
+  animation-delay: -8s;
+}
+
+@keyframes aurora-drift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  33% {
+    transform: translate3d(4vw, -3vh, 0) scale(1.08);
+  }
+  66% {
+    transform: translate3d(-3vw, 4vh, 0) scale(0.94);
+  }
+  100% {
+    transform: translate3d(2vw, -2vh, 0) scale(1.03);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blob {
+    animation: none;
+  }
+}

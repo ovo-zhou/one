@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { TextInput, Button, Group, Stack, Text, Box } from "@mantine/core";
+import { TextInput, Button, Group, Stack, Paper, Text, Box } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import AdminEditor from "../../../../../components/AdminEditor";
 import { updatePage } from "../../../../../actions/page/updatePage";
@@ -46,7 +46,7 @@ export default function EditPageForm({
   };
 
   return (
-    <Stack gap="md" maw={900} className="glass-card" p="xl">
+    <Paper component={Stack} gap="md" maw={900} p="xl" radius="lg" shadow="glass" withBorder variant="glass">
       <TextInput
         label="标题"
         placeholder="输入页面标题"
@@ -60,9 +60,9 @@ export default function EditPageForm({
       </Box>
       {error && <Text c="red" size="sm">{error}</Text>}
       <Group>
-        <Button className="btn-glow" onClick={handleSubmit} loading={saving}>保存更新</Button>
+        <Button mod="brand" onClick={handleSubmit} loading={saving}>保存更新</Button>
         <Button variant="default" onClick={() => router.back()}>取消</Button>
       </Group>
-    </Stack>
+    </Paper>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import classes from "./ThemeToggle.module.css";
 import { useEffect, useState } from "react";
 import { ActionIcon, useMantineColorScheme } from "@mantine/core";
 import { Sun, Moon } from "lucide-react";
@@ -29,8 +30,8 @@ export default function ThemeToggle() {
       pos="fixed"
       right={20}
       bottom={20}
-      className="theme-toggle-btn"
-      style={{ zIndex: 999 }}
+      className={classes.button}
+      style={{ zIndex: 999, backdropFilter: "blur(14px) saturate(1.3)", WebkitBackdropFilter: "blur(14px) saturate(1.3)" }}
     >
       {isDark ? <Sun size={20} /> : <Moon size={20} />}
     </ActionIcon>

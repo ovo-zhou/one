@@ -1,5 +1,6 @@
 "use client";
 
+import classes from "./AdminEditor.module.css";
 import { useState } from "react";
 import { useEditorState, type Editor } from "@tiptap/react";
 import { ActionIcon, Group, Tooltip, Divider, Popover, TextInput, Button, Stack, Box, Menu, Modal, Text } from "@mantine/core";
@@ -132,8 +133,8 @@ export default function EditorToolbar({ editor, onUploadImage, isFullscreen, onT
       gap="xs"
       wrap="wrap"
       p="6px 8px"
-      className="editor-toolbar"
-      style={{ top: isFullscreen ? 0 : 56 }}
+      className={classes.toolbar}
+      style={{ top: isFullscreen ? 0 : 56, backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)" }}
     >
       <ToolButton icon={Undo2} label="撤销" disabled={!s.canUndo} onClick={() => run(() => editor.chain().focus().undo().run())} />
       <ToolButton icon={Redo2} label="重做" disabled={!s.canRedo} onClick={() => run(() => editor.chain().focus().redo().run())} />

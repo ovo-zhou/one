@@ -1,0 +1,19 @@
+/* ===== 渐变文字 ===== */
+.text {
+  background-image: var(--brand-gradient);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  transition: background-position 400ms ease;
+}
+
+.text:hover {
+  background-position: 100% center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .text {
+    transition: none;
+  }
+}

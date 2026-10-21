@@ -1,0 +1,17 @@
+.header {
+  background: #0d0d14;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.copy {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: transparent;
+  color: #a1a1b5;
+  transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease;
+}
+
+.copy:hover {
+  color: #fff;
+  background: color-mix(in srgb, var(--mantine-color-primary-5) 28%, transparent);
+  border-color: var(--mantine-color-primary-5);
+}

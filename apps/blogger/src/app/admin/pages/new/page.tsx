@@ -1,8 +1,9 @@
 "use client";
 
+import brandClasses from "../../../../components/Brand.module.css";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { TextInput, Button, Group, Stack, Switch, Title, Text, Box } from "@mantine/core";
+import { TextInput, Button, Group, Stack, Paper, Switch, Title, Text, Box } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import AdminEditor from "../../../../components/AdminEditor";
 import { createPage } from "../../../../actions/page/createPage";
@@ -35,8 +36,8 @@ export default function NewPagePage() {
 
   return (
     <Box>
-      <Title order={2} mb="lg" className="brand-text">新建页面</Title>
-      <Stack gap="md" maw={900} className="glass-card" p="xl">
+      <Title order={2} mb="lg" className={brandClasses.text}>新建页面</Title>
+      <Paper component={Stack} gap="md" maw={900} p="xl" radius="lg" shadow="glass" withBorder variant="glass">
         <TextInput
           label="标题"
           placeholder="输入页面标题"
@@ -55,12 +56,12 @@ export default function NewPagePage() {
         />
         {error && <Text c="red" size="sm">{error}</Text>}
         <Group>
-          <Button className="btn-glow" onClick={handleSubmit} loading={saving}>
+          <Button mod="brand" onClick={handleSubmit} loading={saving}>
             {isDraft ? "保存草稿" : "立即发布"}
           </Button>
           <Button variant="default" onClick={() => router.back()}>取消</Button>
         </Group>
-      </Stack>
+      </Paper>
     </Box>
   );
 }

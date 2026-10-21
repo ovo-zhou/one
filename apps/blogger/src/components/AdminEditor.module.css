@@ -1,0 +1,55 @@
+/* ===== 编辑器 ===== */
+.shell {
+  --paper-backdrop: blur(16px);
+  background: color-mix(in srgb, var(--mantine-color-body) 70%, transparent);
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.shell:focus-within {
+  border-color: transparent !important;
+  background-image: var(--brand-gradient-soft);
+  box-shadow:
+    0 0 0 1.5px var(--mantine-color-primary-5),
+    0 0 24px color-mix(in srgb, var(--brand-glow) 45%, transparent) !important;
+}
+
+/* ===== 编辑器工具栏吸顶 ===== */
+.toolbar {
+  position: sticky;
+  z-index: 10;
+  background: color-mix(in srgb, var(--mantine-color-body) 80%, transparent);
+  border-bottom: 1px solid var(--mantine-color-default-border);
+  border-radius: var(--mantine-radius-md) var(--mantine-radius-md) 0 0;
+  overflow: hidden;
+}
+
+/* ===== 全屏编辑器 ===== */
+.fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: var(--mantine-color-body);
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.fullscreen > div {
+  --paper-backdrop: none;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.fullscreen .toolbar {
+  top: 0;
+  border-radius: 0;
+}
+
+.fullscreen > div > div:last-child {
+  flex: 1;
+  overflow-y: auto;
+}

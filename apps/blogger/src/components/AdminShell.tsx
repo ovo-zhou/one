@@ -1,5 +1,7 @@
 "use client";
 
+import classes from "./AdminShell.module.css";
+import brandClasses from "./Brand.module.css";
 import { useState } from "react";
 import { useMediaQuery } from "@mantine/hooks";
 import {
@@ -33,7 +35,11 @@ import {
 function SidebarContent({ collapsed, onNavigate }: { collapsed: boolean; onNavigate: () => void }) {
   const pathname = usePathname();
   const router = useRouter();
-  const navClass = `admin-nav-link${collapsed ? " nav-collapsed" : ""}`;
+  const navStyles = collapsed ? {
+    root: { width: "100%", justifyContent: "center", paddingInline: 0 },
+    body: { display: "none" },
+    section: { marginRight: 0 },
+  } : undefined;
 
   const handleClick = (path: string) => {
     router.push(path);
@@ -43,14 +49,20 @@ function SidebarContent({ collapsed, onNavigate }: { collapsed: boolean; onNavig
   return (
     <Stack gap={2} px="xs">
       <NavLink
-        className={navClass}
+        className={classes.navLink}
+        pos="relative"
+        bdrs="md"
+        styles={navStyles}
         label={collapsed ? undefined : "文章管理"}
         leftSection={<Newspaper size={18} />}
         active={pathname.startsWith("/admin/posts") || pathname === "/admin"}
         onClick={() => handleClick("/admin/posts")}
       />
       <NavLink
-        className={navClass}
+        className={classes.navLink}
+        pos="relative"
+        bdrs="md"
+        styles={navStyles}
         label={collapsed ? undefined : "页面管理"}
         leftSection={<FileText size={18} />}
         active={pathname.startsWith("/admin/pages")}
@@ -101,15 +113,16 @@ function TopBar({
             c="inherit"
             fw={800}
             size="lg"
-            className="flex-center"
+            display="inline-flex"
+            style={{ alignItems: "center", gap: 6 }}
           >
-            <Text className="brand-text">博客后台</Text>
+            <Text className={brandClasses.text}>博客后台</Text>
           </Anchor>
         </Group>
 
         <Menu trigger="click" position="bottom-end">
           <Menu.Target>
-            <Group component="span" gap={6} className="cursor-pointer">
+            <Group component="span" gap={6} style={{ cursor: "pointer" }}>
               <CircleUser size={18} />
               {userName}
               <ChevronDown size={14} />
@@ -174,7 +187,7 @@ export default function AdminShell({
       }}
       padding={0}
     >
-      <AppShell.Header className="app-header">
+      <AppShell.Header>
         <TopBar
           userName={userName}
           _mobileOpened={mobileOpened}
@@ -186,7 +199,7 @@ export default function AdminShell({
       </AppShell.Header>
 
       {isMobile ? null : (
-        <AppShell.Navbar p={0} className="app-navbar">
+        <AppShell.Navbar p={0}>
           <AppShell.Section grow mt="sm">
             <SidebarContent collapsed={desktopCollapsed} onNavigate={() => {}} />
           </AppShell.Section>

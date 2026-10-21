@@ -1,3 +1,5 @@
+import classes from "../../components/ArticleLayout.module.css";
+import brandClasses from "../../components/Brand.module.css";
 import type { Metadata } from "next";
 import getPostById from "../../actions/post/getPostById";
 import getPosts from "../../actions/post/getPosts";
@@ -39,7 +41,9 @@ export default async function PostPage({ params }: { params: Promise<{ postId: s
               size="sm"
               c="dimmed"
               w="fit-content"
-              className="flex-center back-link"
+              className={classes.backLink}
+              display="inline-flex"
+              style={{ alignItems: "center", gap: 6 }}
             >
               <ArrowLeft size={14} />
               返回首页
@@ -47,8 +51,9 @@ export default async function PostPage({ params }: { params: Promise<{ postId: s
             <Box>
               <Title
                 order={1}
-                className="brand-text"
-                style={{ fontSize: "clamp(30px, 5vw, 46px)", letterSpacing: "-0.03em" }}
+                className={brandClasses.text}
+                fz="clamp(30px, 5vw, 46px)"
+                lts="-0.03em"
               >
                 {post.title}
               </Title>
@@ -60,7 +65,7 @@ export default async function PostPage({ params }: { params: Promise<{ postId: s
                 {dayjs(post.published).format("YYYY 年 M 月 D 日")}
               </Text>
             </Box>
-            <Divider className="divider-gradient" />
+            <Divider mod="brand" />
             <Box w="100%">
               <MarkdownRenderer content={post.content} />
             </Box>

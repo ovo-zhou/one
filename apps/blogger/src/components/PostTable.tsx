@@ -1,5 +1,6 @@
 "use client";
 
+import StatusBadge from "./StatusBadge";
 import { useState, useCallback, useTransition } from "react";
 import { ChevronLeft, ChevronRight, Plus, Search } from "lucide-react";
 import {
@@ -7,7 +8,6 @@ import {
   TextInput,
   Button,
   Group,
-  Badge,
   Modal,
   Text,
   Flex,
@@ -121,7 +121,7 @@ export default function PostTable({ initialData }: { initialData: PostListData }
   );
 
   return (
-    <Box className="scroll-x">
+    <Box style={{ overflowX: "auto" }}>
       <Group justify="space-between" mb="md">
         <Group>
           <TextInput
@@ -135,10 +135,10 @@ export default function PostTable({ initialData }: { initialData: PostListData }
             搜索
           </Button>
         </Group>
-        <Button className="btn-glow" leftSection={<Plus size={16} />} onClick={() => router.push("/admin/posts/new")}>新建文章</Button>
+        <Button mod="brand" leftSection={<Plus size={16} />} onClick={() => router.push("/admin/posts/new")}>新建文章</Button>
       </Group>
 
-      <Table striped highlightOnHover withTableBorder miw={600} className="admin-table">
+      <Table striped highlightOnHover withTableBorder miw={600}>
         <Table.Thead>
           <Table.Tr>
             <Table.Th>标题</Table.Th>
@@ -174,13 +174,13 @@ export default function PostTable({ initialData }: { initialData: PostListData }
                 </Table.Td>
                 <Table.Td>
                   {post.status === "LIVE" ? (
-                    <Badge color="green" variant="light" className="badge-dot">
+                    <StatusBadge color="green">
                       已发布
-                    </Badge>
+                    </StatusBadge>
                   ) : (
-                    <Badge color="yellow" variant="light" className="badge-dot">
+                    <StatusBadge color="yellow">
                       草稿
-                    </Badge>
+                    </StatusBadge>
                   )}
                 </Table.Td>
                 <Table.Td>

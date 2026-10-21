@@ -1,5 +1,6 @@
 "use client";
 
+import brandClasses from "./Brand.module.css";
 import { useRef } from "react";
 import { UnstyledButton } from "@mantine/core";
 
@@ -20,7 +21,7 @@ export default function BlogNameLogin({ name }: { name: string }) {
   };
 
   return (
-    <UnstyledButton onClick={handleClick} className="brand-text" fz="inherit">
+    <UnstyledButton onClick={handleClick} className={brandClasses.text} fz="inherit" bg="transparent" c="inherit">
       {name}
     </UnstyledButton>
   );}

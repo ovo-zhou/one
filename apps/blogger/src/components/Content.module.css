@@ -1,0 +1,448 @@
+/* ===== 编辑器专属 ===== */
+.editor {
+  min-height: 300px;
+  padding: 8px;
+  outline: none;
+}
+
+.editor:focus {
+  outline: none;
+}
+
+.editor p:global(.is-editor-empty):first-child::before {
+  color: var(--mantine-color-dimmed);
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* 表格编辑：列宽调整、单元格选中 */
+.editor :global(.tableWrapper) {
+  overflow-x: auto;
+}
+
+.editor table {
+  table-layout: fixed;
+  border-collapse: collapse;
+  overflow: hidden;
+  width: 100%;
+  margin: 1em 0;
+}
+
+.editor th,
+.editor td {
+  position: relative;
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--mantine-color-default-border);
+  padding: 0.5em 0.75em;
+  text-align: left;
+  vertical-align: top;
+}
+
+.editor :global(.selectedCell):after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, #8b5cf6 18%, transparent);
+  pointer-events: none;
+}
+
+.editor :global(.column-resize-handle) {
+  position: absolute;
+  right: -2px;
+  top: 0;
+  bottom: -2px;
+  width: 4px;
+  background: var(--mantine-color-default-border);
+  pointer-events: none;
+}
+
+/* ===== 共享排版：编辑器与渲染页一致 ===== */
+.content,
+.editor {
+  line-height: 1.8;
+  font-size: 16px;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+}
+
+.content > :first-child,
+.editor > :first-child {
+  margin-top: 0;
+}
+
+.content > :last-child,
+.editor > :last-child {
+  margin-bottom: 0;
+}
+
+.content p,
+.editor p {
+  margin: 0.75em 0;
+}
+
+.content h1,
+.content h2,
+.content h3,
+.content h4,
+.editor h1,
+.editor h2,
+.editor h3,
+.editor h4 {
+  font-weight: 800;
+  line-height: 1.35;
+  margin: 1.5em 0 0.6em;
+  letter-spacing: -0.02em;
+}
+
+.content h1,
+.editor h1 {
+  font-size: 1.8em;
+}
+
+.content h2,
+.editor h2 {
+  font-size: 1.5em;
+}
+
+.content h3,
+.editor h3 {
+  font-size: 1.25em;
+}
+
+.content h4,
+.editor h4 {
+  font-size: 1.1em;
+}
+
+.content ul,
+.content ol,
+.editor ul,
+.editor ol {
+  padding-left: 1.5em;
+  margin: 0.75em 0;
+}
+
+.content ul,
+.editor ul {
+  list-style: disc;
+}
+
+.content ol,
+.editor ol {
+  list-style: decimal;
+}
+
+.content li,
+.editor li {
+  margin: 0.3em 0;
+}
+
+.content li > p,
+.editor li > p {
+  margin: 0;
+}
+
+/* 任务列表：tiptap 用 data-type，react-markdown 用 GitHub class */
+.content ul[data-type="taskList"],
+.content ul:global(.contains-task-list),
+.editor ul[data-type="taskList"] {
+  list-style: none;
+  padding-left: 0;
+}
+
+.content ul[data-type="taskList"] > li,
+.content ul:global(.contains-task-list) > li,
+.editor ul[data-type="taskList"] > li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4em;
+}
+
+.editor ul[data-type="taskList"] > li > label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5em;
+}
+
+/* tiptap 任务项内段落默认 margin 会把文字推下，导致 checkbox 与首行文字不对齐；
+   与渲染端（无 p 包裹）保持一致，统一从 li 顶部开始 */
+.editor ul[data-type="taskList"] > li > div > p {
+  margin: 0;
+}
+
+.editor ul[data-type="taskList"] > li > label input[type="checkbox"] {
+  margin: calc((1lh - 15px) / 2) 0 0 0;
+  flex: 0 0 auto;
+}
+
+.content ul[data-type="taskList"] input,
+.content ul:global(.contains-task-list) input,
+.editor ul[data-type="taskList"] input {
+  margin: calc((1lh - 15px) / 2) 0.3em 0 0;
+}
+
+.content blockquote,
+.editor blockquote {
+  border-left: 3px solid color-mix(in srgb, var(--mantine-color-primary-6) 50%, transparent);
+  padding-left: 1em;
+  margin: 1.25em 0;
+  color: var(--mantine-color-dimmed);
+  font-size: 1.02em;
+}
+
+.content a,
+.editor a {
+  color: var(--mantine-color-anchor);
+  text-decoration: none;
+  text-underline-offset: 3px;
+}
+
+.content a:hover,
+.editor a:hover {
+  text-decoration: underline;
+}
+
+.content img,
+.editor img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--mantine-radius-md);
+}
+
+.content hr,
+.editor hr {
+  border: none;
+  border-top: 1px solid var(--mantine-color-default-border);
+  margin: 2em 0;
+}
+
+/* 行内代码（块级代码的 .hljs 由导入的 github-dark 主题负责） */
+.content :not(pre) > code,
+.editor :not(pre) > code {
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 0.9em;
+  background: var(--brand-gradient-soft);
+  border: 1px solid color-mix(in srgb, var(--mantine-color-primary-5) 25%, transparent);
+  padding: 0.15em 0.4em;
+  border-radius: 6px;
+}
+
+/* pre 仅作容器，背景/内边距/滚动条交给 .hljs（github-dark 主题） */
+.content pre,
+.editor pre {
+  margin: 1em 0;
+  padding: 0;
+  background: transparent;
+  font-family: var(--mantine-font-family-monospace);
+}
+
+.editor pre code {
+  display: block;
+  overflow-x: auto;
+  padding: 1em;
+  background: #0a0a0a;
+  color: #c9d1d9;
+}
+
+/* 渲染页表格：宽表横向滚动（编辑器走上面的 .tableWrapper） */
+.content table {
+  display: block;
+  overflow-x: auto;
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+  font-size: 0.95em;
+}
+
+.content th,
+.content td {
+  border: 1px solid var(--mantine-color-default-border);
+  padding: 0.5em 0.75em;
+  text-align: left;
+}
+
+.content th {
+  background: var(--brand-gradient-soft);
+  font-weight: 600;
+}
+
+/* ===== highlight.js 代码块背景(与暗色底色统一) =====
+   圆角归零：统一由外层 pre 裁剪（避免与代码块头部/容器圆角拼接错位）
+   背景/文字放高特异性规则，确保覆盖 github-dark 主题默认值 */
+.content :global(.hljs),
+.editor :global(.hljs) {
+  background: #0a0a0a;
+}
+
+.content :global(.hljs) {
+  background: #0a0a0a;
+  color: #c9d1d9;
+}
+
+/* ===== 阅读排版增强（编辑器与渲染页一致）===== */
+.content,
+.editor {
+  font-size: 17px;
+  line-height: 1.9;
+  letter-spacing: 0.01em;
+}
+
+.content h2,
+.editor h2 {
+  position: relative;
+  padding-bottom: 0.4em;
+}
+
+.content h2::after,
+.editor h2::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 2.2em;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--brand-gradient);
+}
+
+.content blockquote,
+.editor blockquote {
+  border-left: none;
+  background:
+    linear-gradient(180deg, var(--brand-from) 0%, var(--brand-mid) 50%, var(--brand-to) 100%) left center / 4px 100% no-repeat,
+    var(--brand-gradient-soft);
+  border-radius: var(--mantine-radius-md);
+  padding: 0.9em 1.2em 0.9em calc(1.2em + 6px);
+  font-size: 1.05em;
+  color: var(--mantine-color-text);
+}
+
+.content a,
+.editor a {
+  background-image: linear-gradient(90deg, var(--brand-from), var(--brand-to));
+  background-size: 0% 2px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 200ms ease;
+}
+
+.content a:hover,
+.editor a:hover {
+  text-decoration: none;
+  background-size: 100% 2px;
+}
+
+.content pre,
+.editor pre {
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--mantine-color-primary-5) 22%, transparent);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.content th,
+.editor th {
+  background: var(--brand-gradient-soft);
+  font-weight: 600;
+}
+
+.content th,
+.content td,
+.editor th,
+.editor td {
+  padding: 0.65em 1em;
+}
+
+.content tbody tr:nth-child(odd),
+.editor tbody tr:nth-child(odd) {
+  background: color-mix(in srgb, var(--mantine-color-text) 3%, transparent);
+}
+
+.content img,
+.editor img {
+  display: block;
+  margin: 1.5em auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.content input[type="checkbox"],
+.editor input[type="checkbox"] {
+  accent-color: var(--mantine-color-primary-6);
+  width: 15px;
+  height: 15px;
+}
+
+.content hr,
+.editor hr {
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--mantine-color-primary-5), transparent);
+}
+
+/* ===== 列表增强：渐变圆点 + 层级区分（排除任务列表）===== */
+.content ul:not([data-type="taskList"]):not(:global(.contains-task-list)),
+.editor ul:not([data-type="taskList"]) {
+  list-style: none;
+  padding-left: 0.25em;
+}
+
+.content ul:not([data-type="taskList"]):not(:global(.contains-task-list)) > li,
+.editor ul:not([data-type="taskList"]) > li {
+  position: relative;
+  padding-left: 1.5em;
+}
+
+.content ul:not([data-type="taskList"]):not(:global(.contains-task-list)) > li::before,
+.editor ul:not([data-type="taskList"]) > li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.72em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--brand-gradient);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--brand-glow) 45%, transparent);
+}
+
+.content ul:not([data-type="taskList"]):not(:global(.contains-task-list)) ul:not([data-type="taskList"]):not(:global(.contains-task-list)),
+.editor ul:not([data-type="taskList"]) ul:not([data-type="taskList"]) {
+  margin: 0.35em 0;
+  padding-left: 0.6em;
+}
+
+.content ul:not([data-type="taskList"]):not(:global(.contains-task-list)) ul:not([data-type="taskList"]):not(:global(.contains-task-list)) > li::before,
+.editor ul:not([data-type="taskList"]) ul:not([data-type="taskList"]) > li::before {
+  width: 5px;
+  height: 5px;
+  top: 0.74em;
+  background: var(--mantine-color-primary-5);
+  box-shadow: none;
+}
+
+.content ol li::marker,
+.editor ol li::marker {
+  color: var(--mantine-color-primary-6);
+  font-weight: 700;
+}
+
+.content li,
+.editor li {
+  margin: 0.35em 0;
+}
+
+.content li > ul,
+.content li > ol,
+.editor li > ul,
+.editor li > ol {
+  margin: 0.35em 0;
+}
+
+.content pre {
+  display: flex;
+  flex-direction: column;
+}

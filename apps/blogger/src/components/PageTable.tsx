@@ -1,12 +1,12 @@
 "use client";
 
+import StatusBadge from "./StatusBadge";
 import { useState, useCallback, useTransition } from "react";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import {
   Table,
   Button,
   Group,
-  Badge,
   Modal,
   Text,
   Flex,
@@ -103,12 +103,12 @@ export default function PageTable({ initialData }: { initialData: PageListData }
     [fetchData, tokens, currentPage]
   );
   return (
-    <Box className="scroll-x">
+    <Box style={{ overflowX: "auto" }}>
       <Group justify="flex-end" mb="md">
-        <Button className="btn-glow" leftSection={<Plus size={16} />} onClick={() => router.push("/admin/pages/new")}>新建页面</Button>
+        <Button mod="brand" leftSection={<Plus size={16} />} onClick={() => router.push("/admin/pages/new")}>新建页面</Button>
       </Group>
 
-      <Table striped highlightOnHover withTableBorder miw={500} className="admin-table">
+      <Table striped highlightOnHover withTableBorder miw={500}>
           <Table.Thead>
             <Table.Tr>
               <Table.Th>标题</Table.Th>
@@ -140,9 +140,9 @@ export default function PageTable({ initialData }: { initialData: PageListData }
                   </Table.Td>
                   <Table.Td>
                     {page.status === "LIVE" ? (
-                      <Badge color="green" variant="light" className="badge-dot">已发布</Badge>
+                      <StatusBadge color="green">已发布</StatusBadge>
                     ) : (
-                      <Badge color="yellow" variant="light" className="badge-dot">草稿</Badge>
+                      <StatusBadge color="yellow">草稿</StatusBadge>
                     )}
                   </Table.Td>
                   <Table.Td>

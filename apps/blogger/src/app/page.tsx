@@ -1,9 +1,10 @@
+import classes from "./page.module.css";
 import type { Metadata } from "next";
 import getBlog from "../actions/blog/getBlog";
 import getPosts from "../actions/post/getPosts";
 import getPublicPages from "../actions/page/getPublicPages";
 import dayjs from "dayjs";
-import { Flex, Box, Title, Stack, Anchor, Text, Group } from "@mantine/core";
+import { Flex, Box, Title, Stack, Anchor, Text, Group, Paper } from "@mantine/core";
 import { Copyright } from "lucide-react";
 import Greeting from "../components/Greeting";
 
@@ -45,7 +46,13 @@ export default async function Home() {
                   href={`/pages/${page.id}`}
                   underline="never"
                   c="inherit"
-                  className="page-pill"
+                  className={classes.pagePill}
+                  display="block"
+                  bd={0}
+                  py={10}
+                  px={24}
+                  bdrs={999}
+                  style={{ backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }}
                 >
                   <Text size="sm" fw={600}>
                     {page.title}
@@ -60,19 +67,44 @@ export default async function Home() {
       <Flex justify="center" pt="xl" pb="lg">
         <Stack w={{ base: "100%", sm: 620, lg: 760 }} gap="lg" px={{ base: "md", sm: 0 }}>
           {posts.items.length === 0 ? (
-            <Box className="post-card" ta="center" c="dimmed">
+            <Paper
+              className={classes.postCard}
+              p={24}
+              radius="lg"
+              shadow="post"
+              withBorder
+              pos="relative"
+              bg="color-mix(in srgb, var(--mantine-color-body) 55%, transparent)"
+              bd="1px solid color-mix(in srgb, var(--mantine-color-default-border) 60%, transparent)"
+              ta="center"
+              c="dimmed"
+            >
               <Text>还没有文章，敬请期待</Text>
-            </Box>
+            </Paper>
           ) : (
             posts.items.map((post) => (
-              <Box key={post.id} className="post-card">
+              <Paper
+                key={post.id}
+                className={classes.postCard}
+                p={24}
+                radius="lg"
+                shadow="post"
+                withBorder
+                pos="relative"
+                bg="color-mix(in srgb, var(--mantine-color-body) 55%, transparent)"
+                bd="1px solid color-mix(in srgb, var(--mantine-color-default-border) 60%, transparent)"
+              >
                 <Group gap="xs" mb={10}>
                   <Text
                     size="xs"
                     fw={600}
                     c="primary"
-                    className="glass-chip"
-                    style={{ padding: "3px 12px" }}
+                    py={3}
+                    px={12}
+                    bdrs="xl"
+                    bg="color-mix(in srgb, var(--mantine-color-body) 55%, transparent)"
+                    bd="1px solid color-mix(in srgb, var(--mantine-color-default-border) 60%, transparent)"
+                    style={{ backdropFilter: "blur(14px) saturate(1.3)", WebkitBackdropFilter: "blur(14px) saturate(1.3)" }}
                   >
                     {dayjs(post.published).format("YYYY 年 M 月 D 日")}
                   </Text>
@@ -81,14 +113,14 @@ export default async function Home() {
                   </Text>
                 </Group>
                 <Anchor href={`/${post.id}`} underline="never" c="inherit">
-                  <Title order={3} lineClamp={2} className="post-title">
+                  <Title order={3} lineClamp={2} className={classes.postTitle}>
                     {post.title}
                   </Title>
                 </Anchor>
                 <Text size="sm" c="dimmed" mt="sm" lineClamp={3}>
                   {post.content.replace(/<[^>]*>/g, "").substring(0, 200)}
                 </Text>
-              </Box>
+              </Paper>
             ))
           )}
         </Stack>
@@ -99,7 +131,6 @@ export default async function Home() {
         py="xl"
         mt="xl"
         style={{
-          borderTop: "1px solid transparent",
           backgroundImage:
             "linear-gradient(var(--mantine-color-body), var(--mantine-color-body)), var(--brand-gradient)",
           backgroundOrigin: "border-box",

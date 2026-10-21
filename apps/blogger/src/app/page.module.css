@@ -1,0 +1,60 @@
+/* ===== 首页 ===== */
+.postCard {
+  --paper-backdrop: blur(16px) saturate(1.3);
+  transition: box-shadow 200ms ease, border-color 200ms ease;
+  overflow: hidden;
+}
+
+.postCard::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: var(--brand-gradient);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 250ms ease;
+  pointer-events: none;
+}
+
+.postCard:hover {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+}
+
+.postCard:hover::before {
+  opacity: 1;
+}
+
+.postCard:hover .postTitle {
+  background-position: 100% center;
+}
+
+.postTitle {
+  background-image: linear-gradient(90deg, var(--mantine-color-text) 0%, var(--mantine-color-text) 45%, var(--brand-from) 90%, var(--brand-to) 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  transition: background-position 350ms ease;
+}
+
+.pagePill {
+  transition: border-color 150ms ease, color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+}
+
+.pagePill:hover {
+  border-color: transparent;
+  background-image: var(--brand-gradient-soft);
+  color: var(--mantine-color-primary-6);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--brand-glow) 30%, transparent);
+  transform: translateY(-1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .postCard {
+    transition: none;
+  }
+}

@@ -1,0 +1,48 @@
+/* ===== 发光按钮（主要 CTA）===== */
+.button[data-brand] {
+  background-image: var(--brand-gradient);
+  background-size: 200% auto;
+  border: none;
+  color: #fff;
+  box-shadow: 0 6px 24px var(--brand-glow);
+  transition: background-position 300ms ease, box-shadow 300ms ease, transform 150ms ease;
+}
+
+.button[data-brand]:hover:not(:disabled) {
+  background-position: 100% center;
+  box-shadow: 0 8px 32px var(--brand-glow);
+  transform: translateY(-1px);
+}
+
+/* 输入框 focus：渐变光环 */
+.input:focus {
+  border-color: color-mix(in srgb, var(--mantine-color-primary-5) 80%, transparent) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand-glow) 40%, transparent) !important;
+}
+
+/* 表格行 hover：渐变边条 */
+.tableRow {
+  transition: background-color 150ms ease;
+}
+
+.tableRow:hover td:first-child {
+  box-shadow: inset 3px 0 0 var(--mantine-color-primary-6);
+}
+
+/* Divider 渐变色（强调场景） */
+.divider[data-brand]::before,
+.divider[data-brand]::after {
+  background: linear-gradient(90deg, transparent, var(--mantine-color-primary-5), transparent) !important;
+}
+
+.paper[data-variant="glass"] {
+  --paper-backdrop: blur(20px) saturate(1.4);
+  background: color-mix(in srgb, var(--mantine-color-body) 62%, transparent);
+  border-color: color-mix(in srgb, var(--mantine-color-default-border) 65%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button[data-brand] {
+    transition: none;
+  }
+}

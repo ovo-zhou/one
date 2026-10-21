@@ -1,8 +1,10 @@
 "use client";
 
+import classes from "./AdminEditor.module.css";
+import contentClasses from "./Content.module.css";
 import { useState, useEffect } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
-import { Box } from "@mantine/core";
+import { Box, Paper } from "@mantine/core";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
@@ -42,6 +44,7 @@ export default function AdminEditor({ content, onChange }: AdminEditorProps) {
         transformCopiedText: true,
       }),
     ],
+    editorProps: { attributes: { class: contentClasses.editor ?? "" } },
     content: content || "",
     immediatelyRender: false,
     onUpdate: ({ editor }) => {
@@ -67,7 +70,7 @@ export default function AdminEditor({ content, onChange }: AdminEditorProps) {
   }, [isFullscreen]);
 
   const editorContent = (
-    <Box className="editor-shell">
+    <Paper className={classes.shell} radius="md" withBorder>
       {editor && (
         <EditorToolbar
           editor={editor}
@@ -84,11 +87,11 @@ export default function AdminEditor({ content, onChange }: AdminEditorProps) {
         onClose={() => setImageModalOpen(false)}
         onInsert={handleInsertImage}
       />
-    </Box>
+    </Paper>
   );
 
   if (isFullscreen) {
-    return <Box className="editor-fullscreen">{editorContent}</Box>;
+    return <Box className={classes.fullscreen}>{editorContent}</Box>;
   }
 
   return editorContent;

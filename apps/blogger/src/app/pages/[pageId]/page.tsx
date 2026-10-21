@@ -1,3 +1,5 @@
+import classes from "../../../components/ArticleLayout.module.css";
+import brandClasses from "../../../components/Brand.module.css";
 import type { Metadata } from "next";
 import getPublicPageById from "../../../actions/page/getPublicPageById";
 import getPublicPages from "../../../actions/page/getPublicPages";
@@ -44,7 +46,9 @@ export default async function PublicPageDetail({ params }: { params: Promise<{ p
               size="sm"
               c="dimmed"
               w="fit-content"
-              className="flex-center back-link"
+              className={classes.backLink}
+              display="inline-flex"
+              style={{ alignItems: "center", gap: 6 }}
             >
               <ArrowLeft size={14} />
               返回首页
@@ -52,8 +56,9 @@ export default async function PublicPageDetail({ params }: { params: Promise<{ p
             <Box>
               <Title
                 order={1}
-                className="brand-text"
-                style={{ fontSize: "clamp(30px, 5vw, 46px)", letterSpacing: "-0.03em" }}
+                className={brandClasses.text}
+                fz="clamp(30px, 5vw, 46px)"
+                lts="-0.03em"
               >
                 {page.title}
               </Title>
@@ -63,7 +68,7 @@ export default async function PublicPageDetail({ params }: { params: Promise<{ p
                 </Text>
               )}
             </Box>
-            <Divider className="divider-gradient" />
+            <Divider mod="brand" />
             {page.content && (
               <Box w="100%">
                 <MarkdownRenderer content={page.content} />

@@ -1,5 +1,6 @@
 "use client";
 
+import brandClasses from "./Brand.module.css";
 import { useEffect, useState } from "react";
 import { Title, Anchor, Text } from "@mantine/core";
 import UserDropdown from "./UserDropdown";
@@ -27,7 +28,7 @@ export default function Greeting({ blogName }: { blogName: string }) {
 
   const renderBlogName = () =>
     user?.isAdmin ? (
-      <Anchor href="/admin" underline="never" className="brand-text" fz="inherit">
+      <Anchor href="/admin" underline="never" className={brandClasses.text} fz="inherit">
         {blogName}
       </Anchor>
     ) : (
@@ -36,7 +37,7 @@ export default function Greeting({ blogName }: { blogName: string }) {
 
   if (!loaded || !user) {
     return (
-      <Title order={1} ta="center" style={{ fontSize: "clamp(34px, 6vw, 56px)", letterSpacing: "-0.03em" }}>
+      <Title order={1} ta="center" fz="clamp(34px, 6vw, 56px)" lts="-0.03em">
         你好，我是 {renderBlogName()}
       </Title>
     );
@@ -44,17 +45,17 @@ export default function Greeting({ blogName }: { blogName: string }) {
 
   if (user?.isAdmin) {
     return (
-      <Title order={1} ta="center" style={{ fontSize: "clamp(34px, 6vw, 56px)", letterSpacing: "-0.03em" }}>
+      <Title order={1} ta="center" fz="clamp(34px, 6vw, 56px)" lts="-0.03em">
         你好，我是 {renderBlogName()}
       </Title>
     );
   }
 
   return (
-    <Title order={1} ta="center" style={{ fontSize: "clamp(34px, 6vw, 56px)", letterSpacing: "-0.03em" }}>
+    <Title order={1} ta="center" fz="clamp(34px, 6vw, 56px)" lts="-0.03em">
       你好
       <UserDropdown name={user.name || user.email || ""} />
-      ，我是 <Text component="span" className="brand-text" fz="inherit">{blogName}</Text>
+      ，我是 <Text component="span" className={brandClasses.text} fz="inherit">{blogName}</Text>
     </Title>
   );
 }
