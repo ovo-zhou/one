@@ -7,6 +7,7 @@ import MarkdownRenderer from "../../components/MarkdownRenderer";
 import dayjs from "dayjs";
 import { Title, Text, Stack, Divider, Anchor, Box } from "@mantine/core";
 import { ArrowLeft } from "lucide-react";
+import { notFound } from "next/navigation";
 
 export const revalidate = 43200;
 
@@ -23,13 +24,17 @@ export async function generateMetadata({
   const { postId } = await params;
   const post = await getPostById(postId);
   return {
-    title: post.title,
+    title: post?.title ?? "内容不存在",
   };
 }
 
 export default async function PostPage({ params }: { params: Promise<{ postId: string }> }) {
   const { postId } = await params;
   const post = await getPostById(postId);
+
+  if (!post) {
+    notFound();
+  }
 
   return (
     <main>
