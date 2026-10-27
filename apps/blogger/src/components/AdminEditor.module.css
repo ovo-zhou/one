@@ -6,11 +6,7 @@
 }
 
 .shell:focus-within {
-  border-color: transparent !important;
-  background-image: var(--brand-gradient-soft);
-  box-shadow:
-    0 0 0 1.5px var(--mantine-color-primary-5),
-    0 0 24px color-mix(in srgb, var(--brand-glow) 45%, transparent) !important;
+  background-image: none;
 }
 
 /* ===== 编辑器工具栏吸顶 ===== */

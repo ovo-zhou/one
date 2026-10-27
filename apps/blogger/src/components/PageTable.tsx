@@ -71,7 +71,7 @@ export default function PageTable({ initialData }: { initialData: PageListData }
       await deletePage(deleteTarget.id);
       notifications.show({ title: "已删除", message: `页面「${deleteTarget.title}」已删除`, color: "green" });
       setDeleteTarget(null);
-      fetchData(tokens[currentPage] || undefined);
+      await fetchData(tokens[currentPage] || undefined);
     } catch (e) {
       notifications.show({ title: "删除失败", message: e instanceof Error ? e.message : "请稍后重试", color: "red" });
     }
@@ -82,7 +82,7 @@ export default function PageTable({ initialData }: { initialData: PageListData }
       try {
         await publishPage(pageId);
         notifications.show({ title: "已发布", message: "页面已发布", color: "green" });
-        fetchData(tokens[currentPage] || undefined);
+        await fetchData(tokens[currentPage] || undefined);
       } catch (e) {
         notifications.show({ title: "发布失败", message: e instanceof Error ? e.message : "请稍后重试", color: "red" });
       }
@@ -95,7 +95,7 @@ export default function PageTable({ initialData }: { initialData: PageListData }
       try {
         await revertPage(pageId);
         notifications.show({ title: "已退回", message: "页面已退回草稿", color: "green" });
-        fetchData(tokens[currentPage] || undefined);
+        await fetchData(tokens[currentPage] || undefined);
       } catch (e) {
         notifications.show({ title: "操作失败", message: e instanceof Error ? e.message : "请稍后重试", color: "red" });
       }

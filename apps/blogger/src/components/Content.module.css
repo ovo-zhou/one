@@ -9,6 +9,19 @@
   outline: none;
 }
 
+/* 编辑器选区背景色。 */
+.editor::selection,
+.editor ::selection {
+  background: var(--mantine-color-blue-1);
+  color: var(--mantine-color-dark-9);
+}
+
+:global([data-mantine-color-scheme="dark"]) .editor::selection,
+:global([data-mantine-color-scheme="dark"]) .editor ::selection {
+  background: var(--mantine-color-blue-8);
+  color: var(--mantine-color-white);
+}
+
 .editor p:global(.is-editor-empty):first-child::before {
   color: var(--mantine-color-dimmed);
   content: attr(data-placeholder);

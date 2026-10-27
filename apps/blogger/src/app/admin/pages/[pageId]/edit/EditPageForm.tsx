@@ -38,6 +38,7 @@ export default function EditPageForm({
       await updatePage({ pageId, title, content, isDraft });
       notifications.show({ title: "保存成功", message: "页面已更新", color: "green" });
       router.push("/admin/pages");
+      router.refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "保存失败");
       notifications.show({ title: "保存失败", message: e instanceof Error ? e.message : "请稍后重试", color: "red" });

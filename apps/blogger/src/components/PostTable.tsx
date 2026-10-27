@@ -88,7 +88,7 @@ export default function PostTable({ initialData }: { initialData: PostListData }
       await deletePost(deleteTarget.id);
       notifications.show({ title: "已删除", message: `文章「${deleteTarget.title}」已删除`, color: "green" });
       setDeleteTarget(null);
-      fetchData(tokens[currentPage] || undefined, search || undefined);
+      await fetchData(tokens[currentPage] || undefined, search || undefined);
     } catch (e) {
       notifications.show({ title: "删除失败", message: e instanceof Error ? e.message : "请稍后重试", color: "red" });
     }
@@ -99,7 +99,7 @@ export default function PostTable({ initialData }: { initialData: PostListData }
       try {
         await publishPost(postId);
         notifications.show({ title: "已发布", message: "文章已发布", color: "green" });
-        fetchData(tokens[currentPage] || undefined, search || undefined);
+        await fetchData(tokens[currentPage] || undefined, search || undefined);
       } catch (e) {
         notifications.show({ title: "发布失败", message: e instanceof Error ? e.message : "请稍后重试", color: "red" });
       }
@@ -112,7 +112,7 @@ export default function PostTable({ initialData }: { initialData: PostListData }
       try {
         await revertPost(postId);
         notifications.show({ title: "已退回", message: "文章已退回草稿", color: "green" });
-        fetchData(tokens[currentPage] || undefined, search || undefined);
+        await fetchData(tokens[currentPage] || undefined, search || undefined);
       } catch (e) {
         notifications.show({ title: "操作失败", message: e instanceof Error ? e.message : "请稍后重试", color: "red" });
       }

@@ -46,6 +46,7 @@ export default function EditPostForm({
       });
       notifications.show({ title: "保存成功", message: "文章已更新", color: "green" });
       router.push("/admin/posts");
+      router.refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "保存失败");
       notifications.show({ title: "保存失败", message: e instanceof Error ? e.message : "请稍后重试", color: "red" });
