@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { TextInput, Button, Group, Stack, Paper, TagsInput, Text, Box } from "@mantine/core";
+import { TextInput, Button, Group, Stack, TagsInput, Text, Box } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import AdminEditor from "../../../../../components/AdminEditor";
 import { updatePost } from "../../../../../actions/post/updatePost";
@@ -54,7 +54,7 @@ export default function EditPostForm({
   };
 
   return (
-    <Paper component={Stack} gap="md" maw={900} p="xl" radius="lg" shadow="glass" withBorder variant="glass">
+    <Stack gap="md" maw={900}>
       <TextInput
         label="标题"
         placeholder="输入文章标题"
@@ -86,6 +86,6 @@ export default function EditPostForm({
           取消
         </Button>
       </Group>
-    </Paper>
+    </Stack>
   );
 }
