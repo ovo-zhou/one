@@ -30,15 +30,15 @@ body {
   --crop-bg: #000;
 }
 
-/* ===== 主题调色板覆盖（Aurora 风格）===== */
-:root[data-mantine-color-scheme='light'] {
+/* 仅公开页面使用 Aurora 的深浅色覆盖，后台保持 Mantine 默认变量。 */
+:root[data-mantine-color-scheme='light'] .brand-theme {
   --mantine-color-default-hover: #fafafa;
   --aurora-1: rgba(99, 102, 241, 0.22);
   --aurora-2: rgba(168, 85, 247, 0.2);
   --aurora-3: rgba(236, 72, 153, 0.16);
 }
 
-:root[data-mantine-color-scheme='dark'] {
+:root[data-mantine-color-scheme='dark'] .brand-theme {
   --mantine-color-body: #05050a;
   --mantine-color-default: #0b0b14;
   --mantine-color-default-hover: #131322;

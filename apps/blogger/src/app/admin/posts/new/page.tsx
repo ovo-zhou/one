@@ -1,6 +1,5 @@
 "use client";
 
-import brandClasses from "../../../../components/Brand.module.css";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { TextInput, Button, Group, Stack, Paper, Switch, TagsInput, Title, Text, Box } from "@mantine/core";
@@ -37,8 +36,8 @@ export default function NewPostPage() {
 
   return (
     <Box>
-      <Title order={2} mb="lg" className={brandClasses.text}>新建文章</Title>
-      <Paper component={Stack} gap="md" maw={900} p="xl" radius="lg" shadow="glass" withBorder variant="glass">
+      <Title order={2} mb="lg">新建文章</Title>
+      <Paper component={Stack} gap="md" maw={900} p="xl" withBorder>
         <TextInput
           label="标题"
           placeholder="输入文章标题"
@@ -68,7 +67,7 @@ export default function NewPostPage() {
           </Text>
         )}
         <Group>
-          <Button mod="brand" onClick={handleSubmit} loading={saving}>
+          <Button onClick={handleSubmit} loading={saving}>
             {isDraft ? "保存草稿" : "立即发布"}
           </Button>
           <Button variant="default" onClick={() => router.back()}>

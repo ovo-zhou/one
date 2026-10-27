@@ -46,7 +46,7 @@ export default function EditPageForm({
   };
 
   return (
-    <Paper component={Stack} gap="md" maw={900} p="xl" radius="lg" shadow="glass" withBorder variant="glass">
+    <Paper component={Stack} gap="md" maw={900} p="xl" withBorder>
       <TextInput
         label="标题"
         placeholder="输入页面标题"
@@ -60,7 +60,7 @@ export default function EditPageForm({
       </Box>
       {error && <Text c="red" size="sm">{error}</Text>}
       <Group>
-        <Button mod="brand" onClick={handleSubmit} loading={saving}>保存更新</Button>
+        <Button onClick={handleSubmit} loading={saving}>保存更新</Button>
         <Button variant="default" onClick={() => router.back()}>取消</Button>
       </Group>
     </Paper>

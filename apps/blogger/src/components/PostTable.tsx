@@ -135,7 +135,7 @@ export default function PostTable({ initialData }: { initialData: PostListData }
             搜索
           </Button>
         </Group>
-        <Button mod="brand" leftSection={<Plus size={16} />} onClick={() => router.push("/admin/posts/new")}>新建文章</Button>
+        <Button leftSection={<Plus size={16} />} onClick={() => router.push("/admin/posts/new")}>新建文章</Button>
       </Group>
 
       <Table striped highlightOnHover withTableBorder miw={600}>

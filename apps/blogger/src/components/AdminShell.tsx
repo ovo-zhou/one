@@ -1,7 +1,6 @@
 "use client";
 
 import classes from "./AdminShell.module.css";
-import brandClasses from "./Brand.module.css";
 import { useState } from "react";
 import { useMediaQuery } from "@mantine/hooks";
 import {
@@ -116,7 +115,7 @@ function TopBar({
             display="inline-flex"
             style={{ alignItems: "center", gap: 6 }}
           >
-            <Text className={brandClasses.text}>博客后台</Text>
+            <Text>博客后台</Text>
           </Anchor>
         </Group>
 

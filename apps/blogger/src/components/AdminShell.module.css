@@ -1,21 +1,3 @@
 .navLink {
   transition: background-color 150ms ease, color 150ms ease;
 }
-
-.navLink[data-active] {
-  background: var(--brand-gradient) !important;
-  color: #fff !important;
-  box-shadow: 0 4px 16px var(--brand-glow);
-}
-
-.navLink[data-active]::before {
-  content: "";
-  position: absolute;
-  left: 6px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 3px;
-  height: 16px;
-  border-radius: 2px;
-  background: rgba(255, 255, 255, 0.9);
-}

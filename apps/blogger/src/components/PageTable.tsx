@@ -105,7 +105,7 @@ export default function PageTable({ initialData }: { initialData: PageListData }
   return (
     <Box style={{ overflowX: "auto" }}>
       <Group justify="flex-end" mb="md">
-        <Button mod="brand" leftSection={<Plus size={16} />} onClick={() => router.push("/admin/pages/new")}>新建页面</Button>
+        <Button leftSection={<Plus size={16} />} onClick={() => router.push("/admin/pages/new")}>新建页面</Button>
       </Group>
 
       <Table striped highlightOnHover withTableBorder miw={500}>

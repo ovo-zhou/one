@@ -1,4 +1,3 @@
-import brandClasses from "../../../../../components/Brand.module.css";
 import { getPageById } from "../../../../../actions/page/getPageById";
 import { Title, Box } from "@mantine/core";
 import EditPageForm from "./EditPageForm";
@@ -9,7 +8,7 @@ export default async function EditPagePage({ params }: { params: Promise<{ pageI
 
   return (
     <Box>
-      <Title order={2} mb="lg" className={brandClasses.text}>编辑页面</Title>
+      <Title order={2} mb="lg">编辑页面</Title>
       <EditPageForm
         pageId={pageId}
         initialTitle={page.title || ""}

@@ -79,7 +79,7 @@ export default function EditPostForm({
         </Text>
       )}
       <Group>
-        <Button mod="brand" onClick={handleSubmit} loading={saving}>
+        <Button onClick={handleSubmit} loading={saving}>
           保存更新
         </Button>
         <Button variant="default" onClick={() => router.back()}>
