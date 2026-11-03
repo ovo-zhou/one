@@ -1,5 +1,5 @@
 import { lazy, type LazyExoticComponent, type ComponentType } from 'react'
-import { Bot, Braces, ImagePlus, Send, Settings, Waypoints, type LucideIcon } from 'lucide-react'
+import { Braces, ImagePlus, Send, Settings, Waypoints, type LucideIcon } from 'lucide-react'
 import type { ModuleServiceStatus } from '../../../shared/contracts'
 
 export type ModuleStatusDot = Pick<ModuleServiceStatus, 'phase'>
@@ -29,15 +29,6 @@ export interface WebModule extends BaseModule {
 export type AppModule = ReactModule | WebModule
 
 export const MODULES: AppModule[] = [
-  {
-    id: 'dsh',
-    name: 'DeepSeek Harness',
-    description: 'AI 编码助手',
-    icon: Bot,
-    order: 10,
-    enabled: true,
-    kind: 'web'
-  },
   {
     id: 'json',
     name: 'JSON 工具',

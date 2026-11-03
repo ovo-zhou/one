@@ -1,5 +1,4 @@
 import type { ModuleService } from './base'
-import { DshService } from './dsh'
 import { WhistleService } from './whistle'
 
 /**
@@ -14,7 +13,6 @@ function registerService(moduleId: string, factory: () => ModuleService): void {
   factories.set(moduleId, factory)
 }
 
-registerService('dsh', () => new DshService())
 registerService('whistle', () => new WhistleService())
 
 export function getService(moduleId: string): ModuleService | null {

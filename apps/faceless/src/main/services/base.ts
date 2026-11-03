@@ -2,7 +2,7 @@ import type { ModuleServiceStatus } from '../../shared/contracts'
 
 export type StatusListener = (status: ModuleServiceStatus) => void
 
-/** A long-lived background process owned by a module (e.g. the dsh web server). */
+/** A long-lived background process owned by a module (e.g. the Whistle proxy). */
 export interface ModuleService {
   /** Idempotent: returns ready status eventually; rejects on fatal error. */
   start(): Promise<ModuleServiceStatus>

@@ -84,12 +84,7 @@ export default function App(): React.JSX.Element {
       <div className="relative flex min-h-0 flex-1 flex-col">
         {activeModule ? (
           webModule ? (
-            <WebPanel
-              moduleId={webModule.id}
-              name={webModule.name}
-              status={status}
-              onActivate={() => activate?.()}
-            />
+            <WebPanel name={webModule.name} status={status} onActivate={() => activate?.()} />
           ) : reactModule ? (
             <Suspense
               fallback={

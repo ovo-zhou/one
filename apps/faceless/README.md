@@ -2,7 +2,6 @@
 
 可扩展的开发助手桌面端（Electron + React），内置模块：
 
-- **DeepSeek Harness** — 内嵌 dsh Web UI（AI 编码助手，懒启动）
 - **Whistle 代理** — 内嵌 w2 Web UI（HTTP 调试代理，固定 127.0.0.1:8899；应用菜单可开关系统代理、安装 HTTPS 根证书）
 
 ## 开发
@@ -24,10 +23,12 @@ pnpm --filter @one/faceless build:mac
 # 产物在 apps/faceless/dist/
 ```
 
-打包时 `scripts/install-services.sh` 会把 dsh / whistle 等服务依赖
+打包时 `scripts/install-services.sh` 会把 whistle 等服务依赖
 以扁平 node_modules 装进 `resources/services/`，经 extraResources 嵌入
-应用，服务通过 `ELECTRON_RUN_AS_NODE` 由 Electron 二进制运行，
+应用，服务通过随包附带的 Node.js 运行时运行，
 用户机器**无需安装 Node.js**。
+
+服务依赖清单变更后会自动重新安装，避免旧依赖残留在安装包中。
 
 ## 发布
 
