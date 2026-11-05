@@ -7,7 +7,6 @@ import type {
 } from '../../../../shared/contracts'
 import { MODULES } from '../registry'
 import { Button } from '../../components/ui/button'
-import { acceleratorFromEvent, prettyAccelerator } from '../../lib/shortcut'
 
 type UpdaterUIState =
   | { phase: 'idle' }
@@ -76,70 +75,23 @@ function updaterStatusText(u: UpdaterUIState): string {
   }
 }
 
-function ShortcutRecorder({
-  value,
-  validate,
-  save,
-  onSaved
+function ShortcutHint({
+  keyName,
+  label
 }: {
-  value: string
-  validate: (accel: string) => Promise<boolean>
-  save: (accel: string) => Promise<void>
-  onSaved: (next: string) => void
+  keyName: 'A' | 'Z'
+  label: string
 }): React.JSX.Element {
-  const [recording, setRecording] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  const handleKey = useCallback(
-    async (e: KeyboardEvent): Promise<void> => {
-      e.preventDefault()
-      e.stopPropagation()
-      if (e.key === 'Escape') {
-        setRecording(false)
-        return
-      }
-      const accel = acceleratorFromEvent(e)
-      if (!accel) return
-      const ok = await validate(accel)
-      if (!ok) {
-        setError(`「${prettyAccelerator(accel)}」已被其他应用占用`)
-        setRecording(false)
-        return
-      }
-      try {
-        await save(accel)
-        onSaved(accel)
-        setError(null)
-      } catch (err) {
-        setError(err instanceof Error ? err.message : String(err))
-      }
-      setRecording(false)
-    },
-    [validate, save, onSaved]
-  )
-
-  useEffect(() => {
-    if (!recording) return
-    window.addEventListener('keydown', handleKey, true)
-    return () => window.removeEventListener('keydown', handleKey, true)
-  }, [recording, handleKey])
-
   return (
-    <div className="flex flex-col gap-1.5">
-      <div className="flex items-center gap-2">
-        <Button
-          variant={recording ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => {
-            setRecording(true)
-            setError(null)
-          }}
-          className="font-mono"
+    <div className="flex items-center gap-1" aria-label={label} title={label}>
+      {['⌃', '⌘', keyName].map((key) => (
+        <kbd
+          key={key}
+          className="inline-flex h-6 min-w-6 items-center justify-center rounded-md border border-border bg-muted px-1.5 font-mono text-xs font-medium text-foreground shadow-[inset_0_-1px_0_var(--border)]"
         >
-          {recording ? '按下新快捷键… (Esc 取消)' : prettyAccelerator(value)}
-        </Button>
-      </div>
-      {error && <p className="text-xs text-destructive">{error}</p>}
+          {key}
+        </kbd>
+      ))}
     </div>
   )
 }
@@ -169,12 +121,14 @@ export default function SettingsPanel(): React.JSX.Element {
   const [appInfo, setAppInfo] = useState<AppInfo | null>(null)
   const [saveDir, setSaveDir] = useState<string | null>(null)
   const [format, setFormat] = useState<ScreenshotFormat>('png')
-  const [shortcut, setShortcut] = useState('Control+Command+A')
   const [trEnabled, setTrEnabled] = useState(true)
   const [trAutoPopup, setTrAutoPopup] = useState(true)
   const [trApiKey, setTrApiKey] = useState('')
   const [trModel, setTrModel] = useState<TranslateModel>('deepseek-v4-flash')
-  const [trShortcut, setTrShortcut] = useState('Alt+Shift+T')
+  const [screenPermission, setScreenPermission] = useState<{
+    supported: boolean
+    granted: boolean
+  }>({ supported: false, granted: false })
   const [accessibility, setAccessibility] = useState<{ supported: boolean; trusted: boolean }>({
     supported: false,
     trusted: false
@@ -221,14 +175,13 @@ export default function SettingsPanel(): React.JSX.Element {
     void window.api.getPrefs().then((p) => {
       setSaveDir(p.screenshot.saveDir)
       setFormat(p.screenshot.format)
-      setShortcut(p.screenshot.shortcut)
       setTrEnabled(p.translate.enabled)
       setTrAutoPopup(p.translate.autoPopup)
       setTrApiKey(p.translate.apiKey)
       setTrModel(p.translate.model)
-      setTrShortcut(p.translate.shortcut)
     })
     void window.api.getTranslateAccessibilityStatus().then(setAccessibility)
+    void window.api.getScreenshotPermissionStatus().then(setScreenPermission)
   }, [])
 
   const chooseDir = async (): Promise<void> => {
@@ -306,14 +259,7 @@ export default function SettingsPanel(): React.JSX.Element {
           <div className="flex flex-col gap-4 text-sm">
             <div className="flex items-center justify-between gap-4">
               <span className="shrink-0 text-muted-foreground">全局快捷键</span>
-              <ShortcutRecorder
-                value={shortcut}
-                onSaved={setShortcut}
-                validate={(accel) => window.api.validateScreenshotShortcut(accel)}
-                save={async (accel) => {
-                  await window.api.setPrefs({ screenshot: { shortcut: accel } })
-                }}
-              />
+              <ShortcutHint keyName="A" label="Control + Command + A" />
             </div>
             <div className="flex items-center justify-between gap-4">
               <span className="shrink-0 text-muted-foreground">保存格式</span>
@@ -387,15 +333,8 @@ export default function SettingsPanel(): React.JSX.Element {
               />
             </div>
             <div className="flex items-center justify-between gap-4">
-              <span className="shrink-0 text-muted-foreground">快捷键兜底</span>
-              <ShortcutRecorder
-                value={trShortcut}
-                onSaved={setTrShortcut}
-                validate={(accel) => window.api.validateTranslateShortcut(accel)}
-                save={async (accel) => {
-                  await window.api.setPrefs({ translate: { shortcut: accel } })
-                }}
-              />
+              <span className="shrink-0 text-muted-foreground">快捷键</span>
+              <ShortcutHint keyName="Z" label="Control + Command + Z" />
             </div>
             <div className="flex items-center justify-between gap-4">
               <span className="shrink-0 text-muted-foreground">模型</span>
@@ -435,18 +374,59 @@ export default function SettingsPanel(): React.JSX.Element {
                 单独配置划词翻译使用的 DeepSeek API Key，留空时无法翻译。
               </p>
             </div>
-            <div className="flex items-center justify-between gap-4">
-              <span className="shrink-0 text-muted-foreground">辅助功能权限</span>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground">
-                  {!accessibility.supported
-                    ? '仅 macOS 支持'
-                    : accessibility.trusted
-                      ? '已授权 ✓'
-                      : '未授权'}
-                </span>
-                {accessibility.supported && (
-                  <>
+            <div className="flex flex-col gap-2 border-t pt-3">
+              <span className="text-sm font-medium">系统权限</span>
+              <div className="flex items-center justify-between gap-4">
+                <span className="shrink-0 text-muted-foreground">屏幕录制（截图）</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground">
+                    {!screenPermission.supported
+                      ? '仅 macOS 支持'
+                      : screenPermission.granted
+                        ? '已授权 ✓'
+                        : '未授权'}
+                  </span>
+                  {screenPermission.supported && !screenPermission.granted && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={async () => {
+                        await window.api.openScreenshotPermissionSettings()
+                        setTimeout(() => {
+                          void window.api.getScreenshotPermissionStatus().then(setScreenPermission)
+                        }, 3000)
+                      }}
+                    >
+                      去授权…
+                    </Button>
+                  )}
+                  {screenPermission.supported && !screenPermission.granted && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={async () => {
+                        await window.api.resetScreenshotPermission()
+                        setTimeout(() => {
+                          void window.api.getScreenshotPermissionStatus().then(setScreenPermission)
+                        }, 3000)
+                      }}
+                    >
+                      重置…
+                    </Button>
+                  )}
+                </div>
+              </div>
+              <div className="flex items-center justify-between gap-4">
+                <span className="shrink-0 text-muted-foreground">辅助功能（划词翻译）</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground">
+                    {!accessibility.supported
+                      ? '仅 macOS 支持'
+                      : accessibility.trusted
+                        ? '已授权 ✓'
+                        : '未授权'}
+                  </span>
+                  {accessibility.supported && !accessibility.trusted && (
                     <Button
                       size="sm"
                       variant="outline"
@@ -459,26 +439,26 @@ export default function SettingsPanel(): React.JSX.Element {
                     >
                       去授权…
                     </Button>
-                    {!accessibility.trusted && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={async () => {
-                          await window.api.resetTranslateAccessibility()
-                          setTimeout(() => {
-                            void window.api.getTranslateAccessibilityStatus().then(setAccessibility)
-                          }, 3000)
-                        }}
-                      >
-                        重置权限…
-                      </Button>
-                    )}
-                  </>
-                )}
+                  )}
+                  {accessibility.supported && !accessibility.trusted && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={async () => {
+                        await window.api.resetTranslateAccessibility()
+                        setTimeout(() => {
+                          void window.api.getTranslateAccessibilityStatus().then(setAccessibility)
+                        }, 3000)
+                      }}
+                    >
+                      重置…
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
             <p className="text-xs text-muted-foreground">
-              任意应用中选中文字后弹出翻译按钮；中文译英文，其他语言译中文。开发模式下权限归属于启动应用的终端（如
+              权限会在首次使用对应功能时按需提示，不会在启动时打扰你。任意应用中选中文字后弹出翻译按钮；中文译英文，其他语言译中文。开发模式下权限归属于启动应用的终端（如
               VS Code 或
               Terminal）。若系统设置中已勾选仍显示「未授权」（应用更新后常见），点击「重置权限」后在系统设置中重新勾选。
             </p>

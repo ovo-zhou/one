@@ -82,8 +82,13 @@ const api = {
     ipcRenderer.invoke(IPC.screenshotFinish, payload),
   getScreenshotImage: (file: string) => ipcRenderer.invoke(IPC.screenshotGetImage, file),
   chooseScreenshotSaveDir: () => ipcRenderer.invoke(IPC.screenshotChooseSaveDir),
-  validateScreenshotShortcut: (accelerator: string) =>
-    ipcRenderer.invoke(IPC.screenshotValidateShortcut, accelerator),
+  getScreenshotPermissionStatus: () =>
+    ipcRenderer.invoke(IPC.screenshotPermissionStatus) as Promise<{
+      supported: boolean
+      granted: boolean
+    }>,
+  openScreenshotPermissionSettings: () => ipcRenderer.invoke(IPC.screenshotOpenPermissionSettings),
+  resetScreenshotPermission: () => ipcRenderer.invoke(IPC.screenshotResetPermission),
   screenshotPinAction: (pinId: number, action: ScreenshotPinAction) =>
     ipcRenderer.invoke(IPC.screenshotPinAction, pinId, action),
   screenshotPinResize: (pinId: number, width: number, height: number) =>
@@ -120,8 +125,6 @@ const api = {
   resizeTranslateTooltip: (width: number, height: number) =>
     ipcRenderer.invoke(IPC.translateResize, width, height),
   copyTranslateText: (text: string) => ipcRenderer.invoke(IPC.translateCopy, text),
-  validateTranslateShortcut: (accelerator: string) =>
-    ipcRenderer.invoke(IPC.translateValidateShortcut, accelerator),
   getTranslateAccessibilityStatus: () =>
     ipcRenderer.invoke(IPC.translateAccessibilityStatus) as Promise<{
       supported: boolean

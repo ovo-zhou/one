@@ -8,8 +8,12 @@ import {
   startScreenshot
 } from './manager'
 import { handlePinAction, getPinBuffer, resizePin, setPinOpacity } from './pin'
-import { validateAccelerator } from './shortcut'
-import { getCapturedBuffer } from './capture'
+import {
+  getCapturedBuffer,
+  getScreenPermissionStatus,
+  openScreenPermissionSettings,
+  resetScreenPermission
+} from './capture'
 
 /**
  * Serves captured / pin PNG bytes to overlay windows.
@@ -37,9 +41,9 @@ export function registerScreenshotIpc(): void {
     })
     return canceled ? null : (filePaths[0] ?? null)
   })
-  ipcMain.handle(IPC.screenshotValidateShortcut, (_event, accelerator: unknown) => {
-    return typeof accelerator === 'string' && validateAccelerator(accelerator)
-  })
+  ipcMain.handle(IPC.screenshotPermissionStatus, () => getScreenPermissionStatus())
+  ipcMain.handle(IPC.screenshotOpenPermissionSettings, () => openScreenPermissionSettings())
+  ipcMain.handle(IPC.screenshotResetPermission, () => resetScreenPermission())
   ipcMain.handle(IPC.screenshotPinAction, (_event, pinId: number, action: ScreenshotPinAction) =>
     handlePinAction(pinId, action)
   )

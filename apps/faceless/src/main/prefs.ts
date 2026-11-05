@@ -3,8 +3,8 @@ import { join } from 'path'
 import { app } from 'electron'
 import type { ApiClientSnapshot, Prefs, PrefsPatch, TranslateModel } from '../shared/contracts'
 
-export const DEFAULT_SCREENSHOT_SHORTCUT = 'Control+Command+A'
-export const DEFAULT_TRANSLATE_SHORTCUT = 'Alt+Shift+T'
+export const SCREENSHOT_SHORTCUT = 'Control+Command+A'
+export const TRANSLATE_SHORTCUT = 'Control+Command+Z'
 export const DEFAULT_TRANSLATE_MODEL: TranslateModel = 'deepseek-v4-flash'
 
 /** Max API-client snapshots kept in prefs (most recent first). */
@@ -14,7 +14,6 @@ const DEFAULT_PREFS: Prefs = {
   systemProxyEnabledByApp: false,
   apiClientSnapshots: [],
   screenshot: {
-    shortcut: DEFAULT_SCREENSHOT_SHORTCUT,
     format: 'png',
     saveDir: null
   },
@@ -22,8 +21,7 @@ const DEFAULT_PREFS: Prefs = {
     enabled: true,
     autoPopup: true,
     apiKey: '',
-    model: DEFAULT_TRANSLATE_MODEL,
-    shortcut: DEFAULT_TRANSLATE_SHORTCUT
+    model: DEFAULT_TRANSLATE_MODEL
   }
 }
 
@@ -85,9 +83,6 @@ function load(): Prefs {
     const s = raw.screenshot
     if (s && typeof s === 'object') {
       const shot = s as Record<string, unknown>
-      if (typeof shot.shortcut === 'string' && shot.shortcut.trim()) {
-        next.screenshot.shortcut = shot.shortcut.trim()
-      }
       if (shot.format === 'png' || shot.format === 'jpeg' || shot.format === 'webp') {
         next.screenshot.format = shot.format
       }
@@ -109,9 +104,6 @@ function load(): Prefs {
       }
       if (isTranslateModel(tr.model)) {
         next.translate.model = tr.model
-      }
-      if (typeof tr.shortcut === 'string' && tr.shortcut.trim()) {
-        next.translate.shortcut = tr.shortcut.trim()
       }
     }
   } catch {
@@ -143,9 +135,6 @@ export function setPrefs(patch: PrefsPatch): Prefs {
   }
   const sp = patch.screenshot
   if (sp) {
-    if (typeof sp.shortcut === 'string' && sp.shortcut.trim()) {
-      next.screenshot.shortcut = sp.shortcut.trim()
-    }
     if (sp.format === 'png' || sp.format === 'jpeg' || sp.format === 'webp') {
       next.screenshot.format = sp.format
     }
@@ -168,9 +157,6 @@ export function setPrefs(patch: PrefsPatch): Prefs {
     }
     if (isTranslateModel(tp.model)) {
       next.translate.model = tp.model
-    }
-    if (typeof tp.shortcut === 'string' && tp.shortcut.trim()) {
-      next.translate.shortcut = tp.shortcut.trim()
     }
   }
   cache = next

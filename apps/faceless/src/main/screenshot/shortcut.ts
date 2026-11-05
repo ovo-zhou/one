@@ -1,29 +1,21 @@
 import { globalShortcut } from 'electron'
+import { SCREENSHOT_SHORTCUT } from '../prefs'
 import { startScreenshot } from './manager'
 
 let current: string | null = null
 
-/** Registers (or re-registers) the global screenshot accelerator. */
-export async function applyScreenshotShortcut(accelerator: string): Promise<boolean> {
-  if (current === accelerator) return true
+/** Registers (or re-registers) the fixed global screenshot accelerator. */
+export async function applyScreenshotShortcut(): Promise<boolean> {
+  if (current === SCREENSHOT_SHORTCUT) return true
   if (current) globalShortcut.unregister(current)
-  const ok = globalShortcut.register(accelerator, () => {
+  const ok = globalShortcut.register(SCREENSHOT_SHORTCUT, () => {
     void startScreenshot()
   })
-  current = ok ? accelerator : null
+  current = ok ? SCREENSHOT_SHORTCUT : null
   return ok
 }
 
 export function unregisterScreenshotShortcut(): void {
   if (current) globalShortcut.unregister(current)
   current = null
-}
-
-/** Dry-run check: does another app already own this accelerator? */
-export function validateAccelerator(accelerator: string): boolean {
-  if (!accelerator) return false
-  if (current === accelerator) return true
-  const ok = globalShortcut.register(accelerator, () => {})
-  if (ok) globalShortcut.unregister(accelerator)
-  return ok
 }

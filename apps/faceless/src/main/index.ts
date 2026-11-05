@@ -46,9 +46,9 @@ if (!app.requestSingleInstanceLock()) {
       optimizer.watchWindowShortcuts(window)
     })
 
-    void applyScreenshotShortcut(getPrefs().screenshot.shortcut)
+    void applyScreenshotShortcut()
     if (getPrefs().translate.enabled) {
-      void applyTranslateShortcut(getPrefs().translate.shortcut)
+      void applyTranslateShortcut()
     }
     void setupTranslate()
     registerIpcHandlers()

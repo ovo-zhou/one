@@ -2,7 +2,7 @@ import { execFile, type ChildProcess } from 'child_process'
 import { existsSync } from 'fs'
 import { join } from 'path'
 import { app, dialog, shell, systemPreferences } from 'electron'
-import { resetTccService } from '../tcc'
+import { ACCESSIBILITY_SETTINGS_URL, resetTccService } from '../tcc'
 
 /**
  * Selection watching for the translate feature.
@@ -68,9 +68,6 @@ export async function ensureSelectionWatcher(): Promise<boolean> {
   return ok
 }
 
-const ACCESSIBILITY_SETTINGS_URL =
-  'x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility'
-
 export function isAccessibilityTrusted(): boolean {
   if (process.platform !== 'darwin') return true
   return systemPreferences.isTrustedAccessibilityClient(false)
@@ -81,13 +78,14 @@ export async function ensureAccessibilityPermission(): Promise<boolean> {
   if (isAccessibilityTrusted()) return true
   const { response } = await dialog.showMessageBox({
     type: 'warning',
+    title: 'Faceless 需要权限',
     message: '需要「辅助功能」权限',
     detail:
-      '划词翻译需要辅助功能权限。请前往 系统设置 → 隐私与安全性 → 辅助功能，勾选本应用。\n\n' +
+      '划词翻译需要读取其他应用选中文本。请前往 系统设置 → 隐私与安全性 → 辅助功能，勾选 Faceless。\n\n' +
       '开发模式下权限归属于启动应用的终端（如 VS Code 或 Terminal），请勾选对应程序。\n\n' +
       '若列表中已勾选本应用仍反复提示未授权，说明旧版本残留的授权已失效：' +
       '请点击「重置后重新授权」，并在系统设置中重新勾选。',
-    buttons: ['打开系统设置', '重置后重新授权', '取消'],
+    buttons: ['打开系统设置', '重置后重新授权', '稍后'],
     defaultId: 0,
     cancelId: 2
   })

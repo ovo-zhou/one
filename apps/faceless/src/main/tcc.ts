@@ -17,6 +17,8 @@ export type TccService = 'Accessibility' | 'ScreenCapture'
 
 export const SCREEN_CAPTURE_SETTINGS_URL =
   'x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture'
+export const ACCESSIBILITY_SETTINGS_URL =
+  'x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility'
 
 /** Reads the running app's CFBundleIdentifier (Electron 39 has no getter). */
 function readBundleId(callback: (bundleId: string) => void): void {

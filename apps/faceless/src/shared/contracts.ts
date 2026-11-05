@@ -18,8 +18,6 @@ export type ScreenshotFormat = 'png' | 'jpeg' | 'webp'
 export type TestImageFormat = 'png' | 'jpeg' | 'webp'
 
 export interface ScreenshotPrefs {
-  /** Global accelerator string, e.g. 'CommandOrControl+Alt+A'. */
-  shortcut: string
   format: ScreenshotFormat
   /** null = ask for a location on every save. */
   saveDir: string | null
@@ -35,8 +33,6 @@ export interface TranslatePrefs {
   /** Dedicated DeepSeek API key for translation. Empty = translation unavailable. */
   apiKey: string
   model: TranslateModel
-  /** Fallback accelerator: query the current selection and translate it. */
-  shortcut: string
 }
 
 export interface Prefs {
@@ -78,7 +74,9 @@ export const IPC = {
   screenshotFinish: 'screenshot:finish',
   screenshotGetImage: 'screenshot:getImage',
   screenshotChooseSaveDir: 'screenshot:chooseSaveDir',
-  screenshotValidateShortcut: 'screenshot:validateShortcut',
+  screenshotPermissionStatus: 'screenshot:permissionStatus',
+  screenshotOpenPermissionSettings: 'screenshot:openPermissionSettings',
+  screenshotResetPermission: 'screenshot:resetPermission',
   screenshotPinAction: 'screenshot:pinAction',
   screenshotPinResize: 'screenshot:pinResize',
   screenshotPinOpacity: 'screenshot:pinOpacity',
@@ -99,7 +97,6 @@ export const IPC = {
   translateResize: 'translate:resize',
   /** Tooltip → main: write text to the clipboard (window may be unfocused). */
   translateCopy: 'translate:copy',
-  translateValidateShortcut: 'translate:validateShortcut',
   /** Returns whether the macOS accessibility permission is granted. */
   translateAccessibilityStatus: 'translate:accessibilityStatus',
   translateOpenAccessibilitySettings: 'translate:openAccessibilitySettings',
@@ -291,7 +288,9 @@ export interface ElectronApi {
   /** Returns the PNG bytes of a captured display / pin image (overlay windows). */
   getScreenshotImage(file: string): Promise<ArrayBuffer>
   chooseScreenshotSaveDir(): Promise<string | null>
-  validateScreenshotShortcut(accelerator: string): Promise<boolean>
+  getScreenshotPermissionStatus(): Promise<{ supported: boolean; granted: boolean }>
+  openScreenshotPermissionSettings(): Promise<void>
+  resetScreenshotPermission(): Promise<void>
   screenshotPinAction(pinId: number, action: ScreenshotPinAction): Promise<void>
   screenshotPinResize(pinId: number, width: number, height: number): Promise<void>
   screenshotPinSetOpacity(pinId: number, opacity: number): Promise<void>
@@ -313,7 +312,6 @@ export interface ElectronApi {
   resizeTranslateTooltip(width: number, height: number): Promise<void>
   /** Clipboard write that works while the tooltip window is unfocused. */
   copyTranslateText(text: string): Promise<void>
-  validateTranslateShortcut(accelerator: string): Promise<boolean>
   /** { supported, trusted } for the macOS accessibility permission. */
   getTranslateAccessibilityStatus(): Promise<{ supported: boolean; trusted: boolean }>
   openTranslateAccessibilitySettings(): Promise<void>

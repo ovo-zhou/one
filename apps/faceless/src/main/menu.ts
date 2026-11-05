@@ -1,5 +1,5 @@
 import { app, dialog, Menu } from 'electron'
-import { getPrefs } from './prefs'
+import { getPrefs, SCREENSHOT_SHORTCUT, TRANSLATE_SHORTCUT } from './prefs'
 import { startScreenshot } from './screenshot/manager'
 import { triggerTranslateShortcut } from './translate/manager'
 import {
@@ -26,7 +26,7 @@ function buildTemplate(): MenuTemplate {
     {
       id: 'app-screenshot',
       label: '截图',
-      accelerator: getPrefs().screenshot.shortcut,
+      accelerator: SCREENSHOT_SHORTCUT,
       click: () => {
         void startScreenshot()
       }
@@ -34,7 +34,7 @@ function buildTemplate(): MenuTemplate {
     {
       id: 'app-translate',
       label: '划词翻译',
-      accelerator: getPrefs().translate.enabled ? getPrefs().translate.shortcut : undefined,
+      accelerator: getPrefs().translate.enabled ? TRANSLATE_SHORTCUT : undefined,
       click: () => {
         void triggerTranslateShortcut()
       }

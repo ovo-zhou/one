@@ -8,7 +8,6 @@ import {
   openAccessibilitySettings,
   resetAccessibilityPermission
 } from './selection-watcher'
-import { validateTranslateAccelerator } from './shortcut'
 
 export function registerTranslateIpc(): void {
   ipcMain.handle(IPC.translateRequest, (_event, payload: unknown) => {
@@ -31,9 +30,6 @@ export function registerTranslateIpc(): void {
   })
   ipcMain.handle(IPC.translateCopy, (_event, text: unknown) => {
     if (typeof text === 'string' && text) clipboard.writeText(text)
-  })
-  ipcMain.handle(IPC.translateValidateShortcut, (_event, accelerator: unknown) => {
-    return typeof accelerator === 'string' && validateTranslateAccelerator(accelerator)
   })
   ipcMain.handle(IPC.translateAccessibilityStatus, () => ({
     supported: isSelectionWatchAvailable(),

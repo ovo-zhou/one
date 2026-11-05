@@ -109,7 +109,14 @@ export function startScreenshot(): boolean {
   void (async () => {
     try {
       if (phase !== 'starting') return
-      if (phase !== 'starting') return
+      // Ask only when the user actually triggers a screenshot. Keeping this
+      // gate before creating the overlay avoids covering the native macOS
+      // permission dialog with our always-on-top window.
+      if (!hasScreenPermission()) {
+        await ensureScreenPermission()
+        await teardown()
+        return
+      }
       // Window detection is optional enhancement. Compile/start it in the
       // background so a first screenshot never waits for Swift or a helper
       // process before the overlay appears.
@@ -124,16 +131,6 @@ export function startScreenshot(): boolean {
       currentDisplayId = display.id
       await presentOverlay(display, null)
       console.log(`[screenshot] session visible in ${Date.now() - t0}ms`)
-      // Permission gate AFTER the show (the raw query costs up to ~1.3s
-      // when the TCC session is cold — it must not delay the crosshair)
-      // but strictly BEFORE any capture. On failure the session is torn
-      // down FIRST so the guide dialog is never trapped under the
-      // always-on-top overlay; the user re-triggers after granting.
-      if (!hasScreenPermission()) {
-        await teardown()
-        await ensureScreenPermission()
-        return
-      }
       if (phase === 'live') {
         pollTimer = setInterval(() => {
           void updateForCursor()

@@ -37,7 +37,7 @@ function makeId(): string {
  */
 export async function ensureScreenPermission(): Promise<boolean> {
   if (process.platform !== 'darwin') return true
-  const status = getScreenPermissionStatus()
+  const status = readScreenPermissionStatus()
   if (status === 'granted') return true
   if (status === 'not-determined') {
     await desktopCapturer.getSources({
@@ -49,6 +49,24 @@ export async function ensureScreenPermission(): Promise<boolean> {
   return false
 }
 
+/** Reads the current screen-recording permission for the settings UI. */
+export function getScreenPermissionStatus(): { supported: boolean; granted: boolean } {
+  if (process.platform !== 'darwin') return { supported: false, granted: true }
+  return {
+    supported: true,
+    granted: systemPreferences.getMediaAccessStatus('screen') === 'granted'
+  }
+}
+
+export function openScreenPermissionSettings(): void {
+  void shell.openExternal(SCREEN_CAPTURE_SETTINGS_URL)
+}
+
+export function resetScreenPermission(): void {
+  resetTccService('ScreenCapture')
+  openScreenPermissionSettings()
+}
+
 /** Caches the process-stable macOS permission result outside the screenshot path. */
 export function warmScreenPermissionStatus(): void {
   if (process.platform === 'darwin')
@@ -57,10 +75,10 @@ export function warmScreenPermissionStatus(): void {
 
 /** macOS screen-recording grants only take effect after restarting this process. */
 export function hasScreenPermission(): boolean {
-  return process.platform !== 'darwin' || getScreenPermissionStatus() === 'granted'
+  return process.platform !== 'darwin' || readScreenPermissionStatus() === 'granted'
 }
 
-function getScreenPermissionStatus(): string {
+function readScreenPermissionStatus(): string {
   if (screenPermissionStatus === null) {
     screenPermissionStatus = systemPreferences.getMediaAccessStatus('screen')
   }
@@ -70,14 +88,14 @@ function getScreenPermissionStatus(): string {
 async function showScreenPermissionDialog(): Promise<void> {
   const { response } = await dialog.showMessageBox({
     type: 'warning',
+    title: 'Faceless 需要权限',
     message: '需要「屏幕录制」权限',
     detail:
-      '截图需要屏幕录制权限。若系统弹出「想要录制屏幕」提示，请点「打开系统设置」并打开本应用的开关；' +
-      '否则请前往 系统设置 → 隐私与安全性 → 屏幕录制，打开本应用的开关。\n\n' +
-      '打开开关后需要退出并重新打开本应用，授权才会生效。\n\n' +
+      '截图需要读取屏幕内容。请前往 系统设置 → 隐私与安全性 → 屏幕录制，打开 Faceless 的开关。\n\n' +
+      '打开开关后需要退出并重新打开本应用，授权才会生效。重启后重新触发截图即可。\n\n' +
       '若开关已打开仍提示未授权（应用更新后常见），请点「重置后重新授权」。\n\n' +
       '开发模式下权限归属于启动应用的终端（如 VS Code 或 Terminal）。',
-    buttons: ['打开系统设置', '重置后重新授权', '取消'],
+    buttons: ['打开系统设置', '重置后重新授权', '稍后'],
     defaultId: 0,
     cancelId: 2
   })

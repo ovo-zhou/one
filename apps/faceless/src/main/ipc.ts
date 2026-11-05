@@ -12,7 +12,6 @@ import {
 import { getPrefs, setPrefs } from './prefs'
 import { getAllServices, getService } from './services/registry'
 import { registerScreenshotIpc } from './screenshot/ipc'
-import { applyScreenshotShortcut } from './screenshot/shortcut'
 import { registerTranslateIpc } from './translate/ipc'
 import { applyTranslateShortcut, unregisterTranslateShortcut } from './translate/shortcut'
 import { applyTranslatePrefs } from './translate/manager'
@@ -87,35 +86,15 @@ export function registerIpcHandlers(): void {
   ipcMain.handle(IPC.prefsSet, async (_event, patch: PrefsPatch) => {
     const before = getPrefs()
     const next = setPrefs(patch)
-    if (next.screenshot.shortcut !== before.screenshot.shortcut) {
-      const ok = await applyScreenshotShortcut(next.screenshot.shortcut)
-      if (!ok) {
-        setPrefs({ screenshot: { shortcut: before.screenshot.shortcut } })
-        throw new Error(`快捷键「${next.screenshot.shortcut}」注册失败，可能已被其他应用占用`)
-      }
-      rebuildAppMenu()
-    }
-    if (next.translate.shortcut !== before.translate.shortcut) {
-      if (!next.translate.enabled) {
-        // Feature disabled: shortcuts stay unregistered; just persist.
-      } else {
-        const ok = await applyTranslateShortcut(next.translate.shortcut)
-        if (!ok) {
-          setPrefs({ translate: { shortcut: before.translate.shortcut } })
-          throw new Error(`快捷键「${next.translate.shortcut}」注册失败，可能已被其他应用占用`)
-        }
-        rebuildAppMenu()
-      }
-    }
     if (next.translate.enabled !== before.translate.enabled) {
-      if (next.translate.enabled) {
-        const ok = await applyTranslateShortcut(next.translate.shortcut)
+      if (!next.translate.enabled) {
+        unregisterTranslateShortcut()
+      } else {
+        const ok = await applyTranslateShortcut()
         if (!ok) {
           setPrefs({ translate: { enabled: false } })
-          throw new Error(`快捷键「${next.translate.shortcut}」注册失败，可能已被其他应用占用`)
+          throw new Error('固定快捷键「Control+Command+Z」注册失败，可能已被其他应用占用')
         }
-      } else {
-        unregisterTranslateShortcut()
       }
       rebuildAppMenu()
       await applyTranslatePrefs()
