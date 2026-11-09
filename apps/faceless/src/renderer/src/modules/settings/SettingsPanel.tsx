@@ -204,54 +204,6 @@ export default function SettingsPanel(): React.JSX.Element {
             <dt className="text-muted-foreground">平台</dt>
             <dd>{appInfo ? appInfo.platform : '—'}</dd>
           </dl>
-          <div className="mt-4 flex flex-col gap-2 border-t pt-4">
-            <div className="flex items-center justify-between gap-4">
-              <span className="shrink-0 text-muted-foreground">软件更新</span>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground">{updaterStatusText(updater)}</span>
-                {updater.phase === 'available' ? (
-                  <Button size="sm" onClick={() => void startUpdate()}>
-                    立即更新
-                  </Button>
-                ) : (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    disabled={
-                      updater.phase === 'checking' ||
-                      updater.phase === 'unsupported' ||
-                      updater.phase === 'downloading' ||
-                      updater.phase === 'installing' ||
-                      updater.phase === 'restarting' ||
-                      (appInfo ? appInfo.platform !== 'darwin' : false)
-                    }
-                    onClick={() => {
-                      if (updater.phase === 'error') void startUpdate()
-                      else void checkUpdates()
-                    }}
-                  >
-                    {updaterButtonText(updater)}
-                  </Button>
-                )}
-              </div>
-            </div>
-            {updater.phase === 'downloading' && (
-              <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                <div
-                  className="h-full rounded-full bg-primary transition-all"
-                  style={{ width: `${updater.percent}%` }}
-                />
-              </div>
-            )}
-            {updater.phase === 'available' && updater.notes && (
-              <p className="whitespace-pre-wrap text-xs text-muted-foreground">
-                {updater.notes.slice(0, 300)}
-              </p>
-            )}
-            {updater.phase === 'error' && (
-              <p className="text-xs text-destructive">{updater.message}</p>
-            )}
-          </div>
         </section>
 
         <section className="rounded-xl border bg-card p-5">
@@ -374,6 +326,79 @@ export default function SettingsPanel(): React.JSX.Element {
                 单独配置划词翻译使用的 DeepSeek API Key，留空时无法翻译。
               </p>
             </div>
+          </div>
+        </section>
+
+        <section className="rounded-xl border bg-card p-5">
+          <h2 className="mb-3 text-sm font-semibold">模块</h2>
+          <ul className="flex flex-col divide-y">
+            {MODULES.map((m) => (
+              <li key={m.id} className="flex items-center gap-3 py-2.5 text-sm">
+                <m.icon className="size-4 text-muted-foreground" />
+                <span className="font-medium">{m.name}</span>
+                <span className="text-xs text-muted-foreground">{m.description}</span>
+                <span className="ml-auto text-xs text-muted-foreground">
+                  {m.enabled ? (m.kind === 'web' ? '本地服务' : '内置页面') : '即将推出'}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="rounded-xl border bg-card p-5">
+          <h2 className="mb-3 text-sm font-semibold">软件更新与系统权限</h2>
+          <div className="flex flex-col gap-4 text-sm">
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between gap-4">
+                <span className="shrink-0 text-muted-foreground">软件更新</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground">
+                    {updaterStatusText(updater)}
+                  </span>
+                  {updater.phase === 'available' ? (
+                    <Button size="sm" onClick={() => void startUpdate()}>
+                      立即更新
+                    </Button>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={
+                        updater.phase === 'checking' ||
+                        updater.phase === 'unsupported' ||
+                        updater.phase === 'downloading' ||
+                        updater.phase === 'installing' ||
+                        updater.phase === 'restarting' ||
+                        (appInfo ? appInfo.platform !== 'darwin' : false)
+                      }
+                      onClick={() => {
+                        if (updater.phase === 'error') void startUpdate()
+                        else void checkUpdates()
+                      }}
+                    >
+                      {updaterButtonText(updater)}
+                    </Button>
+                  )}
+                </div>
+              </div>
+              {updater.phase === 'downloading' && (
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                  <div
+                    className="h-full rounded-full bg-primary transition-all"
+                    style={{ width: `${updater.percent}%` }}
+                  />
+                </div>
+              )}
+              {updater.phase === 'available' && updater.notes && (
+                <p className="whitespace-pre-wrap text-xs text-muted-foreground">
+                  {updater.notes.slice(0, 300)}
+                </p>
+              )}
+              {updater.phase === 'error' && (
+                <p className="text-xs text-destructive">{updater.message}</p>
+              )}
+            </div>
+
             <div className="flex flex-col gap-2 border-t pt-3">
               <span className="text-sm font-medium">系统权限</span>
               <div className="flex items-center justify-between gap-4">
@@ -457,28 +482,7 @@ export default function SettingsPanel(): React.JSX.Element {
                 </div>
               </div>
             </div>
-            <p className="text-xs text-muted-foreground">
-              权限会在首次使用对应功能时按需提示，不会在启动时打扰你。任意应用中选中文字后弹出翻译按钮；中文译英文，其他语言译中文。开发模式下权限归属于启动应用的终端（如
-              VS Code 或
-              Terminal）。若系统设置中已勾选仍显示「未授权」（应用更新后常见），点击「重置权限」后在系统设置中重新勾选。
-            </p>
           </div>
-        </section>
-
-        <section className="rounded-xl border bg-card p-5">
-          <h2 className="mb-3 text-sm font-semibold">模块</h2>
-          <ul className="flex flex-col divide-y">
-            {MODULES.map((m) => (
-              <li key={m.id} className="flex items-center gap-3 py-2.5 text-sm">
-                <m.icon className="size-4 text-muted-foreground" />
-                <span className="font-medium">{m.name}</span>
-                <span className="text-xs text-muted-foreground">{m.description}</span>
-                <span className="ml-auto text-xs text-muted-foreground">
-                  {m.enabled ? (m.kind === 'web' ? '本地服务' : '内置页面') : '即将推出'}
-                </span>
-              </li>
-            ))}
-          </ul>
         </section>
       </div>
     </div>
