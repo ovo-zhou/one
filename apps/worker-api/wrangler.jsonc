@@ -1,7 +1,15 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "damp-shadow-9853",
+  "name": "iparty-server",
   "main": "src/index.ts",
   "compatibility_date": "2026-11-20",
   "workers_dev": true,
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "iparty-database",
+      "database_id": "8cadffb5-396a-4fdc-9854-b19488a0df43",
+      "migrations_dir": "migrations",
+    },
+  ],
 }
