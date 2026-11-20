@@ -41,9 +41,13 @@ Tests exercise Hono routes directly. `build` bundles the Worker into `dist/` usi
    | Setting           | Value                                                      |
    | ----------------- | ---------------------------------------------------------- |
    | Production branch | `main` (or your actual production branch)                  |
-   | Root directory    | `apps/worker-api`                                          |
    | Build command     | Leave empty; Wrangler bundles TypeScript during deployment |
-   | Deploy command    | `pnpm exec wrangler deploy`                                |
+   | Deploy command    | `pnpm --filter @one/worker-api exec wrangler deploy`        |
+   | Preview command   | `pnpm --filter @one/worker-api exec wrangler preview`       |
+
+   These commands assume execution from the repository root. No build output directory is required for this API: Wrangler reads `apps/worker-api/wrangler.jsonc` and bundles `src/index.ts`. If the dashboard does not show a root-directory setting, the filtered commands above select the app without it. If you previously configured a root directory, reset it to the repository root when using these commands.
+
+   When preview builds are enabled, pushes to non-production branches use the preview command to produce a Preview URL without replacing the production deployment. The default current Wrangler preview command is `wrangler preview`, not `wrangler dev` (which starts the local server).
 
 4. Ensure `name` in `wrangler.jsonc` exactly matches the Worker name in Cloudflare. The template uses `worker-api`; change it if connecting to an existing Worker with a different name.
 5. Push a commit to the production branch. Workers Builds installs dependencies and deploys the new version. Keep the root `pnpm-lock.yaml` and `pnpm-workspace.yaml` committed.
