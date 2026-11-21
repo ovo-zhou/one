@@ -13,8 +13,7 @@
     "db:migrate:local": "wrangler d1 migrations apply DB --local",
     "db:migrate:remote": "wrangler d1 migrations apply DB --remote",
     "lint": "eslint src drizzle.config.ts",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "drizzle-orm": "0.45.4",
@@ -23,7 +22,6 @@
   "devDependencies": {
     "drizzle-kit": "0.31.11",
     "typescript": "^5.7.0",
-    "vitest": "^5.1.1",
     "wrangler": "^4.165.0"
   }
 }

@@ -1,6 +1,6 @@
 # Worker API
 
-Minimal **Hono + TypeScript + Cloudflare Workers** API. All routes are deployed as one Worker. The `DB` binding connects to the D1 database `iparty-database`; no database password is required.
+Minimal **Hono + TypeScript + Cloudflare Workers** API with a single Ping endpoint. D1 and Drizzle configuration is retained for future development, but there are no business tables or migrations, and Ping does not access the database.
 
 ## Local development
 
@@ -13,21 +13,19 @@ pnpm dev:worker-api
 
 Wrangler starts the local Workers runtime at `http://localhost:8787`.
 
-| Method | Path         | Response                                     |
-| ------ | ------------ | -------------------------------------------- |
-| GET    | `/`          | `{ "message": "Hello World!" }`              |
-| GET    | `/health`    | `{ "ok": true }`                             |
-| GET    | `/db-check`  | `{ "ok": true }` after a successful D1 query |
-| Any    | Unknown path | HTTP 404, `{ "error": "Not Found" }`         |
+| Method | Path         | Response                             |
+| ------ | ------------ | ------------------------------------ |
+| GET    | `/ping`      | HTTP 200, `{ "message": "pong" }`    |
+| Any    | Unknown path | HTTP 404, `{ "error": "Not Found" }` |
 
 Edit `src/index.ts` to add routes. Local changes reload automatically.
 
 ## D1 database
 
-`wrangler.jsonc` binds the existing cloud database `iparty-database` to `DB`. Access it from Hono handlers with `c.env.DB`. `/db-check` runs `SELECT 1 AS connected` and does not create tables or modify data.
+`wrangler.jsonc` retains the `DB` binding for the D1 database `iparty-database`. No current endpoint uses it. If you delete and recreate the cloud database, update `database_id` in `wrangler.jsonc` before deploying.
 
 - `pnpm dev:worker-api` uses a separate, local D1 database by default. Local data is stored in the Git-ignored `.wrangler/` directory, not synchronized to production.
-- After deployment, the production Worker accesses the cloud database configured in `wrangler.jsonc`. Visit `/db-check` on the production URL to verify the cloud binding.
+- Deleting local state or repository migration files does not reset the cloud database. Cloud database cleanup is a separate, manual operation.
 - Deploying Worker code does not create business tables or copy local data to the cloud. Apply schema changes separately to the intended database.
 - Preview resources may be isolated from production; do not assume a successful preview verifies the production database.
 
@@ -44,14 +42,13 @@ Commit the generated declaration along with configuration changes.
 Drizzle ORM handles typed queries, Drizzle Kit generates SQL from the TypeScript schema, and Wrangler applies the SQL to D1. Only Wrangler manages the database migration history (`d1_migrations`); do not mix it with `drizzle-kit migrate`, `drizzle-kit push`, or an application-startup migrator.
 
 ```text
-src/db/schema.ts       # Table definitions and inferred TypeScript types
+src/db/schema.ts       # Empty schema, ready for future table definitions
 src/db/index.ts        # createDb(c.env.DB), shared by local and production
 drizzle.config.ts     # SQLite schema and SQL output directory; no cloud credentials
-migrations/*.sql       # Reviewed, versioned schema changes consumed by Wrangler
-migrations/meta/       # Drizzle snapshots/journal used to generate the next change
+migrations/            # Empty except for .gitkeep; future generated SQL goes here
 ```
 
-The initial migration creates a minimal example `users` table (`id`, `name`, unique optional `email`, `created_at`). No public user endpoints are added. If your existing database already has a `users` table, reconcile its schema and migration baseline before applying this migration; do not drop existing tables to force it through.
+The example `users` table, initial SQL migration, and Drizzle snapshots/journal have been removed. Start future migrations against an empty database; do not reuse an old database with the removed schema or migration history. Drizzle Kit will create its migration metadata when you generate the first business migration.
 
 ### Three commands
 
@@ -63,7 +60,7 @@ Run from the monorepo root:
 | `pnpm --filter @one/worker-api db:migrate:local`  | Apply pending migrations to local D1                             | None                                                         |
 | `pnpm --filter @one/worker-api db:migrate:remote` | Apply pending migrations to cloud `iparty-database`              | **Writes to production; requires Cloudflare authentication** |
 
-For a descriptive migration name, use `pnpm --filter @one/worker-api db:generate --name=add_user_avatar`. Within `apps/worker-api`, you can use the short forms `pnpm db:generate`, `pnpm db:migrate:local`, and `pnpm db:migrate:remote`.
+After adding table definitions, use `pnpm --filter @one/worker-api db:generate --name=init` to generate the first migration. Within `apps/worker-api`, you can use the short forms `pnpm db:generate`, `pnpm db:migrate:local`, and `pnpm db:migrate:remote`.
 
 ### Development and release workflow
 
@@ -85,29 +82,17 @@ pnpm --filter @one/worker-api exec wrangler d1 migrations list DB --local
 pnpm --filter @one/worker-api exec wrangler d1 migrations list DB --remote
 ```
 
-### Use the ORM in a handler
-
-```ts
-import { createDb } from "./db";
-import { users } from "./db/schema";
-
-// Inside an authenticated handler, after applying the users migration:
-const db = createDb(c.env.DB);
-const rows = await db.select().from(users).limit(100);
-```
-
-Create the client from the current binding, not a global connection or hard-coded local SQLite file path. `/db-check` deliberately remains a table-independent connectivity check and does not validate business-table migrations.
+For future database operations, use `createDb(c.env.DB)` from `src/db/index.ts`. Create the client from the current binding, not a global connection or hard-coded local SQLite file path.
 
 ## Validate without deploying
 
 ```bash
 pnpm --filter @one/worker-api typecheck
 pnpm --filter @one/worker-api lint
-pnpm --filter @one/worker-api test
 pnpm --filter @one/worker-api build
 ```
 
-Tests exercise Hono routes directly and run the generated migration SQL plus ORM CRUD against a disposable local D1 database (`persist: false`, remote bindings disabled), without touching your development or production data. `build` bundles the Worker into `dist/` using Wrangler's dry-run mode; it does **not** deploy or require Cloudflare login. Use `dev` to test in the local Workers runtime.
+`build` bundles the Worker into `dist/` using Wrangler's dry-run mode; it does **not** deploy or require Cloudflare login. Use `dev` to run in the local Workers runtime.
 
 ## Automatic deployment from GitHub
 
