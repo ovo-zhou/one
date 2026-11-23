@@ -1,0 +1,14 @@
+<view class="page">
+  <text class="eyebrow">MY WORKSPACE</text><text class="page-title">把好服务，打理好。</text><text class="subtitle">店铺与伙伴，在这里慢慢完善。</text>
+  <view class="local-notice">管理页面预览 · 未登录 · 所有资料仅在本机保存，无法公开访问或分享。</view>
+  <view class="card shop-summary"><text class="badge">本地草稿</text><text class="shop-name">{{shop.name || '你的店铺，等待被认识'}}</text><text class="muted">{{shop.industry}} · {{staffCount}} 位服务人员</text></view>
+  <view class="appointment-entry" bindtap="openAppointments" role="button"><view><text class="entry-title">预约意向</text><text class="entry-note">接入发布后，在这里跟进客户</text></view><text>查看 →</text></view>
+  <view class="manage-grid">
+    <view class="card manage-item" bindtap="editShop" role="button"><text class="item-symbol">店</text><text class="item-title">店铺管理</text><text class="muted">介绍、地址与联系方式</text><text class="item-link">完善资料 ↗</text></view>
+    <view class="card manage-item" bindtap="openStaff" role="button"><text class="item-symbol">人</text><text class="item-title">服务人员管理</text><text class="muted">添加、编辑与页面预览</text><text class="item-link">{{staffCount}} 位人员 ↗</text></view>
+  </view>
+  <button class="primary" bindtap="publish">登录并发布 · 即将接入</button>
+  <button class="secondary" bindtap="home">返回介绍首页</button>
+  <view class="connection"><button class="text-button" bindtap="checkConnection" loading="{{checking}}">检查后端连接</button><text class="hint">{{connection}}</text></view>
+</view>
+<login-sheet visible="{{loginVisible}}" bind:close="closeLogin" bind:preview="previewManage" />

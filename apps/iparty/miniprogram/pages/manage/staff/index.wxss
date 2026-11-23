@@ -1,0 +1,34 @@
+.staff-card {
+  margin-top: 24rpx;
+}
+.person-row {
+  display: flex;
+  align-items: center;
+  gap: 22rpx;
+}
+.initial {
+  width: 92rpx;
+  height: 112rpx;
+  overflow: hidden;
+  font-size: 23rpx;
+}
+.person-info {
+  flex: 1;
+  min-width: 0;
+}
+.person-name {
+  display: block;
+  margin-bottom: 8rpx;
+  font-size: 31rpx;
+  font-weight: 600;
+}
+.actions {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 26rpx;
+  padding-top: 16rpx;
+  border-top: 2rpx solid #edf0e5;
+}
+.delete {
+  color: #a57361;
+}

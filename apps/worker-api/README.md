@@ -18,7 +18,7 @@ Wrangler starts the local Workers runtime at `http://localhost:8787`.
 | GET    | `/ping`      | HTTP 200, `{ "message": "pong" }`    |
 | Any    | Unknown path | HTTP 404, `{ "error": "Not Found" }` |
 
-Edit `src/index.ts` to add routes. Local changes reload automatically.
+Add business route modules under `src/routes/` and register them in `src/routes/index.ts`. `src/index.ts` only creates the application, mounts the route collection, and handles unknown paths. Ping is defined in `src/routes/ping.ts`. Local changes reload automatically.
 
 ## D1 database
 

@@ -1,0 +1,28 @@
+<view class="page home">
+  <view class="brand-row"><text class="brand">iparty<text class="brand-dot">.</text></text><text class="brand-caption">为每一份专业，留一张名片</text></view>
+  <view class="hero">
+    <text class="eyebrow">好服务 · 值得被看见</text>
+    <text class="headline">把店里的好手艺，<text class="accent">介绍给更多人。</text></text>
+    <text class="subtitle">为你的店铺和服务人员，创建一张可以分享的线上名片。让客户先了解，再放心预约。</text>
+    <view class="industry-row"><text>SPA 养生</text><text>美容美体</text><text>家政服务</text><text>更多行业</text></view>
+  </view>
+
+  <view class="sample" bindtap="viewExample" role="button" aria-label="查看服务人员展示示例">
+    <view class="sample-top"><text class="sample-caption">你的专属服务名片</text><text class="sample-mark">示例 ↗</text></view>
+    <view class="sample-person"><view class="sample-avatar">林</view><view><text class="sample-name">小林</text><text class="sample-role">身心护理师 · 栖里护理</text></view><view class="sample-line"></view></view>
+    <view class="sample-tags"><text>肩颈舒缓</text><text>精油 SPA</text><text>身体护理</text></view>
+    <view class="sample-bottom"><text>让专业成为被选择的理由</text><text>查看示例 →</text></view>
+  </view>
+
+  <view class="section">
+    <text class="section-title">从介绍自己，到迎接新客</text>
+    <view class="feature"><text class="feature-number">01</text><view><text class="feature-title">有店铺，也有温度</text><text class="muted">介绍门店、服务范围与联系方式，让客户找到你。</text></view></view>
+    <view class="feature"><text class="feature-number">02</text><view><text class="feature-title">让每一份专业有姓名</text><text class="muted">展示服务人员的特点、擅长项目和服务介绍。</text></view></view>
+    <view class="feature"><text class="feature-number">03</text><view><text class="feature-title">一张名片，开启一次连接</text><text class="muted">发布后可分享人员页面，让客户留下预约意向。</text></view></view>
+  </view>
+
+  <button class="primary" bindtap="start">{{hasDraft ? '继续完善我的名片' : '开始推广'}} →</button>
+  <text class="start-hint">先填写资料，最后再登录 · 未发布前仅保存本地</text>
+  <button class="text-button manage-link" bindtap="openManage">预览管理页面{{hasDraft ? ' · 有本地草稿' : ''}}</button>
+  <text class="footer">当前为功能预览版，登录、发布和预约尚未开放。</text>
+</view>

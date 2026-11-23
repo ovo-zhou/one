@@ -1,0 +1,161 @@
+.home {
+  padding-top: 20rpx;
+}
+.brand-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.brand {
+  font-size: 50rpx;
+  font-weight: 700;
+  letter-spacing: -3rpx;
+}
+.brand-dot {
+  color: #b88253;
+}
+.brand-caption {
+  color: #8b927f;
+  font-size: 20rpx;
+}
+.hero {
+  padding: 64rpx 0 36rpx;
+}
+.headline {
+  display: block;
+  margin: 24rpx 0;
+  font-size: 55rpx;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: -2rpx;
+}
+.accent {
+  display: block;
+  color: #65805a;
+}
+.industry-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 28rpx;
+}
+.industry-row text {
+  padding: 10rpx 18rpx;
+  border: 2rpx solid #e2e6d5;
+  border-radius: 100rpx;
+  color: #7c866f;
+  font-size: 21rpx;
+}
+.sample {
+  position: relative;
+  overflow: hidden;
+  padding: 30rpx;
+  border-radius: 28rpx;
+  background: #284c3c;
+  color: #f6f5e8;
+}
+.sample-top,
+.sample-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.sample-caption {
+  color: #c8d2ba;
+  font-size: 22rpx;
+  letter-spacing: 2rpx;
+}
+.sample-mark {
+  padding: 7rpx 14rpx;
+  border: 2rpx solid #64806a;
+  border-radius: 100rpx;
+  color: #d7dfc8;
+  font-size: 20rpx;
+}
+.sample-person {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  margin: 32rpx 0;
+}
+.sample-avatar {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 116rpx;
+  height: 136rpx;
+  border-radius: 58rpx 58rpx 20rpx 20rpx;
+  background: #bfcaab;
+  color: #355140;
+  font-size: 48rpx;
+}
+.sample-name {
+  display: block;
+  font-size: 40rpx;
+  font-weight: 600;
+}
+.sample-role {
+  display: block;
+  margin-top: 12rpx;
+  color: #cad4bf;
+  font-size: 23rpx;
+}
+.sample-line {
+  width: 80rpx;
+  height: 80rpx;
+  margin-left: auto;
+  border: 2rpx solid #688265;
+  border-radius: 50%;
+}
+.sample-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+.sample-tags text {
+  padding: 9rpx 15rpx;
+  border-radius: 8rpx;
+  background: #3b5d49;
+  color: #dae2cb;
+  font-size: 21rpx;
+}
+.sample-bottom {
+  margin-top: 28rpx;
+  padding-top: 24rpx;
+  border-top: 2rpx solid #46634c;
+  color: #cad4bf;
+  font-size: 21rpx;
+}
+.feature {
+  display: flex;
+  gap: 24rpx;
+  margin-top: 30rpx;
+}
+.feature-number {
+  padding-top: 4rpx;
+  color: #aa8b65;
+  font-size: 24rpx;
+}
+.feature-title {
+  display: block;
+  margin-bottom: 8rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+.start-hint,
+.footer {
+  display: block;
+  margin-top: 18rpx;
+  color: #939986;
+  font-size: 21rpx;
+  text-align: center;
+  line-height: 1.8;
+}
+.manage-link {
+  margin: 20rpx auto 0;
+}
+.footer {
+  margin-top: 30rpx;
+  font-size: 20rpx;
+}

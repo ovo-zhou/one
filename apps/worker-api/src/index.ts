@@ -1,8 +1,9 @@
 import { Hono } from "hono";
+import { routes } from "./routes";
 
 const app = new Hono<{ Bindings: Env }>();
 
-app.get("/ping", (c) => c.json({ message: "pong" }));
+app.route("/", routes);
 
 app.notFound((c) => c.json({ error: "Not Found" }, 404));
 

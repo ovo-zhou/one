@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2017",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "types": ["miniprogram-api-typings"],
+    "noEmit": true
+  },
+  "include": ["miniprogram/**/*.ts"]
+}

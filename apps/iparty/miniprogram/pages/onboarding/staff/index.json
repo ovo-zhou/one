@@ -1,0 +1,4 @@
+{
+  "navigationBarTitleText": "服务人员资料",
+  "usingComponents": { "login-sheet": "/components/login-sheet/index" }
+}

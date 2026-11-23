@@ -1,0 +1,80 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  background: rgba(26, 42, 35, 0.45);
+}
+.sheet {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 24rpx 40rpx calc(28rpx + env(safe-area-inset-bottom));
+  border-radius: 40rpx 40rpx 0 0;
+  background: #fffdf8;
+}
+.handle {
+  width: 64rpx;
+  height: 6rpx;
+  margin: 0 auto 40rpx;
+  border-radius: 6rpx;
+  background: #dfdfd5;
+}
+.eyebrow,
+.heading,
+.description,
+.privacy {
+  display: block;
+}
+.eyebrow {
+  color: #9a7350;
+  font-size: 22rpx;
+}
+.heading {
+  margin: 18rpx 0;
+  color: #203c31;
+  font-size: 40rpx;
+  font-weight: 600;
+}
+.description {
+  color: #767d72;
+  font-size: 27rpx;
+  line-height: 1.8;
+}
+.notice {
+  margin: 28rpx 0;
+  padding: 24rpx;
+  border-radius: 18rpx;
+  background: #f3eee0;
+  color: #83643e;
+  font-size: 24rpx;
+  line-height: 1.8;
+}
+button {
+  margin: 16rpx 0 0;
+  border-radius: 18rpx;
+  font-size: 28rpx;
+  line-height: 88rpx;
+}
+button::after {
+  border: none;
+}
+.phone-button[disabled] {
+  background: #e4e9e0;
+  color: #7c8a7b;
+}
+.preview-button {
+  background: #244c3c;
+  color: #fff;
+}
+.close-button {
+  background: transparent;
+  color: #526753;
+}
+.privacy {
+  margin-top: 14rpx;
+  color: #92988e;
+  font-size: 21rpx;
+  line-height: 1.7;
+  text-align: center;
+}

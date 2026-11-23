@@ -1,0 +1,21 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/onboarding/shop/index",
+    "pages/onboarding/staff/index",
+    "pages/manage/index",
+    "pages/manage/staff/index",
+    "pages/manage/appointments/index",
+    "pages/staff/detail/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "iparty",
+    "navigationBarBackgroundColor": "#f7f7ef",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f7f7ef",
+    "backgroundTextStyle": "dark"
+  },
+  "style": "v2",
+  "lazyCodeLoading": "requiredComponents",
+  "sitemapLocation": "sitemap.json"
+}

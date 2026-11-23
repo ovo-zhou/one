@@ -1,0 +1,140 @@
+.detail {
+  padding-bottom: calc(150rpx + env(safe-area-inset-bottom));
+}
+.preview-notice {
+  padding: 20rpx 30rpx;
+  background: #eee7d6;
+  color: #8c704c;
+  font-size: 22rpx;
+  text-align: center;
+}
+.portrait {
+  position: relative;
+  display: flex;
+  overflow: hidden;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 440rpx;
+  background: #dce5d0;
+}
+.portrait-word {
+  z-index: 1;
+  color: #54704d;
+  font-size: 76rpx;
+  font-weight: 500;
+}
+.portrait-caption {
+  z-index: 1;
+  margin-top: 26rpx;
+  color: #7b8b6c;
+  font-size: 20rpx;
+  letter-spacing: 4rpx;
+}
+.portrait-ring {
+  position: absolute;
+  width: 380rpx;
+  height: 380rpx;
+  border: 2rpx solid #b9c8a8;
+  border-radius: 50%;
+}
+.ring-one {
+  top: -180rpx;
+  left: -120rpx;
+}
+.ring-two {
+  right: -160rpx;
+  bottom: -220rpx;
+  width: 540rpx;
+  height: 540rpx;
+}
+.profile {
+  padding: 40rpx 36rpx;
+}
+.person-title {
+  display: block;
+  margin: 24rpx 0 12rpx;
+  font-size: 56rpx;
+  font-weight: 600;
+}
+.role {
+  color: #7b8274;
+  font-size: 28rpx;
+}
+.skills {
+  margin-top: 26rpx;
+  padding: 20rpx 24rpx;
+  border-radius: 16rpx;
+  background: #eaf0df;
+  color: #59714e;
+  font-size: 25rpx;
+  line-height: 1.8;
+}
+.bio {
+  display: block;
+  margin-top: 20rpx;
+  color: #7b8274;
+  font-size: 26rpx;
+  line-height: 1.9;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.shop-label {
+  color: #929b83;
+  font-size: 22rpx;
+}
+.shop-name {
+  display: block;
+  margin-top: 16rpx;
+  font-size: 34rpx;
+  font-weight: 600;
+}
+.shop-meta {
+  margin-top: 24rpx;
+  padding-top: 24rpx;
+  border-top: 2rpx solid #edf0e4;
+  font-size: 24rpx;
+  line-height: 1.8;
+}
+.shop-meta text {
+  display: block;
+}
+.shop-meta text:first-child {
+  margin-bottom: 8rpx;
+  color: #929b83;
+  font-size: 22rpx;
+}
+.disclaimer {
+  display: block;
+  margin: 30rpx 0 18rpx;
+  color: #929886;
+  font-size: 21rpx;
+  line-height: 1.8;
+  text-align: center;
+}
+.bottom-bar {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  gap: 20rpx;
+  padding: 22rpx 36rpx calc(22rpx + env(safe-area-inset-bottom));
+  border-top: 2rpx solid #e6eada;
+  background: #fffef9;
+}
+.bottom-bar button {
+  margin: 0;
+  font-size: 26rpx;
+  line-height: 84rpx;
+}
+.contact {
+  width: 220rpx;
+  background: #edf0e3;
+  color: #496344;
+}
+.book {
+  flex: 1;
+  background: #244c3c;
+  color: #fff;
+}

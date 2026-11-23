@@ -1,0 +1,14 @@
+<view wx:if="{{!available}}" class="page"><view class="card empty"><text class="empty-title">这张名片暂不可查看</text><text class="muted">公开展示功能尚未接入，或本地草稿已不存在。</text><button class="primary" bindtap="home">了解 iparty</button></view></view>
+<view wx:else class="detail">
+  <view class="preview-notice">{{mode === 'demo' ? '虚构展示示例 · 非真实商家，不可预约' : '本地预览 · 尚未发布，不支持分享与预约'}}</view>
+  <view class="portrait"><text class="portrait-word">{{staff.name || '待填写姓名'}}</text><text class="portrait-caption">{{mode === 'demo' ? 'IPARTY · SAMPLE PROFILE' : '人物照片待上传'}}</text><view class="portrait-ring ring-one"></view><view class="portrait-ring ring-two"></view></view>
+  <view class="profile">
+    <text class="eyebrow">{{shop.industry}} · 专业服务</text><text class="person-title">{{staff.name || '未命名人员'}}</text><text class="role">{{staff.title || '待完善岗位'}}</text>
+    <view class="skills">{{staff.skills || '待完善擅长项目'}}</view>
+    <view class="section"><text class="section-title">关于我</text><text class="bio">{{staff.description || '还没有填写个人介绍。'}}</text></view>
+    <view class="section card shop-card"><text class="shop-label">所在店铺</text><text class="shop-name">{{shop.name || '待填写店铺名称'}}</text><text class="bio">{{shop.description || '还没有填写店铺介绍。'}}</text><view class="shop-meta"><text>服务地址 / 区域</text><text>{{shop.address || '待填写'}}</text></view><view class="shop-meta"><text>营业时间</text><text>{{shop.businessHours || '请联系商家确认'}}</text></view></view>
+    <text class="disclaimer">{{mode === 'demo' ? '本页面为产品效果示例，人物、店铺和服务资料均为虚构。' : '此页面读取本机草稿，仅供检查排版，其他用户无法访问这些资料。'}}</text>
+    <button class="text-button" bindtap="home">由 iparty 提供展示支持 ↗</button>
+  </view>
+  <view class="bottom-bar"><button class="contact" bindtap="contact">联系商家</button><button class="book" bindtap="book">预约咨询 · 预览</button></view>
+</view>

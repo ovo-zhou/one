@@ -11,6 +11,7 @@ one/
 │   ├── vite-react/     # Vite 6 + React 19
 │   ├── node-service/   # Express REST API
 │   ├── worker-api/     # Hono API on Cloudflare Workers
+│   ├── iparty/         # Native WeChat Mini Program (TypeScript)
 │   └── faceless/       # Faceless desktop app (Electron + React)
 ├── tsconfig.base.json  # Base TypeScript config
 ├── eslint.config.mjs   # ESLint flat config
@@ -30,6 +31,8 @@ pnpm lint          # Lint all apps
 pnpm typecheck     # Type-check all apps
 ```
 
+For the iparty Mini Program, import `apps/iparty` into WeChat DevTools. See [its setup guide](apps/iparty/README.md) for AppID and API configuration.
+
 ## Install Faceless (macOS)
 
 curl downloads the DMG without quarantine attribute, so no "app is damaged" warning.
@@ -48,4 +51,5 @@ Or download the DMG manually: https://github.com/ovo-zhou/one/releases
 | vite-react | 3001 | Vite 6 + React 19 |
 | node-service | 3002 | Express 5 |
 | [worker-api](apps/worker-api/README.md) | 8787 | Hono + Cloudflare Workers |
+| [iparty](apps/iparty/README.md) | — | Native WeChat Mini Program + TypeScript |
 | Faceless | — | Electron + React |

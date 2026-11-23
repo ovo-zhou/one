@@ -1,0 +1,15 @@
+<view class="page">
+  <view wx:if="{{invalid}}" class="empty"><text class="empty-title">找不到这份本地资料</text><text class="muted">请返回管理页面重新选择人员。</text></view>
+  <block wx:else>
+    <view wx:if="{{!editing}}" class="steps"><text>01 店铺资料</text><view class="step-line"></view><text class="step-active">02 服务人员</text><view class="step-line"></view><text>03 登录发布</text></view>
+    <text class="eyebrow">MEET THE PROFESSIONAL</text><text class="page-title">让专业，有姓名</text><text class="subtitle">介绍一位让你引以为傲的伙伴，更多人员可以稍后添加。</text>
+    <view class="local-notice">本地草稿 · 照片上传将在后续接入。请确认已获得人员本人对资料展示的授权。</view>
+    <view class="field"><text class="label">姓名 / 昵称 *</text><input class="input" placeholder="填写对外展示的名字" maxlength="30" value="{{form.name}}" data-field="name" bindinput="onInput" /></view>
+    <view class="field"><text class="label">岗位名称 *</text><input class="input" placeholder="如：美容师、护理师、家政服务师" maxlength="40" value="{{form.title}}" data-field="title" bindinput="onInput" /></view>
+    <view class="field"><text class="label">擅长项目 *</text><input class="input" placeholder="多个项目用顿号隔开" maxlength="150" value="{{form.skills}}" data-field="skills" bindinput="onInput" /></view>
+    <view class="field"><text class="label">个人介绍</text><textarea class="textarea" placeholder="说说服务特色、工作经验或服务理念" maxlength="600" value="{{form.description}}" data-field="description" bindinput="onInput" /></view>
+    <button class="primary" bindtap="finish">{{editing ? '保存本地修改' : '完成资料，登录发布'}} →</button>
+    <text class="hint">退出或取消登录不会丢失已保存的本地草稿。</text>
+  </block>
+</view>
+<login-sheet visible="{{loginVisible}}" bind:close="closeLogin" bind:preview="previewManage" />

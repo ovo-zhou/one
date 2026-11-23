@@ -1,0 +1,10 @@
+<view class="page">
+  <text class="eyebrow">THE PEOPLE BEHIND THE SERVICE</text><text class="page-title">好服务，来自好伙伴</text><text class="subtitle">每位人员都有自己的展示页面。</text>
+  <view class="local-notice">本地草稿尚未发布，可以编辑和预览，暂不支持真实分享或预约。</view>
+  <view wx:if="{{!staff.length}}" class="card empty"><text class="empty-title">介绍你的第一位伙伴</text><text class="muted">从姓名、岗位和擅长项目开始。</text></view>
+  <view wx:for="{{staff}}" wx:key="id" class="card staff-card">
+    <view class="person-row"><view class="initial">{{item.name || '待填'}}</view><view class="person-info"><text class="person-name">{{item.name || '未命名人员'}}</text><text class="muted">{{item.title || '待填写岗位'}}</text><text class="hint">{{item.skills || '待完善擅长项目'}}</text></view><text class="badge">草稿</text></view>
+    <view class="actions"><button class="text-button" data-id="{{item.id}}" bindtap="edit">编辑</button><button class="text-button" data-id="{{item.id}}" bindtap="preview">预览</button><button class="text-button" bindtap="shareNotice">分享</button><button class="text-button delete" data-id="{{item.id}}" bindtap="remove">删除</button></view>
+  </view>
+  <button class="primary" bindtap="add">+ 添加服务人员</button>
+</view>
