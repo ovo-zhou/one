@@ -1,1 +1,15 @@
-<view class="page"><text class="eyebrow">MAKE A CONNECTION</text><text class="page-title">每一份信任，都有回应</text><view class="local-notice">预约功能尚未接入，当前不会接收或保存客户手机号。</view><view class="card empty"><text class="empty-title">预约管理即将开放</text><text class="muted">正式发布后，客户可在人员页面提交手机号和意向时间。你可以在这里查看预约并联系确认。</text></view></view>
+<view class="page">
+  <view class="local-notice">预约为意向申请，请先与客户核实档期。店铺停用后不能确认新预约，但仍可拒绝申请或完成历史预约。</view>
+  <view wx:if="{{error}}" class="local-notice">{{error}}<button class="text-button" bindtap="retry">刷新重试</button></view>
+  <view wx:for="{{items}}" wx:key="id" class="card record">
+    <text class="record-title">{{item.staffName}} · {{item.staffTitle}}</text><text class="record-status">{{item.statusLabel}}</text><text class="record-line">意向时间：{{item.timeLabel}}</text>
+    <text class="record-line">联系人：{{item.contactName}} · {{item.contactPhone}}</text><text class="record-line">备注：{{item.note || '无'}}</text><text class="hint">提交于 {{item.createdLabel}}</text>
+    <view class="record-actions"><button class="text-button" data-id="{{item.id}}" bindtap="call">联系客户</button>
+      <button wx:if="{{item.status === 'pending'}}" class="text-button" data-id="{{item.id}}" data-status="confirmed" bindtap="change" disabled="{{saving}}">确认</button>
+      <button wx:if="{{item.status === 'pending'}}" class="text-button" data-id="{{item.id}}" data-status="rejected" bindtap="change" disabled="{{saving}}">拒绝</button>
+      <button wx:if="{{item.status === 'confirmed'}}" class="text-button" data-id="{{item.id}}" data-status="completed" bindtap="change" disabled="{{saving}}">标记完成</button>
+    </view>
+  </view>
+  <view wx:if="{{!loading && !error && !items.length}}" class="empty muted">暂无客户预约</view>
+  <text wx:if="{{loading}}" class="muted">正在加载…</text><button wx:elif="{{hasMore}}" class="text-button" bindtap="more">加载更多</button>
+</view>

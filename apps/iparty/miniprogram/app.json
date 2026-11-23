@@ -6,7 +6,13 @@
     "pages/manage/index",
     "pages/manage/staff/index",
     "pages/manage/appointments/index",
-    "pages/staff/detail/index"
+    "pages/staff/detail/index",
+    "pages/customer/booking/index",
+    "pages/customer/bookings/index",
+    "pages/customer/booking-detail/index",
+    "pages/admin/index",
+    "pages/admin/shop/index",
+    "pages/admin/audit/index"
   ],
   "window": {
     "navigationBarTitleText": "iparty",

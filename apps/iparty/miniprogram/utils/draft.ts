@@ -9,7 +9,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 function isShop(value: unknown): value is ShopDraft {
   return (
     isRecord(value) &&
-    ["name", "industry", "description", "address", "phone", "businessHours"].every(
+    ["name", "description", "address", "phone", "businessHours"].every(
       (key) => typeof value[key] === "string",
     )
   );
@@ -33,7 +33,13 @@ export function readDraft(): OnboardingDraft {
     value.staff.every(isStaff) &&
     typeof value.updatedAt === "number"
   ) {
-    return value as OnboardingDraft;
+    const { name, description, address, phone, businessHours } = value.shop;
+    return {
+      version: 1,
+      shop: { name, description, address, phone, businessHours },
+      staff: value.staff,
+      updatedAt: value.updatedAt,
+    };
   }
 
   return { version: 1, shop: emptyShop(), staff: [], updatedAt: 0 };
@@ -51,7 +57,6 @@ export function saveDraft(draft: OnboardingDraft): boolean {
 
 export function shopValidationMessage(shop: ShopDraft): string {
   if (!shop.name.trim()) return "请填写店铺名称";
-  if (!shop.industry.trim()) return "请选择服务行业";
   if (!shop.address.trim()) return "请填写服务地址或服务区域";
   if (!/^[0-9+()\-\s]{7,25}$/.test(shop.phone.trim())) return "请填写有效的店铺联系电话";
   return "";

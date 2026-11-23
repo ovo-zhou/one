@@ -1,28 +1,46 @@
-<view class="page home">
-  <view class="brand-row"><text class="brand">iparty<text class="brand-dot">.</text></text><text class="brand-caption">为每一份专业，留一张名片</text></view>
+<view wx:if="{{checking && !entryError}}" class="page entry-loading" role="status" aria-label="加载中">
+  <view class="entry-spinner" aria-hidden="true"></view>
+  <text class="entry-loading-text">加载中</text>
+</view>
+<view wx:elif="{{entryError}}" class="page entry-state">
+  <text class="eyebrow">iparty</text>
+  <text class="page-title">暂时无法进入</text>
+  <text class="subtitle">{{entryError}}</text>
+  <button class="primary" bindtap="resolveEntry">重新进入</button>
+</view>
+<view wx:else class="page home">
+  <view class="brand-row">
+    <text class="brand">iparty<text class="brand-dot">.</text></text>
+    <button wx:if="{{registered}}" class="text-button nav-link" bindtap="openManage">我的中心 ↗</button>
+  </view>
+
   <view class="hero">
-    <text class="eyebrow">好服务 · 值得被看见</text>
-    <text class="headline">把店里的好手艺，<text class="accent">介绍给更多人。</text></text>
-    <text class="subtitle">为你的店铺和服务人员，创建一张可以分享的线上名片。让客户先了解，再放心预约。</text>
-    <view class="industry-row"><text>SPA 养生</text><text>美容美体</text><text>家政服务</text><text>更多行业</text></view>
+    <text class="headline">好服务，<text class="accent">从被了解开始。</text></text>
+    <text class="hero-services">店铺展示 · 人员名片 · 预约管理</text>
+    <text class="hero-description">把店铺与服务人员的介绍，变成一张能在微信里分享的名片。让客户了解服务，也让每一份预约意向有处可寻。</text>
+    <view class="hero-actions">
+      <view class="hero-link" bindtap="start" role="button" aria-label="{{registered ? '进入我的中心' : hasDraft ? '继续创建我的店铺' : '创建我的店铺'}}" hover-class="hero-link-hover"><text>{{registered ? '进入我的中心' : hasDraft ? '继续创建我的店铺' : '创建我的店铺'}}</text><text class="link-arrow">↗</text></view>
+    </view>
+    <view class="hero-summary">
+      <view><text class="summary-title">展示</text><text class="summary-caption">介绍店铺与人员</text></view>
+      <view><text class="summary-title">分享</text><text class="summary-caption">微信好友与群聊</text></view>
+      <view><text class="summary-title">预约</text><text class="summary-caption">申请与状态跟进</text></view>
+    </view>
   </view>
 
-  <view class="sample" bindtap="viewExample" role="button" aria-label="查看服务人员展示示例">
-    <view class="sample-top"><text class="sample-caption">你的专属服务名片</text><text class="sample-mark">示例 ↗</text></view>
-    <view class="sample-person"><view class="sample-avatar">林</view><view><text class="sample-name">小林</text><text class="sample-role">身心护理师 · 栖里护理</text></view><view class="sample-line"></view></view>
-    <view class="sample-tags"><text>肩颈舒缓</text><text>精油 SPA</text><text>身体护理</text></view>
-    <view class="sample-bottom"><text>让专业成为被选择的理由</text><text>查看示例 →</text></view>
+  <view class="workflow-section">
+    <text class="eyebrow">从这里开始</text>
+    <text class="section-heading">介绍准备好，<text class="heading-line">就可以出发。</text></text>
+    <view class="steps">
+      <view class="step"><text class="step-number">1</text><view class="step-content"><text class="step-title">填写店铺资料</text><text class="step-description">介绍你的店铺，留下地址、电话与营业时间。</text></view></view>
+      <view class="step"><text class="step-number">2</text><view class="step-content"><text class="step-title">添加服务人员</text><text class="step-description">填写人员介绍，预览名片后完成创建。</text></view></view>
+      <view class="step"><text class="step-number">3</text><view class="step-content"><text class="step-title">分享名片，接收申请</text><text class="step-description">创建成功后即可分享，在「我的中心」管理资料和预约。</text></view></view>
+    </view>
   </view>
 
-  <view class="section">
-    <text class="section-title">从介绍自己，到迎接新客</text>
-    <view class="feature"><text class="feature-number">01</text><view><text class="feature-title">有店铺，也有温度</text><text class="muted">介绍门店、服务范围与联系方式，让客户找到你。</text></view></view>
-    <view class="feature"><text class="feature-number">02</text><view><text class="feature-title">让每一份专业有姓名</text><text class="muted">展示服务人员的特点、擅长项目和服务介绍。</text></view></view>
-    <view class="feature"><text class="feature-number">03</text><view><text class="feature-title">一张名片，开启一次连接</text><text class="muted">发布后可分享人员页面，让客户留下预约意向。</text></view></view>
+  <view class="site-footer">
+    <text class="footer-brand">iparty<text class="brand-dot">.</text></text>
+    <text class="footer-tagline">让好服务，被更多人了解。</text>
+    <text class="footer-note">店铺及人员资料由商家提供 · 注意甄别虚假信息</text>
   </view>
-
-  <button class="primary" bindtap="start">{{hasDraft ? '继续完善我的名片' : '开始推广'}} →</button>
-  <text class="start-hint">先填写资料，最后再登录 · 未发布前仅保存本地</text>
-  <button class="text-button manage-link" bindtap="openManage">预览管理页面{{hasDraft ? ' · 有本地草稿' : ''}}</button>
-  <text class="footer">当前为功能预览版，登录、发布和预约尚未开放。</text>
 </view>

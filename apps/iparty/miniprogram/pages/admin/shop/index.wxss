@@ -1,0 +1,2 @@
+@import "../../../styles/form-page.wxss";
+@import "../../../styles/records.wxss";

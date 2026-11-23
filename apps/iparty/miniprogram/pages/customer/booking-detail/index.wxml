@@ -1,0 +1,10 @@
+<view class="page">
+  <view wx:if="{{error}}" class="local-notice">{{error}}<button class="text-button" bindtap="load">刷新重试</button></view><text wx:if="{{loading}}" class="muted">正在加载…</text>
+  <view wx:if="{{booking}}" class="card">
+    <text class="record-title">{{booking.shopName}}</text><text class="record-status">{{booking.statusLabel}}</text>
+    <text class="record-line">{{booking.staffName}} · {{booking.staffTitle}}</text><text class="record-line">意向时间：{{booking.timeLabel}}</text>
+    <text class="record-line">地址：{{booking.shopAddress}}</text><text class="record-line">联系人：{{booking.contactName}}</text><text class="record-line">电话：{{booking.contactPhone}}</text><text class="record-line">备注：{{booking.note || '无'}}</text><text class="hint">提交时间：{{booking.createdLabel}}</text>
+    <button class="secondary" bindtap="contact">联系商家</button>
+    <button wx:if="{{booking.status === 'pending' || booking.status === 'confirmed'}}" class="primary" bindtap="cancel" disabled="{{saving}}" loading="{{saving}}">取消预约</button>
+  </view><text class="hint">预约内容为提交时的资料快照。意向申请不锁定档期，以商家确认为准。</text>
+</view>

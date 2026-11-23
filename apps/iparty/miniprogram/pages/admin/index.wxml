@@ -1,0 +1,8 @@
+<view class="page">
+  <text class="page-title">全部店铺</text>
+  <view class="search-controls"><input class="input" placeholder="搜索店铺名称" maxlength="80" value="{{q}}" bindinput="input" bindconfirm="searchShops" confirm-type="search" /><picker range="{{filters}}" value="{{filterIndex}}" bindchange="filter" disabled="{{loading}}"><view class="filter">{{filters[filterIndex]}} ▾</view></picker><button class="secondary" bindtap="searchShops" disabled="{{loading}}">搜索</button></view>
+  <view wx:if="{{error}}" class="local-notice">{{error}}<button class="text-button" bindtap="retry">刷新重试</button></view>
+  <view wx:for="{{items}}" wx:key="id" class="card record" data-id="{{item.id}}" bindtap="detail" role="button"><text class="record-title">{{item.name}}</text><text class="record-line">{{item.address}}</text><text class="record-line">{{item.staffCount}} 位服务人员</text><text class="record-status">{{item.status === 'active' ? '正常' : '已停用'}}{{item.ownerStatus !== 'active' ? ' · 账号已禁用' : ''}}</text><text class="hint">更新于 {{item.timeLabel}} · 查看详情 →</text></view>
+  <view wx:if="{{!loading && !error && !items.length}}" class="empty muted">没有符合条件的店铺</view><text wx:if="{{loading}}" class="muted">正在加载…</text><button wx:elif="{{hasMore}}" class="text-button" bindtap="more">加载更多</button>
+  <button class="text-button" bindtap="customerCenter">我的中心</button>
+</view>

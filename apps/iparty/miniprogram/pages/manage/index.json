@@ -1,4 +1,4 @@
 {
-  "navigationBarTitleText": "管理预览",
-  "usingComponents": { "login-sheet": "/components/login-sheet/index" }
+  "navigationBarTitleText": "我的中心",
+  "usingComponents": {}
 }

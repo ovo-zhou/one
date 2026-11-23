@@ -1,0 +1,6 @@
+.record { margin-bottom: 24rpx; }
+.record-title { display: block; margin-bottom: 12rpx; font-size: 30rpx; font-weight: 600; }
+.record-line { display: block; margin-top: 12rpx; font-size: 25rpx; line-height: 1.8; white-space: pre-wrap; word-break: break-all; }
+.record-status { display: block; margin-top: 16rpx; color: #896b46; font-size: 24rpx; }
+.record-actions { display: flex; gap: 28rpx; flex-wrap: wrap; margin-top: 20rpx; }
+.notice-error { margin-bottom: 24rpx; }

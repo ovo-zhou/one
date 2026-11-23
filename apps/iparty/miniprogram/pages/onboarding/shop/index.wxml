@@ -1,14 +1,14 @@
-<view class="page">
-  <view wx:if="{{!editing}}" class="steps"><text class="step-active">01 店铺资料</text><view class="step-line"></view><text>02 服务人员</text><view class="step-line"></view><text>03 登录发布</text></view>
-  <text class="eyebrow">YOUR SPACE</text>
-  <text class="page-title">{{editing ? '把店铺介绍得更好' : '先认识一下你的店铺'}}</text>
-  <text class="subtitle">一段真实的介绍，是客户放心选择的开始。</text>
-  <view class="local-notice">当前资料仅保存在本机，未登录、未发布。照片上传将在后续版本接入。</view>
-  <view class="field"><text class="label">店铺名称 *</text><input class="input" placeholder="如：栖里身心护理" maxlength="40" value="{{form.name}}" data-field="name" bindinput="onInput" /></view>
-  <view class="field"><text class="label">服务行业 *</text><picker range="{{industries}}" value="{{industryIndex}}" bindchange="onIndustry"><view class="input picker-value">{{form.industry}} ▾</view></picker></view>
-  <view class="field"><text class="label">店铺介绍</text><textarea class="textarea" placeholder="介绍你的店铺、服务理念或特色" maxlength="500" value="{{form.description}}" data-field="description" bindinput="onInput" /></view>
-  <view class="field"><text class="label">门店地址 / 上门服务区域 *</text><input class="input" placeholder="如：杭州市西湖区，支持周边上门服务" maxlength="120" value="{{form.address}}" data-field="address" bindinput="onInput" /></view>
-  <view class="field"><text class="label">店铺联系电话 *</text><input class="input" placeholder="手机号或固定电话" maxlength="25" value="{{form.phone}}" data-field="phone" bindinput="onInput" /><text class="hint">发布后用于客户联系门店，请勿填写未经授权的号码。</text></view>
-  <view class="field"><text class="label">营业时间</text><input class="input" placeholder="如：周一至周日 10:00–21:00" maxlength="80" value="{{form.businessHours}}" data-field="businessHours" bindinput="onInput" /></view>
-  <button class="primary" bindtap="next">{{editing ? '保存本地修改' : '下一步，添加服务人员'}} →</button>
+<view class="form-page">
+  <scroll-view class="form-scroll" scroll-y="{{true}}">
+    <view class="form-content">
+      <view wx:if="{{editing && status === 'disabled'}}" class="local-notice">店铺已被平台停用，公开名片和新增预约不可用。原因：{{statusReason}}。编辑保存不会自动解除停用。</view>
+      <view wx:if="{{loading}}" class="empty"><text class="muted">正在加载店铺资料…</text></view>
+      <view wx:elif="{{loadError}}" class="empty"><text class="muted">{{loadError}}</text><button class="text-button" bindtap="loadShop">重新加载</button></view>
+      <shop-form wx:else form="{{form}}" disabled="{{saving}}" bind:change="onFormChange" />
+      <text wx:if="{{saveError}}" class="publish-error">{{saveError}}</text>
+    </view>
+  </scroll-view>
+  <view wx:if="{{!loading && !loadError}}" class="form-footer">
+    <button class="primary" bindtap="next" disabled="{{saving}}" loading="{{saving}}">{{saving ? '正在保存…' : editing ? '保存修改' : '添加服务人员'}}</button>
+  </view>
 </view>

@@ -1,1 +1,10 @@
 /* Shared empty-state styles are defined in app.wxss. */
+@import "../../../styles/records.wxss";
+.record-actions {
+  flex-wrap: nowrap;
+}
+.record-actions .text-button {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+}

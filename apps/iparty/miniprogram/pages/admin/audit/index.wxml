@@ -1,0 +1,4 @@
+<view class="page"><view wx:if="{{error}}" class="local-notice">{{error}}<button class="text-button" bindtap="retry">刷新重试</button></view>
+  <view wx:for="{{items}}" wx:key="id" class="card record"><text class="record-title">{{item.action === 'disable_shop' ? '停用店铺' : '恢复店铺'}}</text><text class="record-line">{{item.previousStatus === 'active' ? '正常' : '已停用'}} → {{item.nextStatus === 'active' ? '正常' : '已停用'}}</text><text class="record-line">原因：{{item.reason}}</text><text class="hint">{{item.timeLabel}}</text><text class="hint" selectable>操作人：{{item.actorId}}</text></view>
+  <view wx:if="{{!loading && !error && !items.length}}" class="empty muted">暂无平台操作记录</view><text wx:if="{{loading}}" class="muted">正在加载…</text><button wx:elif="{{hasMore}}" class="text-button" bindtap="more">加载更多</button>
+</view>

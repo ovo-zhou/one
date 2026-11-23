@@ -1,70 +1,36 @@
-.shop-summary {
-  padding: 32rpx;
-  background: #eaf0df;
+.management {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
 }
-.shop-name {
-  display: block;
-  margin: 22rpx 0 12rpx;
-  font-size: 36rpx;
-  font-weight: 600;
-}
-.appointment-entry {
+.management-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20rpx;
-  margin: 24rpx 0;
-  padding: 28rpx;
-  border-radius: 20rpx;
-  background: #f0ebdb;
-  color: #8a6f47;
-  font-size: 23rpx;
+  gap: 24rpx;
+  min-height: 168rpx;
+  padding: 32rpx;
 }
-.entry-title,
-.entry-note {
-  display: block;
-}
-.entry-title {
-  margin-bottom: 8rpx;
-  font-size: 27rpx;
-  font-weight: 600;
-}
-.entry-note {
-  font-size: 21rpx;
-}
-.manage-grid {
-  display: flex;
-  gap: 20rpx;
-}
-.manage-item {
+.card-content {
   flex: 1;
   min-width: 0;
-  padding: 26rpx;
 }
-.item-symbol {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 66rpx;
-  height: 66rpx;
-  margin-bottom: 24rpx;
-  border-radius: 18rpx;
-  background: #edf0e4;
-  font-size: 28rpx;
-}
-.item-title {
+.card-title,
+.card-description {
   display: block;
-  margin-bottom: 14rpx;
-  font-size: 28rpx;
+}
+.card-title {
+  font-size: 32rpx;
   font-weight: 600;
 }
-.item-link {
-  display: block;
-  margin-top: 30rpx;
-  color: #55704f;
-  font-size: 23rpx;
+.card-description {
+  margin-top: 12rpx;
+  color: #7b8274;
+  font-size: 24rpx;
+  line-height: 1.6;
 }
-.connection {
-  margin-top: 30rpx;
-  text-align: center;
+.card-arrow {
+  flex-shrink: 0;
+  color: #55704f;
+  font-size: 32rpx;
 }

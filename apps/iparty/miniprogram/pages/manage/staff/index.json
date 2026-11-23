@@ -1,1 +1,5 @@
-{ "navigationBarTitleText": "服务人员管理", "usingComponents": {} }
+{
+  "navigationBarTitleText": "服务人员管理",
+  "disableScroll": true,
+  "usingComponents": {}
+}

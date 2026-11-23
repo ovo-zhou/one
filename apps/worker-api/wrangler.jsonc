@@ -4,6 +4,9 @@
   "main": "src/index.ts",
   "compatibility_date": "2026-11-20",
   "workers_dev": true,
+  "vars": {
+    "WECHAT_APP_ID": "wx401b4f0b10b9f661",
+  },
   "d1_databases": [
     {
       "binding": "DB",

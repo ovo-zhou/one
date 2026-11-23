@@ -1,0 +1,3 @@
+@import "../../styles/records.wxss";
+.search-controls { margin-bottom: 30rpx; }
+.filter { padding: 20rpx 0; color: #526d57; }

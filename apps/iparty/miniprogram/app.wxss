@@ -45,12 +45,6 @@ button {
 .section {
   margin-top: 32rpx;
 }
-.section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 24rpx;
-}
 .section-title {
   font-size: 32rpx;
   font-weight: 600;
@@ -130,9 +124,6 @@ button {
   font-size: 28rpx;
   line-height: 1.7;
 }
-.picker-value {
-  line-height: 84rpx;
-}
 .hint {
   display: block;
   margin-top: 12rpx;
@@ -140,22 +131,12 @@ button {
   font-size: 22rpx;
   line-height: 1.8;
 }
-.steps {
-  display: flex;
-  align-items: center;
-  gap: 14rpx;
-  margin-bottom: 40rpx;
-  color: #929986;
-  font-size: 22rpx;
-}
-.step-active {
-  color: #244c3c;
-  font-weight: 600;
-}
-.step-line {
-  flex: 1;
-  height: 2rpx;
-  background: #dfe5d4;
+.publish-error {
+  display: block;
+  margin-top: 20rpx;
+  color: #b14c38;
+  font-size: 24rpx;
+  line-height: 1.8;
 }
 .initial {
   display: flex;
@@ -178,12 +159,4 @@ button {
   margin-bottom: 16rpx;
   font-size: 32rpx;
   font-weight: 600;
-}
-.badge {
-  display: inline-block;
-  padding: 7rpx 15rpx;
-  border-radius: 10rpx;
-  background: #f0ebdb;
-  color: #896b46;
-  font-size: 21rpx;
 }

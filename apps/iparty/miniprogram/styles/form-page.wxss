@@ -1,0 +1,35 @@
+page {
+  height: 100%;
+  overflow: hidden;
+}
+.form-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+.form-scroll {
+  flex: 1;
+  height: 0;
+  min-height: 0;
+}
+.form-content {
+  padding: 36rpx;
+}
+.form-footer {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  gap: 20rpx;
+  padding: 24rpx 36rpx calc(24rpx + env(safe-area-inset-bottom));
+  border-top: 2rpx solid #e9ecdf;
+  background: #f7f7ef;
+}
+.form-footer button.primary,
+.form-footer button.secondary {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}

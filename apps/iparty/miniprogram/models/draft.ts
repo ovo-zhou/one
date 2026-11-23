@@ -1,8 +1,5 @@
-export const industries = ["SPA 养生", "美容美体", "家政服务", "美发美甲", "其他服务"];
-
 export type ShopDraft = {
   name: string;
-  industry: string;
   description: string;
   address: string;
   phone: string;
@@ -27,7 +24,6 @@ export type OnboardingDraft = {
 export function emptyShop(): ShopDraft {
   return {
     name: "",
-    industry: industries[0]!,
     description: "",
     address: "",
     phone: "",

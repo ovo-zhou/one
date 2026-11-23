@@ -1,0 +1,4 @@
+<view class="field"><text class="label">姓名 / 昵称 *</text><input class="input" placeholder="填写对外展示的名字" maxlength="30" value="{{form.name}}" disabled="{{disabled}}" data-field="name" bindinput="onInput" /></view>
+<view class="field"><text class="label">岗位名称 *</text><input class="input" placeholder="如：美容师、护理师、家政服务师" maxlength="40" value="{{form.title}}" disabled="{{disabled}}" data-field="title" bindinput="onInput" /></view>
+<view class="field"><text class="label">擅长项目 *</text><input class="input" placeholder="多个项目用顿号隔开" maxlength="150" value="{{form.skills}}" disabled="{{disabled}}" data-field="skills" bindinput="onInput" /></view>
+<view class="field"><text class="label">个人介绍</text><textarea class="textarea" placeholder="说说服务特色、工作经验或服务理念" maxlength="600" value="{{form.description}}" disabled="{{disabled}}" data-field="description" bindinput="onInput" /></view>

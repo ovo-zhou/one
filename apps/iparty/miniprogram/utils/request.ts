@@ -1,27 +1,52 @@
 import { getApiBaseUrl } from "../config/api";
+import { clearSession, getToken } from "./session";
 
-type RequestOptions = Pick<WechatMiniprogram.RequestOption, "method" | "data" | "header">;
+export type RequestOptions = Pick<
+  WechatMiniprogram.RequestOption,
+  "method" | "data" | "header" | "timeout"
+>;
+
+export class RequestError extends Error {
+  constructor(
+    message: string,
+    readonly statusCode: number,
+  ) {
+    super(message);
+    this.name = "RequestError";
+  }
+}
 
 export async function request<T extends string | Record<string, unknown> | ArrayBuffer>(
   path: string,
   options: RequestOptions = {},
 ): Promise<T> {
   const baseUrl = getApiBaseUrl();
+  const token = getToken();
 
   return new Promise<T>((resolve, reject) => {
     wx.request<T>({
       url: `${baseUrl}/${path.replace(/^\/+/, "")}`,
       method: options.method ?? "GET",
       data: options.data,
-      header: options.header,
-      timeout: 10_000,
+      header: { ...options.header, ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      timeout: options.timeout ?? 10_000,
       success(response) {
         if (response.statusCode >= 200 && response.statusCode < 300) {
           resolve(response.data);
           return;
         }
 
-        reject(new Error(`请求失败（HTTP ${response.statusCode}）`));
+        // A late 401 for an old request must not erase a newly restored session.
+        if (response.statusCode === 401 && token && getToken() === token) clearSession();
+        const data: unknown = response.data;
+        const message =
+          typeof data === "object" &&
+          data !== null &&
+          "error" in data &&
+          typeof data.error === "string"
+            ? data.error
+            : `请求失败（HTTP ${response.statusCode}）`;
+        reject(new RequestError(message, response.statusCode));
       },
       fail(error) {
         reject(new Error(error.errMsg || "网络请求失败，请检查网络和 API 地址"));

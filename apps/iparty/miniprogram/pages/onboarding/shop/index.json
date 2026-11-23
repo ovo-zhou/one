@@ -1,1 +1,5 @@
-{ "navigationBarTitleText": "创建你的店铺", "usingComponents": {} }
+{
+  "navigationBarTitleText": "创建你的店铺",
+  "disableScroll": true,
+  "usingComponents": { "shop-form": "/components/shop-form/index" }
+}

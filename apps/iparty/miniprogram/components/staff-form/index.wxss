@@ -1,0 +1,7 @@
+:host {
+  display: block;
+}
+input,
+textarea {
+  box-sizing: border-box;
+}
