@@ -139,12 +139,14 @@ The old development migration chain was replaced during an explicitly authorized
 For an explicitly approved local reset:
 
 1. Stop the local Worker so it cannot write to D1 during the reset.
-2. Back up `apps/worker-api/.wrangler/state/v3/d1/` and `apps/worker-api/migrations/` outside the persistence directory. Keep the backup private because it contains account, session and contact data; preserve SQLite WAL files or make a consistent SQLite backup.
+2. Confirm that all local application data and migration history may be discarded. The current local reset policy is to create no backup; do not copy account, session or contact data elsewhere.
 3. Delete **only** `apps/worker-api/.wrangler/state/v3/d1/`. This clears local application data and Wrangler's local `d1_migrations` records; leave other `.wrangler` state, configuration and secrets intact. Keep the checked-in initialization SQL and Drizzle metadata for a normal data reset.
 4. Run `pnpm --filter @one/worker-api db:migrate:local`, then run it again to verify there are no pending migrations. The result is an empty database with the current schema; it has no administrator account.
 5. Restart with `pnpm dev:worker-api`. In the Mini Program console, remove only the development login cache with `wx.removeStorageSync("iparty:session:http://localhost:8787")`, then recompile and log in/create a shop again. Existing share IDs no longer resolve. Do not clear all Storage if you want to retain onboarding drafts.
 
 This procedure never uses `--remote`. Do not regenerate or rewrite the baseline on every data reset; future schema changes should produce new migrations.
+
+Only when explicitly authorized to regenerate the local baseline as well, remove the old migration SQL and `migrations/meta/` files and its now-empty directory, retain `.gitkeep`, and run `pnpm --filter @one/worker-api db:generate --name=init` before applying local migrations. This recreates a single initialization migration and fresh Drizzle metadata; it does not make the baseline safe for an existing cloud database.
 
 ### Three commands
 
