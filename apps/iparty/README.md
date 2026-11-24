@@ -59,7 +59,7 @@
 ## 名片分享与短链
 
 - 使用方式：服务人员管理 → 对应人员「分享」→ 选择微信好友或群聊；也可以打开云端名片后从右上角菜单转发。商家预览中联系和预约仍不可用，但转发出去的是不带预览标志的客户页面。
-- 好友实际打开需要小程序版本可访问、相应版本的后端可用，且云端存在该人员。开发/体验版本受微信成员权限限制，普通客户需使用已发布版本。开发版的本地 D1 资料不会随分享自动复制到线上，手机也无法访问电脑的 localhost。
+- 好友实际打开需要小程序版本可访问、相应版本的后端可用，且云端存在该人员。开发/体验版本受微信成员权限限制，普通客户需使用已发布版本。开发者工具的本地 D1 资料不会随分享自动复制到线上；手机开发版预览使用线上 API，因此电脑本地创建的人员不能直接在手机打开，需要在线上重新创建。
 - 原生转发不需要服务端调用微信生成链接，也不会为每次分享触发微信登录。人员被删除后，原来的分享卡片仍可能留在聊天中，但打开会显示不可查看。
 - 微信 [URL Link](https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/url-link.html) 是可在短信、网页等使用的 HTTPS 链接；[Short Link](https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/shortlink.html) 是微信内使用的 `#小程序://…` 链接。按当前官方文档，这两项生成能力面向非个人主体开放，当前未接入。以后接入应在服务端持有 `access_token`、校验人员归属并生成公开详情路径，不能把 AppSecret 或服务端令牌放到客户端。
 
@@ -97,17 +97,18 @@ iparty/
 
 ## API 环境
 
-在 `miniprogram/config/api.ts` 中配置 API 根地址，客户端根据 `wx.getAccountInfoSync().miniProgram.envVersion` 选择环境：
+在 `miniprogram/config/api.ts` 中配置 API 根地址，客户端根据 `wx.getAccountInfoSync().miniProgram.envVersion` 和 `wx.getDeviceInfo().platform` 选择环境。只有开发版且运行于微信开发者工具时使用 localhost，其余情况使用线上地址：
 
-| 环境      | API 地址                 | 用途             |
-| --------- | ------------------------ | ---------------- |
-| `develop` | `http://localhost:8787`  | 本地开发         |
-| `trial`   | `https://api.ryandev.cn` | 体验版，线上后端 |
-| `release` | `https://api.ryandev.cn` | 正式版，线上后端 |
+| 环境及运行平台         | API 地址                 | 用途                          |
+| ---------------------- | ------------------------ | ----------------------------- |
+| `develop` + `devtools` | `http://localhost:8787`  | 电脑开发者工具，本地后端      |
+| `develop` + 真机       | `https://api.ryandev.cn` | 手机预览 / 真机调试，线上后端 |
+| `trial`                | `https://api.ryandev.cn` | 体验版，线上后端              |
+| `release`              | `https://api.ryandev.cn` | 正式版，线上后端              |
 
-客户端自动根据微信版本环境选择地址，无需在发布前手动切换。体验版和正式版目前共用线上后端及其数据，并非独立的预发布环境。
+客户端自动选择地址，无需在扫码预览或发布前手动切换。真机开发版、体验版和正式版目前共用线上后端及其数据，并非独立的预发布环境；真机预览中的创建、编辑和预约操作会写入线上数据库。
 
-- 开发版真机预览同样属于 `develop`，不会自动切到线上。手机上的 localhost 指手机本身，不能访问电脑的后端。局域网联调需将开发地址改为电脑的局域网 IP，并显式让 Wrangler 监听局域网：`pnpm --filter @one/worker-api dev --ip 0.0.0.0`。仅在可信网络使用，并检查防火墙和开发工具的调试限制。如需开发版访问线上，可临时将 `develop` 地址改为 `https://api.ryandev.cn`，注意避免误操作线上数据。
+- 手机上的 localhost 指手机本身，不能访问电脑的后端，因此真机开发版按运行平台自动选择线上 API。线上后端与 D1 必须已部署并具备当前接口和表结构；本地数据重置不会影响线上账号、登录会话或店铺。不要通过网络失败自动切换 API，以免混用本地和线上数据。
 - 在微信公众平台的服务器域名配置中，将 `https://api.ryandev.cn` 添加为 **request 合法域名**；域名须满足微信平台的备案、证书等要求。本地关闭域名校验不代表线上已配置完成。
 - AppID 不是密钥，可以填写在项目配置中；AppSecret、数据库凭据和其他服务端密钥绝不能放进小程序代码。
 - Token 按 API 地址隔离保存在本地，通过 `Authorization: Bearer ...` 发送；D1 仅保存 Token 哈希。登录响应不返回 OpenID 或账号手机号，公开页只展示商家主动填写的店铺联系电话。
