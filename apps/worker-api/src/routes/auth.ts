@@ -40,7 +40,7 @@ export const authRoutes = new Hono<AppEnv>()
       throw new HTTPException(429, { message: "登录请求过于频繁，请稍后再试" });
     }
     const identity = await verifyWechatLogin(c.env, parsed.data.loginCode);
-    // Opening the app may restore an existing account, but must not register visitors.
+    // Explicit entry actions may restore an existing account without registering visitors.
     const [user] = parsed.data.existingOnly
       ? await db
           .select({ id: users.id, status: users.status, role: users.role })

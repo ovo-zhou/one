@@ -70,7 +70,4 @@ Page({
       url: `/pages/admin/shop/index?id=${encodeURIComponent(String(event.currentTarget.dataset.id))}`,
     });
   },
-  customerCenter() {
-    wx.navigateTo({ url: "/pages/manage/index" });
-  },
 });

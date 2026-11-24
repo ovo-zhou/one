@@ -2,9 +2,28 @@ import { getApiBaseUrl } from "../config/api";
 import { isRole, type Account, type Role } from "../models/account";
 
 type Session = { token: string; expiresAt: number; user: Account };
+export type SessionState = "missing" | "expired" | "incomplete" | "valid";
 
 function storageKey(): string {
   return `iparty:session:${getApiBaseUrl()}`;
+}
+
+// Expired credentials are only a UI hint, never authentication or authorization.
+export function getSessionState(): SessionState {
+  const value: unknown = wx.getStorageSync(storageKey());
+  if (typeof value !== "object" || value === null) return "missing";
+  const session = value as Partial<Session>;
+  if (
+    typeof session.token !== "string" ||
+    !session.token ||
+    typeof session.expiresAt !== "number" ||
+    !Number.isFinite(session.expiresAt)
+  )
+    return "missing";
+  if (session.expiresAt <= Date.now()) return "expired";
+  return typeof session.user?.id === "string" && session.user.id && isRole(session.user.role)
+    ? "valid"
+    : "incomplete";
 }
 
 export function getToken(): string {

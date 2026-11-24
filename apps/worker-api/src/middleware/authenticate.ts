@@ -29,7 +29,8 @@ export const authenticate = createMiddleware<AppEnv>(async (c, next) => {
 });
 
 export const requireMerchant = createMiddleware<AppEnv>(async (c, next) => {
-  if (c.get("role") !== "merchant") throw new HTTPException(403, { message: "仅商家可访问" });
+  if (c.get("role") !== "merchant" && c.get("role") !== "super_admin")
+    throw new HTTPException(403, { message: "仅商家或超级管理员可访问" });
   await next();
 });
 

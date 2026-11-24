@@ -61,6 +61,8 @@ export const merchantRoutes = new Hono<AppEnv>()
       .from(shops)
       .where(eq(shops.ownerId, c.get("userId")))
       .limit(1);
+    if (!shop && c.get("role") === "super_admin")
+      throw new HTTPException(409, { message: "当前管理员账号未关联店铺，请联系管理员核查" });
     if (!shop) return c.json({ profile: null });
     const people = await db
       .select(staffFields)
@@ -93,7 +95,7 @@ export const merchantRoutes = new Hono<AppEnv>()
       .set({ ...parsed.data, updatedAt })
       .where(eq(shops.ownerId, c.get("userId")))
       .returning({ id: shops.id });
-    if (!shop) throw new HTTPException(404, { message: "店铺尚未创建，请先完成创建流程" });
+    if (!shop) throw new HTTPException(404, { message: "店铺不存在，请联系管理员核查" });
     return c.json({ updatedAt });
   })
   .put("/staff", requireMerchant, async (c) => {
@@ -106,7 +108,7 @@ export const merchantRoutes = new Hono<AppEnv>()
       .from(shops)
       .where(eq(shops.ownerId, ownerId))
       .limit(1);
-    if (!shop) throw new HTTPException(404, { message: "店铺尚未创建，请先完成创建流程" });
+    if (!shop) throw new HTTPException(404, { message: "店铺不存在，请联系管理员核查" });
     const { id: clientId, ...person } = parsed.data;
     const id = await sha256(`${ownerId}:${clientId}`);
     const updatedAt = Date.now();
@@ -173,7 +175,9 @@ export const merchantRoutes = new Hono<AppEnv>()
   })
   .put("/profile", async (c) => {
     if (c.get("role") !== "customer" && c.get("role") !== "merchant")
-      throw new HTTPException(403, { message: "超级管理员请使用平台管理，不通过此入口创建店铺" });
+      throw new HTTPException(403, {
+        message: "超级管理员请通过店铺管理编辑已有店铺，不能创建店铺",
+      });
     const parsed = profileSchema.safeParse(await c.req.json().catch(() => null));
     if (!parsed.success)
       throw new HTTPException(400, { message: "请完善店铺和人员资料，最多支持 50 位人员" });

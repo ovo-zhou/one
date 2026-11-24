@@ -1,60 +1,60 @@
-import { getCurrentAccount } from "../../api/account";
-import { ensureWechatLogin } from "../../api/auth";
-import { getRole, getToken } from "../../utils/session";
+import { accountPermissions, centerFeaturesFor } from "../../models/account";
+import { getRole, getSessionState } from "../../utils/session";
+import { restoreEntrySession } from "../../utils/entry-session";
 import { errorMessage } from "../../utils/booking-view";
 
 Page({
-  data: { role: "", loading: false, error: "" },
+  data: {
+    features: centerFeaturesFor(),
+    canCreateShop: false,
+    needsLogin: true,
+    loading: false,
+    error: "",
+  },
   onShow() {
     wx.hideShareMenu();
-    const role = getRole() ?? "";
-    this.setData({ role });
-    if (getToken() && !getRole()) void this.loadRole();
+    this.readAccount();
   },
-  async loadRole() {
+  readAccount() {
+    const role = getSessionState() === "valid" ? getRole() : undefined;
+    this.setData({
+      features: centerFeaturesFor(role),
+      canCreateShop: accountPermissions(role).canCreateShop,
+      needsLogin: !role,
+    });
+  },
+  async enterCenter() {
     if (this.data.loading) return;
     this.setData({ loading: true, error: "" });
     try {
-      const account = await getCurrentAccount();
-      this.setData({ role: account.role });
-    } catch (error) {
-      this.setData({ role: "", error: errorMessage(error) });
-    } finally {
-      this.setData({ loading: false });
-    }
-  },
-  editShop() {
-    wx.navigateTo({ url: "/pages/onboarding/shop/index?mode=edit" });
-  },
-  createShop() {
-    wx.navigateTo({ url: "/pages/onboarding/shop/index" });
-  },
-  openStaff() {
-    wx.navigateTo({ url: "/pages/manage/staff/index" });
-  },
-  openAppointments() {
-    wx.navigateTo({ url: "/pages/manage/appointments/index" });
-  },
-  async openMyBookings() {
-    if (this.data.loading) return;
-    this.setData({ loading: true, error: "" });
-    try {
-      await ensureWechatLogin();
-      this.setData({ role: getRole() ?? "" });
-      await new Promise<void>((resolve, reject) => {
-        wx.navigateTo({
-          url: "/pages/customer/bookings/index",
-          success: () => resolve(),
-          fail: () => reject(new Error("进入我的预约失败，请重试")),
-        });
-      });
+      if (!(await restoreEntrySession()))
+        throw new Error("账号不存在，请返回首页创建店铺，或从公开名片提交预约。");
+      this.readAccount();
     } catch (error) {
       this.setData({ error: errorMessage(error) });
     } finally {
       this.setData({ loading: false });
     }
   },
-  openAdmin() {
-    wx.reLaunch({ url: "/pages/admin/index" });
+  openFeature(event: WechatMiniprogram.TouchEvent) {
+    const role = getSessionState() === "valid" ? getRole() : undefined;
+    const feature = centerFeaturesFor(role).find(
+      (item) => item.id === event.currentTarget.dataset.id,
+    );
+    if (!feature) {
+      this.readAccount();
+      return;
+    }
+    wx.navigateTo({ url: feature.url });
+  },
+  createShop() {
+    if (getSessionState() !== "valid" || !accountPermissions(getRole()).canCreateShop) {
+      this.readAccount();
+      return;
+    }
+    wx.navigateTo({ url: "/pages/onboarding/shop/index" });
+  },
+  home() {
+    wx.reLaunch({ url: "/pages/index/index?intro=1" });
   },
 });

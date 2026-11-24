@@ -4,7 +4,7 @@ import { request, RequestError, type RequestOptions } from "./request";
 
 async function restoreExistingAccount(): Promise<void> {
   if (!(await restoreWechatLogin()))
-    throw new Error("账号不存在，请进入「我的中心」点击「我的预约」登录后重试");
+    throw new Error("账号不存在，请返回首页创建店铺，或从公开名片提交预约。");
 }
 
 export async function authenticatedRequest<

@@ -1,24 +1,12 @@
 <view class="page management">
-  <view wx:if="{{role === 'merchant'}}" class="card management-card" bindtap="editShop" role="button" aria-label="店铺管理">
-    <view class="card-content"><text class="card-title">店铺管理</text><text class="card-description">编辑店铺介绍、地址与联系方式</text></view>
+  <view wx:for="{{features}}" wx:key="id" class="card management-card" data-id="{{item.id}}" bindtap="openFeature" role="button" aria-label="{{item.title}}">
+    <view class="card-content"><text class="card-title">{{item.title}}</text><text class="card-description">{{item.description}}</text></view>
     <text class="card-arrow">→</text>
   </view>
-  <view wx:if="{{role === 'merchant'}}" class="card management-card" bindtap="openStaff" role="button" aria-label="服务人员管理">
-    <view class="card-content"><text class="card-title">服务人员管理</text><text class="card-description">添加、编辑和预览服务人员资料</text></view>
-    <text class="card-arrow">→</text>
+  <button wx:if="{{canCreateShop}}" class="text-button" bindtap="createShop">创建我的店铺</button>
+  <view wx:if="{{needsLogin}}">
+    <button class="text-button" bindtap="enterCenter" disabled="{{loading}}">{{loading ? '正在进入…' : '进入我的中心'}}</button>
+    <button class="text-button" bindtap="home" disabled="{{loading}}">返回首页</button>
   </view>
-  <view wx:if="{{role === 'merchant'}}" class="card management-card" bindtap="openAppointments" role="button" aria-label="预约管理">
-    <view class="card-content"><text class="card-title">预约管理</text><text class="card-description">查看、确认和处理客户预约</text></view>
-    <text class="card-arrow">→</text>
-  </view>
-  <view class="card management-card" bindtap="openMyBookings" role="button" aria-label="我的预约">
-    <view class="card-content"><text class="card-title">我的预约</text><text class="card-description">查看我向其他店铺提交的预约</text></view>
-    <text class="card-arrow">→</text>
-  </view>
-  <button wx:if="{{role === 'customer'}}" class="text-button" bindtap="createShop">创建我的店铺</button>
   <view wx:if="{{error}}" class="local-notice">{{error}}</view>
-  <view>
-    <text wx:if="{{loading}}" class="hint">正在确认账号身份…</text>
-    <button wx:if="{{role === 'super_admin'}}" class="text-button" bindtap="openAdmin">进入平台管理</button>
-  </view>
 </view>

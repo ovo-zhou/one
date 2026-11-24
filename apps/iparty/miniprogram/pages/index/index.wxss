@@ -188,35 +188,13 @@
   margin-top: 30rpx;
   font-size: 20rpx;
 }
-.entry-loading {
-  display: flex;
-  min-height: 100vh;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 24rpx;
+.hero-link-busy {
+  opacity: 0.65;
 }
-.entry-spinner {
-  width: 36rpx;
-  height: 36rpx;
-  border: 3rpx solid #e2e6d5;
-  border-top-color: #65805a;
-  border-radius: 50%;
-  animation: entry-spin 0.8s linear infinite;
-}
-.entry-loading-text {
-  color: #8b927f;
+.entry-error {
+  display: block;
+  margin-top: 24rpx;
+  color: #a34e3c;
   font-size: 24rpx;
-  line-height: 1.6;
-}
-@keyframes entry-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-.entry-state {
-  padding-top: 180rpx;
+  line-height: 1.8;
 }

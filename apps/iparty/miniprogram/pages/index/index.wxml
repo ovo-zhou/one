@@ -1,17 +1,7 @@
-<view wx:if="{{checking && !entryError}}" class="page entry-loading" role="status" aria-label="加载中">
-  <view class="entry-spinner" aria-hidden="true"></view>
-  <text class="entry-loading-text">加载中</text>
-</view>
-<view wx:elif="{{entryError}}" class="page entry-state">
-  <text class="eyebrow">iparty</text>
-  <text class="page-title">暂时无法进入</text>
-  <text class="subtitle">{{entryError}}</text>
-  <button class="primary" bindtap="resolveEntry">重新进入</button>
-</view>
-<view wx:else class="page home">
+<view class="page home">
   <view class="brand-row">
     <text class="brand">iparty<text class="brand-dot">.</text></text>
-    <button wx:if="{{registered}}" class="text-button nav-link" bindtap="openManage">我的中心 ↗</button>
+    <button wx:if="{{returning}}" class="text-button nav-link" bindtap="start" disabled="{{entering}}">我的中心 ↗</button>
   </view>
 
   <view class="hero">
@@ -19,8 +9,9 @@
     <text class="hero-services">店铺展示 · 人员名片 · 预约管理</text>
     <text class="hero-description">把店铺与服务人员的介绍，变成一张能在微信里分享的名片。让客户了解服务，也让每一份预约意向有处可寻。</text>
     <view class="hero-actions">
-      <view class="hero-link" bindtap="start" role="button" aria-label="{{registered ? '进入我的中心' : hasDraft ? '继续创建我的店铺' : '创建我的店铺'}}" hover-class="hero-link-hover"><text>{{registered ? '进入我的中心' : hasDraft ? '继续创建我的店铺' : '创建我的店铺'}}</text><text class="link-arrow">↗</text></view>
+      <view class="hero-link {{entering ? 'hero-link-busy' : ''}}" bindtap="start" role="button" aria-disabled="{{entering}}" aria-label="{{entering ? '正在进入' : returning ? '进入我的中心' : hasDraft ? '继续创建我的店铺' : '创建我的店铺'}}" hover-class="hero-link-hover"><text>{{entering ? '正在进入…' : returning ? '进入我的中心' : hasDraft ? '继续创建我的店铺' : '创建我的店铺'}}</text><text class="link-arrow">↗</text></view>
     </view>
+    <text wx:if="{{entryError}}" class="entry-error">{{entryError}}</text>
     <view class="hero-summary">
       <view><text class="summary-title">展示</text><text class="summary-caption">介绍店铺与人员</text></view>
       <view><text class="summary-title">分享</text><text class="summary-caption">微信好友与群聊</text></view>
@@ -28,7 +19,7 @@
     </view>
   </view>
 
-  <view class="workflow-section">
+  <view wx:if="{{!returning}}" class="workflow-section">
     <text class="eyebrow">从这里开始</text>
     <text class="section-heading">介绍准备好，<text class="heading-line">就可以出发。</text></text>
     <view class="steps">
