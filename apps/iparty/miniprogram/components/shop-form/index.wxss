@@ -5,3 +5,38 @@ input,
 textarea {
   box-sizing: border-box;
 }
+.location-picker {
+  position: relative;
+}
+.location-input {
+  background: #f0f0e9;
+  color: #737c68;
+  pointer-events: none;
+}
+.location-trigger,
+.location-trigger[disabled] {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border-radius: 16rpx;
+  background: transparent;
+}
+.privacy-notice {
+  margin-top: 20rpx;
+  padding: 24rpx;
+  border-radius: 12rpx;
+  background: #f0eddf;
+}
+.location-error {
+  display: block;
+  margin-top: 16rpx;
+  color: #a34e3c;
+  font-size: 24rpx;
+  line-height: 1.7;
+}

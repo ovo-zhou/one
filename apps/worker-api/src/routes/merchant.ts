@@ -12,7 +12,11 @@ import { merchantBookingRoutes } from "./bookings";
 const shopSchema = z.object({
   name: z.string().trim().min(1).max(40),
   description: z.string().trim().max(500),
-  address: z.string().trim().min(1).max(120),
+  address: z.string().trim().min(1).max(200),
+  locationName: z.string().trim().min(1).max(100),
+  addressDetail: z.string().trim().max(120),
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180),
   phone: z
     .string()
     .trim()
@@ -34,6 +38,10 @@ const shopFields = {
   name: shops.name,
   description: shops.description,
   address: shops.address,
+  locationName: shops.locationName,
+  addressDetail: shops.addressDetail,
+  latitude: shops.latitude,
+  longitude: shops.longitude,
   phone: shops.phone,
   businessHours: shops.businessHours,
 };

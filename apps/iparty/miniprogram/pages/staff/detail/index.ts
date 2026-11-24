@@ -2,6 +2,7 @@ import { emptyShop, emptyStaff } from "../../../models/draft";
 import { readDraft } from "../../../utils/draft";
 import { getPublicStaff } from "../../../api/merchant";
 import { introShareContent, staffShareContent } from "../../../utils/staff-share";
+import { hasShopLocation, shopAddress } from "../../../utils/shop-location";
 
 Page({
   data: {
@@ -12,6 +13,8 @@ Page({
     available: false,
     loading: false,
     error: "",
+    fullAddress: "",
+    hasLocation: false,
   },
   publicId: "",
   onLoad(query: Record<string, string | undefined>) {
@@ -19,7 +22,15 @@ Page({
     if (query.mode === "local") {
       const draft = readDraft();
       const staff = draft.staff.find((staff) => staff.id === query.id);
-      if (staff) this.setData({ mode: "local", shop: draft.shop, staff, available: true });
+      if (staff)
+        this.setData({
+          mode: "local",
+          shop: draft.shop,
+          staff,
+          available: true,
+          fullAddress: shopAddress(draft.shop),
+          hasLocation: hasShopLocation(draft.shop),
+        });
       return;
     }
     if (!query.mode && query.id) {
@@ -48,7 +59,16 @@ Page({
     this.setData({ loading: true });
     try {
       const profile = await getPublicStaff(id);
-      this.setData({ ...profile, mode: "public", available: true }, () => this.updateShareMenu());
+      this.setData(
+        {
+          ...profile,
+          mode: "public",
+          available: true,
+          fullAddress: shopAddress(profile.shop),
+          hasLocation: hasShopLocation(profile.shop),
+        },
+        () => this.updateShareMenu(),
+      );
     } catch (error) {
       this.setData({ error: error instanceof Error ? error.message : "名片加载失败" });
     } finally {
@@ -67,6 +87,20 @@ Page({
   book() {
     if (this.previewBlocked()) return;
     wx.navigateTo({ url: `/pages/customer/booking/index?id=${encodeURIComponent(this.publicId)}` });
+  },
+  openLocation() {
+    const shop = this.data.shop;
+    if (!this.data.available || !hasShopLocation(shop)) return;
+    wx.openLocation({
+      latitude: shop.latitude!,
+      longitude: shop.longitude!,
+      name: shop.locationName || shop.name,
+      address: shopAddress(shop),
+      fail: (error) => {
+        if (!/cancel/i.test(error.errMsg))
+          wx.showToast({ title: "地图暂时无法打开，请重试", icon: "none" });
+      },
+    });
   },
   contact() {
     if (this.previewBlocked()) return;

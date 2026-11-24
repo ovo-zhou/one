@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "6fc049eb-5f53-46fd-828d-c33f8227d083",
+  "id": "f19ba734-6da5-4b0b-ab42-b4633ef92e80",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "admin_audit_logs": {
@@ -67,7 +67,11 @@
       "indexes": {
         "admin_audit_shop_created_idx": {
           "name": "admin_audit_shop_created_idx",
-          "columns": ["shop_id", "created_at", "id"],
+          "columns": [
+            "shop_id",
+            "created_at",
+            "id"
+          ],
           "isUnique": false
         }
       },
@@ -76,8 +80,12 @@
           "name": "admin_audit_logs_actor_id_users_id_fk",
           "tableFrom": "admin_audit_logs",
           "tableTo": "users",
-          "columnsFrom": ["actor_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "actor_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -85,8 +93,12 @@
           "name": "admin_audit_logs_shop_id_shops_id_fk",
           "tableFrom": "admin_audit_logs",
           "tableTo": "shops",
-          "columnsFrom": ["shop_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "shop_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -260,17 +272,28 @@
       "indexes": {
         "bookings_customer_request_unique": {
           "name": "bookings_customer_request_unique",
-          "columns": ["customer_id", "request_key"],
+          "columns": [
+            "customer_id",
+            "request_key"
+          ],
           "isUnique": true
         },
         "bookings_customer_created_idx": {
           "name": "bookings_customer_created_idx",
-          "columns": ["customer_id", "created_at", "id"],
+          "columns": [
+            "customer_id",
+            "created_at",
+            "id"
+          ],
           "isUnique": false
         },
         "bookings_shop_created_idx": {
           "name": "bookings_shop_created_idx",
-          "columns": ["shop_id", "created_at", "id"],
+          "columns": [
+            "shop_id",
+            "created_at",
+            "id"
+          ],
           "isUnique": false
         }
       },
@@ -279,8 +302,12 @@
           "name": "bookings_customer_id_users_id_fk",
           "tableFrom": "bookings",
           "tableTo": "users",
-          "columnsFrom": ["customer_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "customer_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -288,8 +315,12 @@
           "name": "bookings_shop_id_shops_id_fk",
           "tableFrom": "bookings",
           "tableTo": "shops",
-          "columnsFrom": ["shop_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "shop_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -336,8 +367,12 @@
           "name": "sessions_user_id_users_id_fk",
           "tableFrom": "sessions",
           "tableTo": "users",
-          "columnsFrom": ["user_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -380,6 +415,35 @@
         "address": {
           "name": "address",
           "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "location_name": {
+          "name": "location_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "address_detail": {
+          "name": "address_detail",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "''"
+        },
+        "latitude": {
+          "name": "latitude",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "longitude": {
+          "name": "longitude",
+          "type": "real",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -433,17 +497,26 @@
       "indexes": {
         "shops_owner_id_unique": {
           "name": "shops_owner_id_unique",
-          "columns": ["owner_id"],
+          "columns": [
+            "owner_id"
+          ],
           "isUnique": true
         },
         "shops_updated_idx": {
           "name": "shops_updated_idx",
-          "columns": ["updated_at", "id"],
+          "columns": [
+            "updated_at",
+            "id"
+          ],
           "isUnique": false
         },
         "shops_status_updated_idx": {
           "name": "shops_status_updated_idx",
-          "columns": ["status", "updated_at", "id"],
+          "columns": [
+            "status",
+            "updated_at",
+            "id"
+          ],
           "isUnique": false
         }
       },
@@ -452,8 +525,12 @@
           "name": "shops_owner_id_users_id_fk",
           "tableFrom": "shops",
           "tableTo": "users",
-          "columnsFrom": ["owner_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "owner_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -525,7 +602,10 @@
       "indexes": {
         "staff_shop_client_unique": {
           "name": "staff_shop_client_unique",
-          "columns": ["shop_id", "client_id"],
+          "columns": [
+            "shop_id",
+            "client_id"
+          ],
           "isUnique": true
         }
       },
@@ -534,8 +614,12 @@
           "name": "staff_shop_id_shops_id_fk",
           "tableFrom": "staff",
           "tableTo": "shops",
-          "columnsFrom": ["shop_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "shop_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -609,7 +693,10 @@
       "indexes": {
         "users_app_openid_unique": {
           "name": "users_app_openid_unique",
-          "columns": ["app_id", "openid"],
+          "columns": [
+            "app_id",
+            "openid"
+          ],
           "isUnique": true
         }
       },

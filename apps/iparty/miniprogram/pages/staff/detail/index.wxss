@@ -112,6 +112,12 @@
   line-height: 1.8;
   text-align: center;
 }
+.location-link {
+  margin: 12rpx 0 0;
+  padding: 8rpx 0;
+  text-align: left;
+  font-size: 24rpx;
+}
 .bottom-bar {
   position: fixed;
   right: 0;

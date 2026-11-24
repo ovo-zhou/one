@@ -79,7 +79,7 @@ export const customerRoutes = new Hono<AppEnv>()
       insert into bookings (id, customer_id, shop_id, staff_public_id, shop_name, shop_address,
         shop_phone, staff_name, staff_title, contact_name, contact_phone, requested_at, note,
         status, request_key, payload_hash, created_at, updated_at)
-      select ${id}, ${customerId}, s.id, p.id, s.name, s.address, s.phone, p.name, p.title,
+      select ${id}, ${customerId}, s.id, p.id, s.name, trim(s.address || ' ' || s.address_detail), s.phone, p.name, p.title,
         ${payload.contactName}, ${payload.contactPhone}, ${payload.requestedAt}, ${payload.note},
         'pending', ${requestKey}, ${payloadHash}, ${now}, ${now}
       from staff p join shops s on p.shop_id = s.id join users u on s.owner_id = u.id

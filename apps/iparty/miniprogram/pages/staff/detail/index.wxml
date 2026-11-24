@@ -6,7 +6,7 @@
     <text class="person-title">{{staff.name || '未命名人员'}}</text><text class="role">{{staff.title || '待完善岗位'}}</text>
     <view class="skills">{{staff.skills || '待完善擅长项目'}}</view>
     <view class="section"><text class="section-title">详细介绍</text><text class="bio">{{staff.description || '还没有填写个人介绍。'}}</text></view>
-    <view class="section card"><text class="shop-label">所在店铺</text><text class="shop-name">{{shop.name || '待填写店铺名称'}}</text><text class="bio">{{shop.description || '还没有填写店铺介绍。'}}</text><view class="shop-meta"><text>服务地址 / 区域</text><text>{{shop.address || '待填写'}}</text></view><view class="shop-meta"><text>营业时间</text><text>{{shop.businessHours || '请联系商家确认'}}</text></view></view>
+    <view class="section card"><text class="shop-label">所在店铺</text><text class="shop-name">{{shop.name || '待填写店铺名称'}}</text><text class="bio">{{shop.description || '还没有填写店铺介绍。'}}</text><view class="shop-meta"><text>门店位置</text><text wx:if="{{shop.locationName}}">{{shop.locationName}}</text><text>{{fullAddress || '待填写'}}</text><button wx:if="{{hasLocation}}" class="text-button location-link" bindtap="openLocation">查看位置 ↗</button></view><view class="shop-meta"><text>营业时间</text><text>{{shop.businessHours || '请联系商家确认'}}</text></view></view>
     <text class="disclaimer">{{mode === 'public' ? '店铺及人员资料由商家提供，服务详情请与商家确认。' : '此页面读取本机草稿，仅供检查排版，其他用户无法通过本地 ID 访问。'}}</text>
     <button class="text-button" bindtap="home">由 iparty 提供展示支持 ↗</button>
   </view>

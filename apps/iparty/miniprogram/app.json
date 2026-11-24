@@ -21,6 +21,12 @@
     "backgroundColor": "#f7f7ef",
     "backgroundTextStyle": "dark"
   },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "用于在地图上选择门店位置，展示门店地址并提供到店指引"
+    }
+  },
+  "requiredPrivateInfos": ["chooseLocation"],
   "style": "v2",
   "lazyCodeLoading": "requiredComponents",
   "sitemapLocation": "sitemap.json"

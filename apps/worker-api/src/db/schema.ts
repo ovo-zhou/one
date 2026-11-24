@@ -1,4 +1,4 @@
-import { index, integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { index, integer, real, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 export const roles = ["customer", "merchant", "super_admin"] as const;
 export type Role = (typeof roles)[number];
@@ -47,6 +47,11 @@ export const shops = sqliteTable(
     name: text("name").notNull(),
     description: text("description").notNull(),
     address: text("address").notNull(),
+    locationName: text("location_name").notNull(),
+    addressDetail: text("address_detail").notNull().default(""),
+    // GCJ-02, matching wx.chooseLocation / wx.openLocation. Required for every published shop.
+    latitude: real("latitude").notNull(),
+    longitude: real("longitude").notNull(),
     phone: text("phone").notNull(),
     businessHours: text("business_hours").notNull(),
     status: text("status", { enum: ["active", "disabled"] })

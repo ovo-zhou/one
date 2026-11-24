@@ -12,6 +12,7 @@ Page({
     saveError: "",
     loading: false,
     loadError: "",
+    choosingLocation: false,
   },
   onLoad(query: Record<string, string | undefined>) {
     const draft = readDraft();
@@ -43,12 +44,13 @@ Page({
       this.setData({ loading: false });
     }
   },
-  onFormChange(event: WechatMiniprogram.CustomEvent<{ field: keyof ShopDraft; value: string }>) {
+  onFormChange(event: WechatMiniprogram.CustomEvent<{ changes: Partial<ShopDraft> }>) {
     if (this.data.saving || this.data.loading || this.data.loadError) return;
-    const { field, value } = event.detail;
-    if (!(field in this.data.form)) return;
-    this.setData({ [`form.${field}`]: value, saveError: "" });
+    this.setData({ form: { ...this.data.form, ...event.detail.changes }, saveError: "" });
     this.persist();
+  },
+  onLocationBusy(event: WechatMiniprogram.CustomEvent<{ busy: boolean }>) {
+    this.setData({ choosingLocation: event.detail.busy });
   },
   persist(): boolean {
     // Management loads the current published shop directly. Failed loads or
@@ -64,7 +66,8 @@ Page({
     this.persist();
   },
   async next() {
-    if (this.data.saving || this.data.loading || this.data.loadError) return;
+    if (this.data.saving || this.data.loading || this.data.loadError || this.data.choosingLocation)
+      return;
     const message = shopValidationMessage(this.data.form);
     if (message) {
       wx.showToast({ title: message, icon: "none" });

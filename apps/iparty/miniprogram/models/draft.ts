@@ -2,6 +2,10 @@ export type ShopDraft = {
   name: string;
   description: string;
   address: string;
+  locationName: string;
+  addressDetail: string;
+  latitude: number | null;
+  longitude: number | null;
   phone: string;
   businessHours: string;
 };
@@ -15,7 +19,7 @@ export type StaffDraft = {
 };
 
 export type OnboardingDraft = {
-  version: 1;
+  version: 2;
   shop: ShopDraft;
   staff: StaffDraft[];
   updatedAt: number;
@@ -26,6 +30,10 @@ export function emptyShop(): ShopDraft {
     name: "",
     description: "",
     address: "",
+    locationName: "",
+    addressDetail: "",
+    latitude: null,
+    longitude: null,
     phone: "",
     businessHours: "",
   };

@@ -13,6 +13,10 @@ export type ShopSummary = {
 export type AdminShop = Omit<ShopSummary, "staffCount"> & {
   ownerId: string;
   description: string;
+  locationName: string;
+  addressDetail: string;
+  latitude: number;
+  longitude: number;
   phone: string;
   businessHours: string;
   statusReason: string;

@@ -1,5 +1,21 @@
 <view class="field"><text class="label">店铺名称 *</text><input class="input" placeholder="填写对外展示的店铺名称" maxlength="40" value="{{form.name}}" disabled="{{disabled}}" data-field="name" bindinput="onInput" /></view>
 <view class="field"><text class="label">店铺介绍</text><textarea class="textarea" placeholder="介绍你的店铺、服务理念或特色" maxlength="500" value="{{form.description}}" disabled="{{disabled}}" data-field="description" bindinput="onInput" /></view>
-<view class="field"><text class="label">门店地址 / 上门服务区域 *</text><input class="input" placeholder="如：杭州市西湖区，支持周边上门服务" maxlength="120" value="{{form.address}}" disabled="{{disabled}}" data-field="address" bindinput="onInput" /></view>
+<view class="field">
+  <text class="label">门店位置 *</text>
+  <view class="location-picker">
+    <input class="input location-input" value="{{hasLocation ? form.locationName : ''}}" placeholder="{{locating ? '正在打开地图…' : '点击选择门店地址'}}" disabled="{{true}}" aria-hidden="{{true}}" />
+    <button class="location-trigger" bindtap="chooseLocation" disabled="{{disabled || locating || showPrivacy}}" aria-label="{{locating ? '正在打开地图' : hasLocation ? form.locationName + '，' + form.address + '，点击重新选择地址' : '点击选择门店地址'}}"></button>
+  </view>
+  <text wx:if="{{hasLocation}}" class="hint">{{form.address}}</text>
+  <text class="hint">{{hasLocation ? '点击输入框可重新选择地址。' : '请在地图上选择实际门店位置，客户可查看位置和到店导航。'}}</text>
+  <view wx:if="{{showPrivacy}}" class="privacy-notice">
+    <text class="hint">地图选址需要处理你选择的位置信息，用于公开展示门店地址和提供到店指引。请先阅读并同意隐私保护指引。</text>
+    <button class="text-button" bindtap="openPrivacyContract">阅读{{privacyContractName || '隐私保护指引'}} ↗</button>
+    <button class="primary" open-type="agreePrivacyAuthorization" bindagreeprivacyauthorization="agreePrivacy" disabled="{{disabled}}">同意并选择位置</button>
+    <button class="text-button" bindtap="cancelPrivacy">暂不选择</button>
+  </view>
+  <text wx:if="{{locationError}}" class="location-error">{{locationError}}</text>
+</view>
+<view class="field"><text class="label">详细地址</text><input class="input" placeholder="例如：A座3楼305室（选填）" maxlength="120" value="{{form.addressDetail}}" disabled="{{disabled || locating}}" data-field="addressDetail" bindinput="onInput" /></view>
 <view class="field"><text class="label">店铺联系电话 *</text><input class="input" placeholder="手机号或固定电话" maxlength="25" value="{{form.phone}}" disabled="{{disabled}}" data-field="phone" bindinput="onInput" /><text class="hint">用于客户联系门店，请填写已获授权的公开联系电话。</text></view>
 <view class="field"><text class="label">营业时间</text><input class="input" placeholder="如：周一至周日 10:00–21:00" maxlength="80" value="{{form.businessHours}}" disabled="{{disabled}}" data-field="businessHours" bindinput="onInput" /></view>
