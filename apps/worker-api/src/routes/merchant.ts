@@ -8,21 +8,33 @@ import { createDb } from "../db";
 import { shops, staff, users } from "../db/schema";
 import { authenticate, requireMerchant } from "../middleware/authenticate";
 import { merchantBookingRoutes } from "./bookings";
+import { businessHoursSchema, readBusinessHours } from "../core/business-hours";
 
-const shopSchema = z.object({
-  name: z.string().trim().min(1).max(40),
-  description: z.string().trim().max(500),
-  address: z.string().trim().min(1).max(200),
-  locationName: z.string().trim().min(1).max(100),
-  addressDetail: z.string().trim().max(120),
-  latitude: z.number().min(-90).max(90),
-  longitude: z.number().min(-180).max(180),
-  phone: z
-    .string()
-    .trim()
-    .regex(/^[0-9+()\-\s]{7,25}$/),
-  businessHours: z.string().trim().max(80),
-});
+const shopSchema = z
+  .object({
+    name: z.string().trim().min(1).max(40),
+    description: z.string().trim().max(500),
+    address: z.string().trim().min(1).max(200),
+    locationName: z.string().trim().min(1).max(100),
+    addressDetail: z.string().trim().max(120),
+    latitude: z.number().min(-90).max(90),
+    longitude: z.number().min(-180).max(180),
+    phone: z
+      .string()
+      .trim()
+      .regex(/^$|^[0-9+()\-\s]{7,25}$/)
+      .default(""),
+    wechat: z.string().trim().max(64).regex(/^\S*$/).default(""),
+    qq: z
+      .string()
+      .trim()
+      .regex(/^$|^[1-9][0-9]{4,11}$/)
+      .default(""),
+    businessHours: businessHoursSchema,
+  })
+  .refine((shop) => Boolean(shop.wechat || shop.qq || shop.phone), {
+    message: "微信、QQ、电话至少填写一项",
+  });
 const staffSchema = z.object({
   id: z.string().min(1).max(100),
   name: z.string().trim().min(1).max(30),
@@ -43,6 +55,8 @@ const shopFields = {
   latitude: shops.latitude,
   longitude: shops.longitude,
   phone: shops.phone,
+  wechat: shops.wechat,
+  qq: shops.qq,
   businessHours: shops.businessHours,
 };
 const staffFields = {
@@ -83,8 +97,14 @@ export const merchantRoutes = new Hono<AppEnv>()
           name: shop.name,
           description: shop.description,
           address: shop.address,
+          locationName: shop.locationName,
+          addressDetail: shop.addressDetail,
+          latitude: shop.latitude,
+          longitude: shop.longitude,
           phone: shop.phone,
-          businessHours: shop.businessHours,
+          wechat: shop.wechat,
+          qq: shop.qq,
+          ...readBusinessHours(shop.businessHours),
         },
         staff: people,
         updatedAt: shop.updatedAt,
@@ -95,12 +115,15 @@ export const merchantRoutes = new Hono<AppEnv>()
   })
   .put("/shop", requireMerchant, async (c) => {
     const parsed = shopSchema.safeParse(await c.req.json().catch(() => null));
-    if (!parsed.success) throw new HTTPException(400, { message: "请检查店铺必填信息及字段长度" });
+    if (!parsed.success)
+      throw new HTTPException(400, {
+        message: "请检查店铺信息、联系方式及营业时间，星期不能重复且结束时间须晚于开始时间",
+      });
     const updatedAt = Date.now();
     // Shop editing must not publish or replace unrelated local staff drafts.
     const [shop] = await createDb(c.env.DB)
       .update(shops)
-      .set({ ...parsed.data, updatedAt })
+      .set({ ...parsed.data, businessHours: JSON.stringify(parsed.data.businessHours), updatedAt })
       .where(eq(shops.ownerId, c.get("userId")))
       .returning({ id: shops.id });
     if (!shop) throw new HTTPException(404, { message: "店铺不存在，请联系管理员核查" });
@@ -188,11 +211,14 @@ export const merchantRoutes = new Hono<AppEnv>()
       });
     const parsed = profileSchema.safeParse(await c.req.json().catch(() => null));
     if (!parsed.success)
-      throw new HTTPException(400, { message: "请完善店铺和人员资料，最多支持 50 位人员" });
+      throw new HTTPException(400, {
+        message: "请完善店铺和人员资料，联系方式至少填写一项，最多支持 50 位人员",
+      });
     const db = createDb(c.env.DB);
     const ownerId = c.get("userId");
     const shopId = `shop-${ownerId}`;
-    const { shop, staff: people } = parsed.data;
+    const { shop: inputShop, staff: people } = parsed.data;
+    const shop = { ...inputShop, businessHours: JSON.stringify(inputShop.businessHours) };
     const updatedAt = Date.now();
     // Stable, unguessable public IDs; clients cannot choose another merchant's identifiers.
     const records = await Promise.all(
@@ -245,5 +271,8 @@ export const publicRoutes = new Hono<AppEnv>().get("/staff/:id", async (c) => {
     .limit(1);
   if (!profile) throw new HTTPException(404, { message: "名片不存在或暂不可查看" });
   c.header("Cache-Control", "no-store");
-  return c.json(profile);
+  return c.json({
+    ...profile,
+    shop: { ...profile.shop, ...readBusinessHours(profile.shop.businessHours) },
+  });
 });

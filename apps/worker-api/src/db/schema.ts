@@ -53,6 +53,9 @@ export const shops = sqliteTable(
     latitude: real("latitude").notNull(),
     longitude: real("longitude").notNull(),
     phone: text("phone").notNull(),
+    wechat: text("wechat").notNull().default(""),
+    qq: text("qq").notNull().default(""),
+    // Validated weekday/time groups as JSON; legacy free text is decoded on reads.
     businessHours: text("business_hours").notNull(),
     status: text("status", { enum: ["active", "disabled"] })
       .notNull()
@@ -105,6 +108,8 @@ export const bookings = sqliteTable(
     shopName: text("shop_name").notNull(),
     shopAddress: text("shop_address").notNull(),
     shopPhone: text("shop_phone").notNull(),
+    shopWechat: text("shop_wechat").notNull().default(""),
+    shopQq: text("shop_qq").notNull().default(""),
     staffName: text("staff_name").notNull(),
     staffTitle: text("staff_title").notNull(),
     contactName: text("contact_name").notNull(),

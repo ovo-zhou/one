@@ -1,3 +1,5 @@
+import type { BusinessHours } from "../utils/business-hours";
+
 export type ShopDraft = {
   name: string;
   description: string;
@@ -7,7 +9,10 @@ export type ShopDraft = {
   latitude: number | null;
   longitude: number | null;
   phone: string;
-  businessHours: string;
+  wechat: string;
+  qq: string;
+  businessHours: BusinessHours;
+  legacyBusinessHours?: string;
 };
 
 export type StaffDraft = {
@@ -35,7 +40,9 @@ export function emptyShop(): ShopDraft {
     latitude: null,
     longitude: null,
     phone: "",
-    businessHours: "",
+    wechat: "",
+    qq: "",
+    businessHours: [],
   };
 }
 

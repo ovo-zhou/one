@@ -1,5 +1,6 @@
 import { authenticatedRequest } from "../utils/authenticated-request";
 import { cursorQuery, type Cursor, type ListResult } from "./bookings";
+import type { BusinessHours } from "../utils/business-hours";
 
 export type ShopSummary = {
   id: string;
@@ -18,7 +19,10 @@ export type AdminShop = Omit<ShopSummary, "staffCount"> & {
   latitude: number;
   longitude: number;
   phone: string;
-  businessHours: string;
+  wechat: string;
+  qq: string;
+  businessHours: BusinessHours;
+  legacyBusinessHours?: string;
   statusReason: string;
   moderationVersion: number;
 };

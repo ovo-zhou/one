@@ -3,6 +3,8 @@ import { readDraft } from "../../../utils/draft";
 import { getPublicStaff } from "../../../api/merchant";
 import { introShareContent, staffShareContent } from "../../../utils/staff-share";
 import { hasShopLocation, shopAddress } from "../../../utils/shop-location";
+import { contactShop, shopContacts } from "../../../utils/shop-contact";
+import { businessHoursRows } from "../../../utils/business-hours";
 
 Page({
   data: {
@@ -15,6 +17,9 @@ Page({
     error: "",
     fullAddress: "",
     hasLocation: false,
+    contacts: shopContacts(emptyShop()),
+    hoursRows: businessHoursRows([]),
+    hasRestDays: false,
   },
   publicId: "",
   onLoad(query: Record<string, string | undefined>) {
@@ -30,6 +35,10 @@ Page({
           available: true,
           fullAddress: shopAddress(draft.shop),
           hasLocation: hasShopLocation(draft.shop),
+          contacts: shopContacts(draft.shop),
+          hoursRows: businessHoursRows(draft.shop.businessHours),
+          hasRestDays:
+            draft.shop.businessHours.reduce((count, group) => count + group.days.length, 0) < 7,
         });
       return;
     }
@@ -66,6 +75,10 @@ Page({
           available: true,
           fullAddress: shopAddress(profile.shop),
           hasLocation: hasShopLocation(profile.shop),
+          contacts: shopContacts(profile.shop),
+          hoursRows: businessHoursRows(profile.shop.businessHours),
+          hasRestDays:
+            profile.shop.businessHours.reduce((count, group) => count + group.days.length, 0) < 7,
         },
         () => this.updateShareMenu(),
       );
@@ -102,17 +115,9 @@ Page({
       },
     });
   },
-  contact() {
+  contact(event: WechatMiniprogram.TouchEvent) {
     if (this.previewBlocked()) return;
-    if (this.data.shop.phone) {
-      wx.makePhoneCall({ phoneNumber: this.data.shop.phone });
-      return;
-    }
-    wx.showModal({
-      title: "暂时无法联系",
-      content: "商家暂未提供联系电话。",
-      showCancel: false,
-    });
+    contactShop(this.data.shop, event.currentTarget.dataset.channel);
   },
   home() {
     wx.reLaunch({ url: "/pages/index/index?intro=1" });

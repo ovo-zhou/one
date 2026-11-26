@@ -139,6 +139,10 @@ The old development migration chain was replaced during an explicitly authorized
 
 ### Rebuild local development data
 
+Business hours are now an array of `{ days: number[], start: "HH:mm", end: "HH:mm" }`, where weekdays are 1 (Monday) through 7 (Sunday). Both shop writes validate at most 7 groups, at least one day per group, no repeated weekday within or across groups, and strictly increasing same-day times. An empty array means unspecified, not closed all week. The existing `shops.business_hours` TEXT column stores validated JSON for new writes; no schema migration or database reset is needed for this change. Merchant/public/admin reads decode it into an array. Old free text remains in storage and is returned separately as `legacyBusinessHours` with an empty array, so it can still be displayed and the merchant must reselect or explicitly clear it before saving in the new client. Deploy the matching client and API together; old string writes are rejected. Business hours remain presentation-only and do not restrict bookings.
+
+Shop contacts use `phone`, `wechat` and `qq`. Publication and independent shop edits trim all three fields, require at least one non-empty contact, and validate every supplied value (WeChat: up to 64 non-whitespace characters; QQ: 5–12 digits without a leading zero; phone: the existing 7–25 character phone format). Merchant profiles, public staff cards and admin shop details return all three. `0001_shop_contacts.sql` adds empty-default WeChat/QQ fields to shops and booking snapshots without changing existing phone data. New bookings snapshot all three contact channels; historical bookings are not backfilled. Customer booking contact phone remains required. Apply this additive migration locally with `db:migrate:local`; cloud application still requires separate target/history review and authorization. Merchant profile responses also return all location fields so independent shop edits preserve the selected map location.
+
 For an explicitly approved local reset:
 
 1. Stop the local Worker so it cannot write to D1 during the reset.

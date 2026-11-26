@@ -5,6 +5,7 @@ import {
   type AdminStaff,
 } from "../../../api/admin";
 import { errorMessage } from "../../../utils/booking-view";
+import { businessHoursRows } from "../../../utils/business-hours";
 
 Page({
   data: {
@@ -14,6 +15,7 @@ Page({
     saving: false,
     error: "",
     reason: "",
+    hoursRows: businessHoursRows([]),
   },
   shopId: "",
   onLoad(query: Record<string, string | undefined>) {
@@ -25,7 +27,8 @@ Page({
     if (this.data.loading) return;
     this.setData({ loading: true, error: "" });
     try {
-      this.setData(await getAdminShop(this.shopId));
+      const result = await getAdminShop(this.shopId);
+      this.setData({ ...result, hoursRows: businessHoursRows(result.shop.businessHours) });
     } catch (error) {
       this.setData({ error: errorMessage(error) });
     } finally {

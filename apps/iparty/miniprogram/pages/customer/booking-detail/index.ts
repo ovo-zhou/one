@@ -1,5 +1,6 @@
 import { cancelBooking, getBooking } from "../../../api/bookings";
 import { bookingView, errorMessage } from "../../../utils/booking-view";
+import { contactShop } from "../../../utils/shop-contact";
 
 Page({
   data: {
@@ -49,6 +50,8 @@ Page({
     }
   },
   contact() {
-    if (this.data.booking) wx.makePhoneCall({ phoneNumber: this.data.booking.shopPhone });
+    const booking = this.data.booking;
+    if (booking)
+      contactShop({ wechat: booking.shopWechat, qq: booking.shopQq, phone: booking.shopPhone });
   },
 });

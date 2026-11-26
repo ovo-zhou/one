@@ -1,5 +1,6 @@
 import { emptyShop, type OnboardingDraft, type ShopDraft, type StaffDraft } from "../models/draft";
 import { hasShopLocation } from "./shop-location";
+import { businessHoursMessage, normalizeBusinessHours } from "./business-hours";
 
 const storageKey = "iparty:onboarding:v2";
 
@@ -7,18 +8,18 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
-function isShop(value: unknown): value is ShopDraft {
+function isShop(
+  value: unknown,
+): value is Omit<ShopDraft, "wechat" | "qq" | "businessHours"> &
+  Partial<Pick<ShopDraft, "wechat" | "qq">> & { businessHours: unknown } {
   return (
     isRecord(value) &&
-    [
-      "name",
-      "description",
-      "address",
-      "locationName",
-      "addressDetail",
-      "phone",
-      "businessHours",
-    ].every((key) => typeof value[key] === "string") &&
+    ["name", "description", "address", "locationName", "addressDetail", "phone"].every(
+      (key) => typeof value[key] === "string",
+    ) &&
+    ["wechat", "qq"].every((key) => value[key] === undefined || typeof value[key] === "string") &&
+    (typeof value.businessHours === "string" || !businessHoursMessage(value.businessHours)) &&
+    (value.legacyBusinessHours === undefined || typeof value.legacyBusinessHours === "string") &&
     ((value.latitude === null && value.longitude === null) ||
       (typeof value.latitude === "number" &&
         typeof value.longitude === "number" &&
@@ -46,7 +47,11 @@ export function readDraft(): OnboardingDraft {
   ) {
     return {
       version: 2,
-      shop: value.shop,
+      shop: {
+        ...emptyShop(),
+        ...value.shop,
+        ...normalizeBusinessHours(value.shop.businessHours, value.shop.legacyBusinessHours),
+      },
       staff: value.staff,
       updatedAt: value.updatedAt,
     };
@@ -72,7 +77,16 @@ export function shopValidationMessage(shop: ShopDraft): string {
   if (shop.address.length > 200) return "门店地址最多 200 字";
   if (shop.addressDetail.length > 120) return "详细地址最多 120 字";
   if (shop.locationName.length > 100) return "位置名称最多 100 字";
-  if (!/^[0-9+()\-\s]{7,25}$/.test(shop.phone.trim())) return "请填写有效的店铺联系电话";
+  const wechat = shop.wechat.trim();
+  const qq = shop.qq.trim();
+  const phone = shop.phone.trim();
+  if (!wechat && !qq && !phone) return "微信、QQ、电话至少填写一项";
+  if (wechat && (wechat.length > 64 || /\s/.test(wechat))) return "微信号最多 64 位，不能包含空格";
+  if (qq && !/^[1-9][0-9]{4,11}$/.test(qq)) return "请填写有效的 QQ 号（5–12 位数字）";
+  if (phone && !/^[0-9+()\-\s]{7,25}$/.test(phone)) return "请填写有效的店铺电话（7–25 位）";
+  if (shop.legacyBusinessHours) return "请重新选择营业时间，或清除原文字设置";
+  const hoursMessage = businessHoursMessage(shop.businessHours);
+  if (hoursMessage) return hoursMessage;
   return "";
 }
 

@@ -112,6 +112,37 @@
   line-height: 1.8;
   text-align: center;
 }
+.hours-rest {
+  margin-top: 8rpx;
+  color: #929b83;
+  font-size: 22rpx;
+}
+.contact-row {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  margin-top: 20rpx;
+}
+.contact-info {
+  flex: 1;
+  min-width: 0;
+}
+.contact-label {
+  display: block;
+  margin-bottom: 8rpx;
+  color: #929b83;
+  font-size: 22rpx;
+}
+.contact-value {
+  font-size: 26rpx;
+  word-break: break-all;
+}
+.contact-action {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 12rpx 0 12rpx 20rpx;
+  font-size: 24rpx;
+}
 .location-link {
   margin: 12rpx 0 0;
   padding: 8rpx 0;

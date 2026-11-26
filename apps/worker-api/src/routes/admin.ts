@@ -7,6 +7,7 @@ import { pagination, pageResult } from "../core/pagination";
 import { createDb } from "../db";
 import { adminAuditLogs, shops, staff, users } from "../db/schema";
 import { authenticate, requireSuperAdmin } from "../middleware/authenticate";
+import { readBusinessHours } from "../core/business-hours";
 
 const filters = z.object({
   q: z.string().trim().max(80).default(""),
@@ -68,6 +69,8 @@ export const adminRoutes = new Hono<AppEnv>()
         latitude: shops.latitude,
         longitude: shops.longitude,
         phone: shops.phone,
+        wechat: shops.wechat,
+        qq: shops.qq,
         businessHours: shops.businessHours,
         status: shops.status,
         statusReason: shops.statusReason,
@@ -91,7 +94,7 @@ export const adminRoutes = new Hono<AppEnv>()
       .from(staff)
       .where(eq(staff.shopId, shop.id))
       .orderBy(asc(staff.sortOrder), asc(staff.id));
-    return c.json({ shop, staff: people });
+    return c.json({ shop: { ...shop, ...readBusinessHours(shop.businessHours) }, staff: people });
   })
   .put("/shops/:id/status", async (c) => {
     const parsed = statusChange.safeParse(await c.req.json().catch(() => null));

@@ -6,6 +6,8 @@ export type Booking = {
   shopName: string;
   shopAddress: string;
   shopPhone: string;
+  shopWechat: string;
+  shopQq: string;
   staffName: string;
   staffTitle: string;
   contactName: string;
