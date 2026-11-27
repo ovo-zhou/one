@@ -18,7 +18,7 @@
 }
 .nav-link {
   flex-shrink: 0;
-  padding: 16rpx 0 16rpx 20rpx;
+  padding: 0 0 0 20rpx;
   font-size: 23rpx;
 }
 .hero {
@@ -61,12 +61,12 @@
   align-items: center;
   gap: 36rpx;
   max-width: 100%;
-  padding: 12rpx 0;
+  height: 40px;
   border-bottom: 2rpx solid #526d57;
   color: #244c3c;
   font-size: 30rpx;
   font-weight: 600;
-  line-height: 1.8;
+  line-height: 1.4;
 }
 .link-arrow {
   flex-shrink: 0;

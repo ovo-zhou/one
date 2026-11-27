@@ -1,28 +1,49 @@
-<view class="field"><text class="label">店铺名称 *</text><input class="input" placeholder="填写对外展示的店铺名称" maxlength="40" value="{{form.name}}" disabled="{{disabled}}" data-field="name" bindinput="onInput" /></view>
-<view class="field"><text class="label">店铺介绍</text><textarea class="textarea" placeholder="介绍你的店铺、服务理念或特色" maxlength="500" value="{{form.description}}" disabled="{{disabled}}" data-field="description" bindinput="onInput" /></view>
+<import src="../../templates/form-field.wxml" />
+
 <view class="field">
-  <text class="label">门店位置 *</text>
-  <view class="location-picker">
-    <input class="input location-input" value="{{hasLocation ? form.locationName : ''}}" placeholder="{{locating ? '正在打开地图…' : '点击选择门店地址'}}" disabled="{{true}}" aria-hidden="{{true}}" />
-    <button class="location-trigger" bindtap="chooseLocation" disabled="{{disabled || locating || showPrivacy}}" aria-label="{{locating ? '正在打开地图' : hasLocation ? form.locationName + '，' + form.address + '，点击重新选择地址' : '点击选择门店地址'}}"></button>
+  <template is="field-input" data="{{label: '店铺名称', required: true, placeholder: '填写对外展示的店铺名称', maxlength: 40, value: form.name, disabled: disabled, field: 'name', inputHandler: 'onInput', error: errors.name}}" />
+</view>
+<view class="field">
+  <template is="field-heading" data="{{label: '店铺介绍'}}" />
+  <textarea class="textarea" placeholder="介绍你的店铺、服务理念或特色" maxlength="500" value="{{form.description}}" disabled="{{disabled}}" data-field="description" bindinput="onInput" />
+  <template is="field-error" data="{{message: errors.description}}" />
+</view>
+<view class="field">
+  <template is="field-heading" data="{{label: '门店位置', required: true}}" />
+  <view class="input location-picker">
+    <input class="location-input" value="{{hasLocation ? form.locationName : ''}}" placeholder="{{locating ? '正在打开地图…' : '选择门店地址'}}" disabled="{{true}}" aria-hidden="{{true}}" />
+    <button class="text-button location-action" bindtap="chooseLocation" disabled="{{disabled || locating || showPrivacy || hoursEditing}}" aria-label="{{locating ? '正在打开地图' : hasLocation ? form.locationName + '，重新选择门店地址' : '选择门店地址'}}">
+      <text wx:if="{{hasLocation}}">重新选择</text>
+      <view wx:else class="location-pin" aria-hidden="{{true}}"></view>
+    </button>
   </view>
   <text wx:if="{{hasLocation}}" class="hint">{{form.address}}</text>
-  <text class="hint">{{hasLocation ? '点击输入框可重新选择地址。' : '请在地图上选择实际门店位置，客户可查看位置和到店导航。'}}</text>
   <view wx:if="{{showPrivacy}}" class="privacy-notice">
     <text class="hint">地图选址需要处理你选择的位置信息，用于公开展示门店地址和提供到店指引。请先阅读并同意隐私保护指引。</text>
     <button class="text-button" bindtap="openPrivacyContract">阅读{{privacyContractName || '隐私保护指引'}} ↗</button>
     <button class="primary" open-type="agreePrivacyAuthorization" bindagreeprivacyauthorization="agreePrivacy" disabled="{{disabled}}">同意并选择位置</button>
     <button class="text-button" bindtap="cancelPrivacy">暂不选择</button>
   </view>
-  <text wx:if="{{locationError}}" class="location-error">{{locationError}}</text>
+  <template is="field-error" data="{{message: locationError || errors.location}}" />
 </view>
-<view class="field"><text class="label">详细地址</text><input class="input" placeholder="例如：A座3楼305室（选填）" maxlength="120" value="{{form.addressDetail}}" disabled="{{disabled || locating}}" data-field="addressDetail" bindinput="onInput" /></view>
-<view class="field"><text class="label">联系方式 *</text><text class="hint">微信、QQ、电话至少填写一项，已填写的联系方式会在分享名片中公开展示，请确认已获展示授权。</text></view>
-<view class="contact-field"><text class="contact-label">微信</text><input class="contact-input" aria-label="微信号" placeholder="填写微信号" maxlength="64" value="{{form.wechat}}" disabled="{{disabled}}" data-field="wechat" bindinput="onInput" /></view>
-<view class="contact-field"><text class="contact-label">QQ</text><input class="contact-input" aria-label="QQ 号" placeholder="填写 QQ 号" type="number" maxlength="12" value="{{form.qq}}" disabled="{{disabled}}" data-field="qq" bindinput="onInput" /></view>
-<view class="contact-field contact-field-last"><text class="contact-label">电话</text><input class="contact-input" aria-label="店铺电话" placeholder="手机号或固定电话" maxlength="25" value="{{form.phone}}" disabled="{{disabled}}" data-field="phone" bindinput="onInput" /></view>
+<view class="field">
+  <template is="field-input" data="{{label: '详细地址', placeholder: '例如：A座3楼305室', maxlength: 120, value: form.addressDetail, disabled: disabled || locating, field: 'addressDetail', inputHandler: 'onInput', error: errors.addressDetail}}" />
+</view>
+<view class="field">
+  <template is="field-heading" data="{{label: '联系方式', required: true, description: '至少填写一项，已填写的联系方式会在名片中展示。'}}" />
+  <view class="contact-field">
+    <template is="field-input" data="{{label: '微信', labelPosition: 'left', placeholder: '填写微信号', maxlength: 64, value: form.wechat, disabled: disabled, field: 'wechat', inputHandler: 'onInput', error: errors.wechat}}" />
+  </view>
+  <view class="contact-field">
+    <template is="field-input" data="{{label: 'QQ', labelPosition: 'left', placeholder: '填写 QQ 号', inputType: 'number', maxlength: 12, value: form.qq, disabled: disabled, field: 'qq', inputHandler: 'onInput', error: errors.qq}}" />
+  </view>
+  <view class="contact-field">
+    <template is="field-input" data="{{label: '电话', labelPosition: 'left', placeholder: '手机号或固定电话', maxlength: 25, value: form.phone, disabled: disabled, field: 'phone', inputHandler: 'onInput', error: errors.phone}}" />
+  </view>
+  <template is="field-error" data="{{message: errors.contact}}" />
+</view>
 <view class="field hours-field">
-  <text class="label">营业时间</text>
+  <template is="field-heading" data="{{label: '营业时间', description: hoursRows.length ? '未选择的星期为休息日。' : !form.legacyBusinessHours ? '未设置时，名片显示“请联系商家确认”。' : ''}}" />
   <view wx:if="{{form.legacyBusinessHours}}" class="hours-legacy">
     <text class="hint">原设置：{{form.legacyBusinessHours}}。请添加营业时间重新选择，或清除原设置。</text>
     <button class="text-button hours-link" bindtap="clearLegacyHours" disabled="{{disabled || hoursEditing}}">清除原设置</button>
@@ -35,25 +56,23 @@
     </view>
   </view>
   <button wx:if="{{canAddHours}}" class="text-button hours-add" bindtap="openHours" disabled="{{disabled || locating || showPrivacy || hoursEditing}}">＋ 添加营业时间</button>
-  <text wx:if="{{hoursRows.length}}" class="hint">未选择的星期为休息日。</text>
-  <text wx:elif="{{!form.legacyBusinessHours && !hoursEditing}}" class="hint">未设置时，名片显示“请联系商家确认”。</text>
+  <template is="field-error" data="{{message: errors.businessHours}}" />
 </view>
 <root-portal wx:if="{{hoursEditing}}">
   <view class="hours-overlay" catchtap="preventHoursBubble" catchtouchmove="preventHoursBubble">
     <view class="hours-dialog" catchtap="preventHoursBubble" role="dialog" aria-modal="true" aria-label="设置营业时间">
       <text class="hours-dialog-title">{{hoursIndex < 0 ? '添加营业时间' : '编辑营业时间'}}</text>
-      <text class="hours-caption">选择工作日</text>
+      <template is="field-heading" data="{{label: '选择工作日', required: true, description: '可多选，灰色日期已在其他分组中配置。'}}" />
       <view class="hours-weekdays">
         <button wx:for="{{weekOptions}}" wx:key="day" class="hours-day {{item.selected ? 'hours-day-selected' : ''}}" data-day="{{item.day}}" bindtap="toggleHoursDay" aria-label="{{item.label + (item.unavailable ? '，已配置' : item.selected ? '，已选' : '，未选')}}" disabled="{{disabled || item.unavailable}}">{{item.label}}</button>
       </view>
-      <text class="hours-day-hint">可多选，灰色日期已在其他分组中配置。</text>
-      <text class="hours-caption hours-time-caption">选择营业时间</text>
+      <template is="field-error" data="{{message: hoursDaysError}}" />
       <view class="hours-times">
-        <picker class="hours-picker" mode="time" value="{{hoursStart || '10:00'}}" data-field="hoursStart" bindchange="changeHoursTime" disabled="{{disabled}}" aria-label="开始时间"><text class="hours-time-label">开始时间</text><view class="hours-time">{{hoursStart}}<text class="hours-chevron">⌄</text></view></picker>
+        <view class="hours-picker"><template is="field-heading" data="{{label: '开始时间', required: true}}" /><picker mode="time" value="{{hoursStart || '10:00'}}" data-field="hoursStart" bindchange="changeHoursTime" disabled="{{disabled}}" aria-label="开始时间"><view class="hours-time">{{hoursStart}}<text class="hours-chevron">⌄</text></view></picker></view>
         <text class="hours-separator">—</text>
-        <picker class="hours-picker" mode="time" value="{{hoursEnd || '21:00'}}" data-field="hoursEnd" bindchange="changeHoursTime" disabled="{{disabled}}" aria-label="结束时间"><text class="hours-time-label">结束时间</text><view class="hours-time">{{hoursEnd}}<text class="hours-chevron">⌄</text></view></picker>
+        <view class="hours-picker"><template is="field-heading" data="{{label: '结束时间', required: true}}" /><picker mode="time" value="{{hoursEnd || '21:00'}}" data-field="hoursEnd" bindchange="changeHoursTime" disabled="{{disabled}}" aria-label="结束时间"><view class="hours-time">{{hoursEnd}}<text class="hours-chevron">⌄</text></view></picker></view>
       </view>
-      <text wx:if="{{hoursError}}" class="location-error">{{hoursError}}</text>
+      <template is="field-error" data="{{message: hoursError}}" />
       <view class="hours-editor-actions"><button class="secondary hours-dialog-button" bindtap="cancelHours" disabled="{{disabled}}">取消</button><button class="primary hours-dialog-button" bindtap="saveHours" disabled="{{disabled}}">确定</button></view>
     </view>
   </view>

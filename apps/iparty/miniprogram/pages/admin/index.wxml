@@ -1,7 +1,35 @@
+<import src="../../templates/form-field.wxml" />
+
 <view class="page">
-  <text class="page-title">全部店铺</text>
-  <view class="search-controls"><input class="input" placeholder="搜索店铺名称" maxlength="80" value="{{q}}" bindinput="input" bindconfirm="searchShops" confirm-type="search" /><picker range="{{filters}}" value="{{filterIndex}}" bindchange="filter" disabled="{{loading}}"><view class="filter">{{filters[filterIndex]}} ▾</view></picker><button class="secondary" bindtap="searchShops" disabled="{{loading}}">搜索</button></view>
-  <view wx:if="{{error}}" class="local-notice">{{error}}<button class="text-button" bindtap="retry">刷新重试</button></view>
-  <view wx:for="{{items}}" wx:key="id" class="card record" data-id="{{item.id}}" bindtap="detail" role="button"><text class="record-title">{{item.name}}</text><text class="record-line">{{item.address}}</text><text class="record-line">{{item.staffCount}} 位服务人员</text><text class="record-status">{{item.status === 'active' ? '正常' : '已停用'}}{{item.ownerStatus !== 'active' ? ' · 账号已禁用' : ''}}</text><text class="hint">更新于 {{item.timeLabel}} · 查看详情 →</text></view>
+  <view class="search-controls">
+    <view class="field">
+      <template is="field-heading" data="{{label: '店铺名称'}}" />
+      <input class="input" placeholder="搜索店铺名称" maxlength="80" value="{{q}}" bindinput="input" bindconfirm="searchShops" confirm-type="search" />
+    </view>
+    <template is="field-heading" data="{{label: '店铺状态'}}" />
+    <view class="search-row">
+      <picker class="status-picker" range="{{filters}}" value="{{filterIndex}}" bindchange="filter" disabled="{{loading}}">
+        <view class="input filter"><text>{{filters[filterIndex]}}</text><text aria-hidden="{{true}}">▾</text></view>
+      </picker>
+      <button class="secondary search-button" bindtap="searchShops" disabled="{{loading}}">搜索</button>
+    </view>
+    <text wx:if="{{error}}" class="field-error" aria-role="alert">{{error}}</text>
+    <button wx:if="{{error}}" class="text-button" bindtap="retry">刷新重试</button>
+  </view>
+  <view wx:for="{{items}}" wx:key="id" class="card record" data-id="{{item.id}}" bindtap="detail" role="button">
+    <view class="shop-card-heading">
+      <text class="record-title">{{item.name}}</text>
+      <view class="shop-card-status">
+        <text class="shop-status-badge {{item.status === 'active' ? '' : 'shop-status-disabled'}}">{{item.status === 'active' ? '正常' : '已停用'}}</text>
+        <text wx:if="{{item.ownerStatus !== 'active'}}" class="shop-owner-status">账号已禁用</text>
+      </view>
+    </view>
+    <text class="record-line">{{item.address}}</text>
+    <text class="record-line">{{item.staffCount}} 位服务人员</text>
+    <view class="hint">
+      <view>创建时间：{{item.createdLabel}}</view>
+      <view>更新时间：{{item.updatedLabel}}</view>
+    </view>
+  </view>
   <view wx:if="{{!loading && !error && !items.length}}" class="empty muted">没有符合条件的店铺</view><text wx:if="{{loading}}" class="muted">正在加载…</text><button wx:elif="{{hasMore}}" class="text-button" bindtap="more">加载更多</button>
 </view>

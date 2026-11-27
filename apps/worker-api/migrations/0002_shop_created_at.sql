@@ -1,0 +1,1 @@
+ALTER TABLE `shops` ADD `created_at` integer NOT NULL;

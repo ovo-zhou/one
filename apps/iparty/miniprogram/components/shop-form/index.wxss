@@ -5,69 +5,67 @@ input,
 textarea {
   box-sizing: border-box;
 }
-.location-picker {
-  position: relative;
-}
-.contact-field {
+.input.location-picker {
   display: flex;
   align-items: center;
-  box-sizing: border-box;
-  height: 88rpx;
-  margin-bottom: 18rpx;
-  padding: 0 24rpx;
-  border: 2rpx solid #e7eadf;
-  border-radius: 16rpx;
-  background: #fffef9;
+  width: 100%;
+  min-height: calc(40px + 4rpx);
+  padding-right: 12rpx;
+  background: #f0f0e9;
 }
-.contact-label {
-  flex-shrink: 0;
-  width: 88rpx;
-  color: #405343;
-  font-size: 26rpx;
-  font-weight: 600;
-}
-.contact-input {
-  flex: 1;
+.location-input {
+  flex: 1 1 0;
   min-width: 0;
   height: 100%;
   padding: 0;
-  color: #263b30;
+  color: #737c68;
   font-size: 28rpx;
 }
-.contact-field-last {
-  margin-bottom: 30rpx;
+.location-picker .location-action {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: flex-end;
+  width: auto;
+  min-width: 72rpx;
+  margin: 0 0 0 auto;
+  padding: 0 12rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+  white-space: nowrap;
 }
-.location-input {
-  background: #f0f0e9;
-  color: #737c68;
-  pointer-events: none;
-}
-.location-trigger,
-.location-trigger[disabled] {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 1;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  border-radius: 16rpx;
+.location-picker .location-action[disabled] {
   background: transparent;
+  color: #737c68;
+}
+.location-pin {
+  position: relative;
+  width: 28rpx;
+  height: 28rpx;
+  margin: 0 3rpx 5rpx;
+  border: 3rpx solid currentColor;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+}
+.location-pin::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8rpx;
+  height: 8rpx;
+  border-radius: 50%;
+  background: currentColor;
+  content: "";
+  transform: translate(-50%, -50%);
+}
+.contact-field + .contact-field {
+  margin-top: 18rpx;
 }
 .privacy-notice {
   margin-top: 20rpx;
   padding: 24rpx;
   border-radius: 12rpx;
   background: #f0eddf;
-}
-.location-error {
-  display: block;
-  margin-top: 16rpx;
-  color: #a34e3c;
-  font-size: 24rpx;
-  line-height: 1.7;
 }
 .hours-field {
   text-align: left;
@@ -76,7 +74,7 @@ textarea {
   display: flex;
   align-items: center;
   gap: 18rpx;
-  padding: 20rpx 0;
+  padding: 8rpx 0;
   border-bottom: 2rpx solid #e7eadf;
 }
 .hours-summary {
@@ -111,16 +109,16 @@ textarea {
 .hours-link {
   flex-shrink: 0;
   margin: 0;
-  padding: 8rpx 0;
   font-size: 24rpx;
-  line-height: 1.6;
 }
-.hours-delete {
-  color: #919585;
+.hours-row-actions .hours-delete {
+  color: #b14c38;
 }
-.hours-add {
-  margin: 12rpx 0 0;
-  padding: 12rpx 0;
+.hours-field .hours-add {
+  display: inline-flex;
+  align-items: center;
+  width: auto;
+  margin: 12rpx auto 0 0;
   text-align: left;
   font-size: 25rpx;
 }
@@ -155,17 +153,10 @@ textarea {
   font-size: 32rpx;
   font-weight: 600;
 }
-.hours-caption {
-  display: block;
-  color: #405343;
-  font-size: 26rpx;
-  font-weight: 600;
-}
 .hours-weekdays {
   display: flex;
   flex-wrap: nowrap;
   gap: 8rpx;
-  margin: 20rpx 0 12rpx;
 }
 .hours-day {
   flex: 1;
@@ -177,7 +168,6 @@ textarea {
   background: #f0f0e9;
   color: #405343;
   font-size: 23rpx;
-  line-height: 72rpx;
   white-space: nowrap;
 }
 .hours-day-selected {
@@ -192,22 +182,7 @@ textarea {
   display: flex;
   align-items: center;
   gap: 16rpx;
-  margin-top: 18rpx;
-}
-.hours-day-hint {
-  display: block;
-  color: #919585;
-  font-size: 21rpx;
-  line-height: 1.7;
-}
-.hours-time-caption {
   margin-top: 32rpx;
-}
-.hours-time-label {
-  display: block;
-  margin-bottom: 12rpx;
-  color: #737c68;
-  font-size: 23rpx;
 }
 .hours-picker {
   flex: 1;
@@ -241,5 +216,4 @@ textarea {
   min-width: 0;
   margin: 0;
   font-size: 27rpx;
-  line-height: 80rpx;
 }

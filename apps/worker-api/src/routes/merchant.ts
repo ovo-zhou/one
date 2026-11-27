@@ -238,7 +238,7 @@ export const merchantRoutes = new Hono<AppEnv>()
         .where(and(eq(users.id, ownerId), eq(users.role, "customer"))),
       db
         .insert(shops)
-        .values({ id: shopId, ownerId, ...shop, updatedAt })
+        .values({ id: shopId, ownerId, ...shop, createdAt: updatedAt, updatedAt })
         .onConflictDoUpdate({ target: shops.ownerId, set: { ...shop, updatedAt } }),
       db.delete(staff).where(eq(staff.shopId, shopId)),
       ...Array.from({ length: Math.ceil(records.length / 10) }, (_, index) =>

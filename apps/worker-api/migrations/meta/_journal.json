@@ -15,6 +15,13 @@
       "when": 1795593242868,
       "tag": "0001_shop_contacts",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1795753141241,
+      "tag": "0002_shop_created_at",
+      "breakpoints": true
     }
   ]
 }

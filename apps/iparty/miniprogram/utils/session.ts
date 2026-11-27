@@ -1,8 +1,10 @@
 import { getApiBaseUrl } from "../config/api";
 import { isRole, type Account, type Role } from "../models/account";
+import { clearGetCache } from "./get-cache";
 
 type Session = { token: string; expiresAt: number; user: Account };
 export type SessionState = "missing" | "expired" | "incomplete" | "valid";
+let revision = 0;
 
 function storageKey(): string {
   return `iparty:session:${getApiBaseUrl()}`;
@@ -37,11 +39,30 @@ export function getToken(): string {
     : "";
 }
 
+export function getSessionRevision(): number {
+  return revision;
+}
+
+function discardCachedData() {
+  revision += 1;
+  clearGetCache();
+}
+
 export function saveSession(session: Session) {
-  wx.setStorageSync(storageKey(), session);
+  const key = storageKey();
+  const previous = wx.getStorageSync(key) as Partial<Session> | undefined;
+  wx.setStorageSync(key, session);
+  if (
+    previous?.token !== session.token ||
+    previous?.user?.id !== session.user.id ||
+    previous?.user?.role !== session.user.role
+  ) {
+    discardCachedData();
+  }
 }
 export function clearSession() {
   wx.removeStorageSync(storageKey());
+  discardCachedData();
 }
 
 export function getRole(): Role | undefined {

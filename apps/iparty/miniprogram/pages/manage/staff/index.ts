@@ -6,6 +6,7 @@ Page({
     staff: [] as MerchantProfile["staff"],
     shopName: "",
     loading: true,
+    refreshing: false,
     error: "",
     shopStatus: "active",
     statusReason: "",
@@ -15,10 +16,10 @@ Page({
     wx.hideShareMenu();
     void this.loadStaff();
   },
-  async loadStaff() {
+  async loadStaff(refresh = false) {
     this.setData({ loading: true, error: "" });
     try {
-      const { profile } = await getMerchantProfile();
+      const { profile } = await getMerchantProfile(refresh);
       this.setData({
         staff: profile?.staff ?? [],
         shopName: profile?.shop.name ?? "",
@@ -29,6 +30,18 @@ Page({
       this.setData({ error: error instanceof Error ? error.message : "人员资料加载失败，请重试" });
     } finally {
       this.setData({ loading: false });
+    }
+  },
+  retry() {
+    void this.loadStaff(true);
+  },
+  async refreshStaff() {
+    if (this.data.deleting || this.data.refreshing) return;
+    this.setData({ refreshing: true });
+    try {
+      await this.loadStaff(true);
+    } finally {
+      this.setData({ refreshing: false });
     }
   },
   add() {

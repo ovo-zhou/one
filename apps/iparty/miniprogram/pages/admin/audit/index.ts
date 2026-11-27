@@ -16,11 +16,11 @@ Page({
     this.shopId = query.id ?? "";
     void this.load(true);
   },
-  async load(reset: boolean) {
+  async load(reset: boolean, refresh = false) {
     if (this.data.loading) return;
     this.setData({ loading: true, error: "" });
     try {
-      const result = await listAudit(this.shopId, reset ? null : this.cursor);
+      const result = await listAudit(this.shopId, reset ? null : this.cursor, refresh);
       this.cursor = result.next;
       const items = result.items.map((item) => ({
         ...item,
@@ -31,13 +31,21 @@ Page({
         hasMore: !!result.next,
       });
     } catch (error) {
-      this.setData({ error: errorMessage(error) });
+      this.cursor = null;
+      this.setData({ items: [], hasMore: false, error: errorMessage(error) });
     } finally {
       this.setData({ loading: false });
     }
   },
   retry() {
-    void this.load(true);
+    void this.load(true, true);
+  },
+  async onPullDownRefresh() {
+    try {
+      await this.load(true, true);
+    } finally {
+      wx.stopPullDownRefresh();
+    }
   },
   more() {
     if (this.data.hasMore) void this.load(false);

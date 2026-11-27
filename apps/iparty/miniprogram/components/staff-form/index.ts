@@ -1,9 +1,11 @@
 import { emptyStaff, type StaffDraft } from "../../models/draft";
+import type { StaffFieldErrors } from "../../utils/draft";
 
 Component({
   options: { styleIsolation: "apply-shared" },
   properties: {
     form: { type: Object, value: emptyStaff() },
+    errors: { type: Object, value: {} as StaffFieldErrors },
     disabled: { type: Boolean, value: false },
   },
   methods: {

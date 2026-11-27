@@ -33,6 +33,7 @@ export const adminRoutes = new Hono<AppEnv>()
         name: shops.name,
         address: sql<string>`trim(${shops.address} || ' ' || ${shops.addressDetail})`,
         status: shops.status,
+        createdAt: shops.createdAt,
         updatedAt: shops.updatedAt,
         ownerStatus: users.status,
         staffCount: sql<number>`(select count(*) from staff where staff.shop_id = ${shops.id})`,

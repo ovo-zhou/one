@@ -1,1 +1,1 @@
-{ "navigationBarTitleText": "平台管理" }
+{ "navigationBarTitleText": "平台管理", "enablePullDownRefresh": true }

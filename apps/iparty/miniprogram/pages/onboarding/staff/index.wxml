@@ -2,16 +2,16 @@
   <scroll-view class="form-scroll" scroll-y="{{true}}">
     <view class="form-content">
       <view wx:if="{{loading}}" class="empty"><text class="muted">正在加载人员资料…</text></view>
-      <view wx:elif="{{loadError}}" class="empty"><text class="muted">{{loadError}}</text><button class="text-button" bindtap="loadPerson">重新加载</button></view>
+      <view wx:elif="{{loadError}}" class="empty"><text class="muted">{{loadError}}</text><button class="text-button" bindtap="retry">重新加载</button></view>
       <view wx:elif="{{invalid}}" class="empty"><text class="empty-title">找不到这位服务人员</text><text class="muted">请返回后重新选择人员。</text></view>
-      <block wx:else>
-        <staff-form form="{{form}}" disabled="{{publishing}}" bind:change="onFormChange" />
-        <text wx:if="{{publishError}}" class="publish-error">{{publishError}}</text>
-      </block>
+      <staff-form wx:else form="{{form}}" errors="{{fieldErrors}}" disabled="{{publishing}}" bind:change="onFormChange" />
     </view>
   </scroll-view>
   <view wx:if="{{!invalid && !loading && !loadError}}" class="form-footer">
-    <button wx:if="{{!editing}}" class="secondary" bindtap="preview" disabled="{{publishing}}">预览</button>
-    <button class="primary" bindtap="finish" disabled="{{publishing}}" loading="{{publishing}}">{{publishing ? (editing ? '正在保存…' : '正在创建…') : editing ? (existing ? '保存修改' : '添加服务人员') : '创建我的店铺'}}</button>
+    <text wx:if="{{publishError}}" class="form-error" aria-role="alert">{{publishError}}</text>
+    <view class="staff-footer-actions">
+      <button wx:if="{{!editing}}" class="secondary" bindtap="preview" disabled="{{publishing}}">预览</button>
+      <button class="primary" bindtap="finish" disabled="{{publishing}}" loading="{{publishing}}">{{publishing ? (editing ? '正在保存…' : '正在创建…') : editing ? (existing ? '保存修改' : '添加服务人员') : '创建我的店铺'}}</button>
+    </view>
   </view>
 </view>

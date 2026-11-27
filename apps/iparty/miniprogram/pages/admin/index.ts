@@ -5,7 +5,7 @@ import { requireRole } from "../../utils/role-guard";
 
 Page({
   data: {
-    items: [] as (ShopSummary & { timeLabel: string })[],
+    items: [] as (ShopSummary & { createdLabel: string; updatedLabel: string })[],
     q: "",
     filterIndex: 0,
     filters: ["全部店铺", "正常店铺", "已停用店铺"],
@@ -35,29 +35,38 @@ Page({
     this.status = ["", "active", "disabled"][this.data.filterIndex] ?? "";
     void this.load(true);
   },
-  async load(reset: boolean) {
+  async load(reset: boolean, refresh = false) {
     if (this.data.loading) return;
     this.setData({ loading: true, error: "" });
     try {
       if (!(await requireRole("super_admin"))) return;
-      const result = await listShops(this.search, this.status, reset ? null : this.cursor);
+      const result = await listShops(this.search, this.status, reset ? null : this.cursor, refresh);
       this.cursor = result.next;
       const items = result.items.map((item) => ({
         ...item,
-        timeLabel: formatTime(item.updatedAt),
+        createdLabel: formatTime(item.createdAt),
+        updatedLabel: formatTime(item.updatedAt),
       }));
       this.setData({
         items: reset ? items : [...this.data.items, ...items],
         hasMore: !!result.next,
       });
     } catch (error) {
-      this.setData({ error: errorMessage(error) });
+      this.cursor = null;
+      this.setData({ items: [], hasMore: false, error: errorMessage(error) });
     } finally {
       this.setData({ loading: false });
     }
   },
   retry() {
-    void this.load(true);
+    void this.load(true, true);
+  },
+  async onPullDownRefresh() {
+    try {
+      await this.load(true, true);
+    } finally {
+      wx.stopPullDownRefresh();
+    }
   },
   more() {
     if (this.data.hasMore) void this.load(false);

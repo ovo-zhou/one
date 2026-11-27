@@ -1,0 +1,18 @@
+<template name="field-heading">
+  <text class="label">{{label}}<text wx:if="{{required}}" class="field-required">*</text></text>
+  <text wx:if="{{description}}" class="field-description">{{description}}</text>
+</template>
+
+<template name="field-error">
+  <text wx:if="{{message}}" class="field-error" aria-role="alert">{{message}}</text>
+</template>
+
+<template name="field-input">
+  <template wx:if="{{labelPosition !== 'left'}}" is="field-heading" data="{{label: label, required: required, description: description}}" />
+  <text wx:elif="{{description}}" class="field-description">{{description}}</text>
+  <view class="{{labelPosition === 'left' ? 'input field-input-row' : ''}}">
+    <text wx:if="{{labelPosition === 'left'}}" class="label field-input-label">{{label}}<text wx:if="{{required}}" class="field-required">*</text></text>
+    <input class="{{labelPosition === 'left' ? 'field-input-control' : 'input'}}" aria-label="{{label}}" placeholder="{{placeholder}}" type="{{inputType || 'text'}}" maxlength="{{maxlength}}" value="{{value}}" disabled="{{disabled}}" data-field="{{field}}" bindinput="{{inputHandler}}" />
+  </view>
+  <template is="field-error" data="{{message: error}}" />
+</template>

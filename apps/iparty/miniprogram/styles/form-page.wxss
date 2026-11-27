@@ -27,7 +27,6 @@ page {
 }
 .form-footer button.primary,
 .form-footer button.secondary {
-  display: block;
   box-sizing: border-box;
   width: 100%;
   max-width: none;

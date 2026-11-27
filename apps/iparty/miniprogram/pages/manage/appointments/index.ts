@@ -14,11 +14,11 @@ Page({
     wx.hideShareMenu();
     void this.load(true);
   },
-  async load(reset: boolean) {
+  async load(reset: boolean, refresh = false) {
     if (this.data.loading) return;
     this.setData({ loading: true, error: "" });
     try {
-      const result = await listBookings(true, reset ? null : this.cursor);
+      const result = await listBookings(true, reset ? null : this.cursor, refresh);
       this.cursor = result.next;
       this.setData({
         items: reset
@@ -33,7 +33,14 @@ Page({
     }
   },
   retry() {
-    void this.load(true);
+    void this.load(true, true);
+  },
+  async onPullDownRefresh() {
+    try {
+      if (!this.data.saving) await this.load(true, true);
+    } finally {
+      wx.stopPullDownRefresh();
+    }
   },
   more() {
     if (this.data.hasMore) void this.load(false);

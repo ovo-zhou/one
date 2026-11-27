@@ -15,11 +15,11 @@ Page({
     this.bookingId = query.id ?? "";
     void this.load();
   },
-  async load() {
+  async load(refresh = false) {
     if (this.data.loading) return;
     this.setData({ loading: true, error: "" });
     try {
-      const { booking } = await getBooking(this.bookingId);
+      const { booking } = await getBooking(this.bookingId, refresh);
       this.setData({ booking: bookingView(booking) });
     } catch (error) {
       this.setData({ error: errorMessage(error) });
@@ -27,8 +27,18 @@ Page({
       this.setData({ loading: false });
     }
   },
+  retry() {
+    if (!this.data.saving) void this.load(true);
+  },
+  async onPullDownRefresh() {
+    try {
+      if (!this.data.saving) await this.load(true);
+    } finally {
+      wx.stopPullDownRefresh();
+    }
+  },
   cancel() {
-    if (this.data.saving) return;
+    if (this.data.saving || this.data.loading || this.data.error) return;
     wx.showModal({
       title: "取消预约？",
       content: "取消后若需预约，请重新提交。",

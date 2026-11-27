@@ -1,5 +1,11 @@
 import { emptyShop, type ShopDraft } from "../../../models/draft";
-import { readDraft, saveDraft, shopValidationMessage } from "../../../utils/draft";
+import {
+  draftSaveError,
+  readDraft,
+  saveDraft,
+  shopFieldErrors,
+  type ShopFieldErrors,
+} from "../../../utils/draft";
 import { getMerchantProfile, updateShop } from "../../../api/merchant";
 
 Page({
@@ -7,6 +13,7 @@ Page({
     status: "active",
     statusReason: "",
     form: emptyShop(),
+    fieldErrors: {} as ShopFieldErrors,
     editing: false,
     saving: false,
     saveError: "",
@@ -14,6 +21,7 @@ Page({
     loadError: "",
     choosingLocation: false,
   },
+  validateFields: false,
   onLoad(query: Record<string, string | undefined>) {
     const draft = readDraft();
     const editing = query.mode === "edit";
@@ -25,11 +33,14 @@ Page({
     wx.hideShareMenu();
     if (editing) void this.loadShop();
   },
-  async loadShop() {
+  retry() {
+    void this.loadShop(true);
+  },
+  async loadShop(refresh = false) {
     if (this.data.loading) return;
     this.setData({ loading: true, loadError: "" });
     try {
-      const { profile } = await getMerchantProfile();
+      const { profile } = await getMerchantProfile(refresh);
       if (!profile) throw new Error("店铺尚未创建，请先完成创建流程");
       this.setData({
         form: profile.shop,
@@ -46,8 +57,13 @@ Page({
   },
   onFormChange(event: WechatMiniprogram.CustomEvent<{ changes: Partial<ShopDraft> }>) {
     if (this.data.saving || this.data.loading || this.data.loadError) return;
-    this.setData({ form: { ...this.data.form, ...event.detail.changes }, saveError: "" });
-    this.persist();
+    const form = { ...this.data.form, ...event.detail.changes };
+    this.setData({
+      form,
+      fieldErrors: this.validateFields ? shopFieldErrors(form) : {},
+      saveError: "",
+    });
+    if (!this.persist()) this.setData({ saveError: draftSaveError });
   },
   onLocationBusy(event: WechatMiniprogram.CustomEvent<{ busy: boolean }>) {
     this.setData({ choosingLocation: event.detail.busy });
@@ -68,12 +84,14 @@ Page({
   async next() {
     if (this.data.saving || this.data.loading || this.data.loadError || this.data.choosingLocation)
       return;
-    const message = shopValidationMessage(this.data.form);
-    if (message) {
-      wx.showToast({ title: message, icon: "none" });
+    this.validateFields = true;
+    const fieldErrors = shopFieldErrors(this.data.form);
+    this.setData({ fieldErrors, saveError: "" });
+    if (Object.keys(fieldErrors).length) return;
+    if (!this.persist()) {
+      this.setData({ saveError: draftSaveError });
       return;
     }
-    if (!this.persist()) return;
     if (this.data.editing) {
       this.setData({ saving: true, saveError: "" });
       try {

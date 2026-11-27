@@ -23,6 +23,18 @@ export type ListResult<T> = { items: T[]; next: Cursor };
 export function cursorQuery(cursor: Cursor): string {
   return cursor ? `?before=${cursor.before}&afterId=${encodeURIComponent(cursor.afterId)}` : "";
 }
+
+const customerBookingsGroup = "customer-bookings";
+const merchantBookingsGroup = "merchant-bookings";
+
+function bookingGroup(id: string): string {
+  return `booking/${encodeURIComponent(id)}`;
+}
+
+function bookingChanges(id: string): string[] {
+  return [customerBookingsGroup, merchantBookingsGroup, bookingGroup(id)];
+}
+
 export function createBooking(data: {
   staffId: string;
   contactName: string;
@@ -35,27 +47,30 @@ export function createBooking(data: {
   return authenticatedRequest<{ id: string }>("/api/v1/customer/bookings", {
     method: "POST",
     data,
+    invalidates: [customerBookingsGroup],
   });
 }
-export function listBookings(merchant: boolean, cursor: Cursor) {
+export function listBookings(merchant: boolean, cursor: Cursor, refresh = false) {
   return authenticatedRequest<ListResult<Booking>>(
     `/api/v1/${merchant ? "merchant" : "customer"}/bookings${cursorQuery(cursor)}`,
+    { cache: { group: merchant ? merchantBookingsGroup : customerBookingsGroup, refresh } },
   );
 }
-export function getBooking(id: string) {
+export function getBooking(id: string, refresh = false) {
   return authenticatedRequest<{ booking: Booking }>(
     `/api/v1/customer/bookings/${encodeURIComponent(id)}`,
+    { cache: { group: bookingGroup(id), refresh } },
   );
 }
 export function cancelBooking(id: string) {
   return authenticatedRequest<{ id: string }>(
     `/api/v1/customer/bookings/${encodeURIComponent(id)}/cancel`,
-    { method: "PUT" },
+    { method: "PUT", invalidates: bookingChanges(id) },
   );
 }
 export function setBookingStatus(id: string, status: "confirmed" | "rejected" | "completed") {
   return authenticatedRequest<{ id: string }>(
     `/api/v1/merchant/bookings/${encodeURIComponent(id)}/status`,
-    { method: "PUT", data: { status } },
+    { method: "PUT", data: { status }, invalidates: bookingChanges(id) },
   );
 }

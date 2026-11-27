@@ -29,7 +29,6 @@ page {
   background: #f7f7ef;
 }
 .staff-footer button.add-staff {
-  display: block;
   width: 100%;
   max-width: none;
   margin: 0;

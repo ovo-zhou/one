@@ -1,1 +1,1 @@
-{ "navigationBarTitleText": "平台操作记录" }
+{ "navigationBarTitleText": "平台操作记录", "enablePullDownRefresh": true }

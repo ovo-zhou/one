@@ -48,8 +48,8 @@ export async function ensureWechatLogin(): Promise<void> {
 }
 
 export async function restoreWechatLogin(): Promise<boolean> {
-  // Local expiry is enough for navigation. Every private API still validates
-  // the session server-side, and only an actual 401 triggers recovery.
+  // Local expiry is enough to decide whether to try the current session.
+  // Private requests sent to the server still validate it; a server 401 triggers recovery.
   if (getToken()) return true;
   return loginWechat(true);
 }

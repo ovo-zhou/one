@@ -62,6 +62,7 @@ export const shops = sqliteTable(
       .default("active"),
     statusReason: text("status_reason").notNull().default(""),
     moderationVersion: integer("moderation_version").notNull().default(0),
+    createdAt: integer("created_at").notNull(),
     updatedAt: integer("updated_at").notNull(),
   },
   (table) => [

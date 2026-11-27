@@ -1,4 +1,3 @@
 @import "../../../styles/form-page.wxss";
 .consent { display: flex; align-items: flex-start; gap: 12rpx; font-size: 24rpx; line-height: 1.8; }
 .picker { line-height: 88rpx; }
-.form-footer .publish-error { margin-top: 0; }

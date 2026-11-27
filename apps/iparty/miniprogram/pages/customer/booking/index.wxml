@@ -1,3 +1,5 @@
+<import src="../../../templates/form-field.wxml" />
+
 <view class="form-page">
   <scroll-view class="form-scroll" scroll-y="{{true}}"><view class="form-content">
     <view wx:if="{{loading}}" class="empty muted">正在读取名片…</view>
@@ -5,16 +7,40 @@
     <block wx:else>
       <text class="page-title">{{staff.name}} · {{staff.title}}</text><text class="subtitle">{{shop.name}}</text>
       <view class="local-notice">这是预约申请，不代表档期已锁定。时间安排以商家确认为准，商家可通过你填写的电话联系你。</view>
-      <view class="field"><text class="label">联系人 *</text><input class="input" maxlength="40" value="{{contactName}}" data-field="contactName" bindinput="input" disabled="{{saving || submittedId}}" /></view>
-      <view class="field"><text class="label">联系电话 *</text><input class="input" maxlength="25" value="{{contactPhone}}" data-field="contactPhone" bindinput="input" disabled="{{saving || submittedId}}" /></view>
-      <view class="field"><text class="label">意向日期 *</text><picker mode="date" value="{{date}}" bindchange="chooseDate" disabled="{{saving || submittedId}}"><view class="input picker">{{date || '请选择日期'}}</view></picker></view>
-      <view class="field"><text class="label">意向时间 *</text><picker mode="time" value="{{time}}" bindchange="chooseTime" disabled="{{saving || submittedId}}"><view class="input picker">{{time || '请选择时间'}}</view></picker><text class="hint">以中国标准时间（UTC+8）为准，请填写中国当地时间。</text></view>
-      <view class="field"><text class="label">备注</text><textarea class="textarea" maxlength="500" value="{{note}}" data-field="note" bindinput="input" disabled="{{saving || submittedId}}" /></view>
-      <checkbox-group bindchange="consentChange"><label class="consent"><checkbox value="agree" checked="{{consent}}" disabled="{{saving || submittedId}}" /><text>同意将本次联系人、电话、意向时间和备注提供给该商家，用于处理预约。</text></label></checkbox-group>
+      <view class="field">
+        <template is="field-heading" data="{{label: '联系人', required: true}}" />
+        <input class="input" maxlength="40" value="{{contactName}}" data-field="contactName" bindinput="input" disabled="{{saving || submittedId}}" />
+        <template is="field-error" data="{{message: fieldErrors.contactName}}" />
+      </view>
+      <view class="field">
+        <template is="field-heading" data="{{label: '联系电话', required: true}}" />
+        <input class="input" maxlength="25" value="{{contactPhone}}" data-field="contactPhone" bindinput="input" disabled="{{saving || submittedId}}" />
+        <template is="field-error" data="{{message: fieldErrors.contactPhone}}" />
+      </view>
+      <view class="field">
+        <template is="field-heading" data="{{label: '意向日期', required: true}}" />
+        <picker mode="date" value="{{date}}" bindchange="chooseDate" disabled="{{saving || submittedId}}"><view class="input picker">{{date || '请选择日期'}}</view></picker>
+        <template is="field-error" data="{{message: fieldErrors.date}}" />
+      </view>
+      <view class="field">
+        <template is="field-heading" data="{{label: '意向时间', required: true, description: '以中国标准时间（UTC+8）为准。'}}" />
+        <picker mode="time" value="{{time}}" bindchange="chooseTime" disabled="{{saving || submittedId}}"><view class="input picker">{{time || '请选择时间'}}</view></picker>
+        <template is="field-error" data="{{message: fieldErrors.time}}" />
+      </view>
+      <view class="field">
+        <template is="field-heading" data="{{label: '备注'}}" />
+        <textarea class="textarea" maxlength="500" value="{{note}}" data-field="note" bindinput="input" disabled="{{saving || submittedId}}" />
+        <template is="field-error" data="{{message: fieldErrors.note}}" />
+      </view>
+      <view class="field">
+        <template is="field-heading" data="{{label: '预约信息授权', required: true, description: '联系人、电话、意向时间和备注仅提供给该商家，用于处理本次预约。'}}" />
+        <checkbox-group bindchange="consentChange"><label class="consent"><checkbox value="agree" checked="{{consent}}" disabled="{{saving || submittedId}}" /><text>同意将本次预约信息提供给商家</text></label></checkbox-group>
+        <template is="field-error" data="{{message: fieldErrors.consent}}" />
+      </view>
     </block>
   </view></scroll-view>
   <view wx:if="{{!loading && !loadError}}" class="form-footer">
-    <text wx:if="{{error}}" class="publish-error">{{error}}</text>
+    <text wx:if="{{error}}" class="form-error" aria-role="alert">{{error}}</text>
     <button class="primary" bindtap="submit" disabled="{{saving}}" loading="{{saving}}">{{submittedId ? '进入我的中心' : saving ? '正在提交…' : '提交预约申请'}}</button>
   </view>
 </view>

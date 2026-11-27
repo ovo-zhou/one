@@ -1,11 +1,13 @@
 import { emptyShop, type ShopDraft } from "../../models/draft";
 import { hasShopLocation } from "../../utils/shop-location";
 import { businessHoursMessage, businessHoursRows, weekdays } from "../../utils/business-hours";
+import type { ShopFieldErrors } from "../../utils/draft";
 
 Component({
   options: { styleIsolation: "apply-shared" },
   properties: {
     form: { type: Object, value: emptyShop() },
+    errors: { type: Object, value: {} as ShopFieldErrors },
     disabled: { type: Boolean, value: false },
   },
   data: {
@@ -22,6 +24,7 @@ Component({
     hoursStart: "",
     hoursEnd: "",
     hoursError: "",
+    hoursDaysError: "",
     weekOptions: weekdays.map((label, index) => ({
       label,
       day: index + 1,
@@ -77,6 +80,7 @@ Component({
         hoursStart: group?.start ?? "10:00",
         hoursEnd: group?.end ?? "21:00",
         hoursError: "",
+        hoursDaysError: "",
         weekOptions: weekdays.map((label, i) => ({
           label,
           day: i + 1,
@@ -95,7 +99,7 @@ Component({
         : [...this.data.hoursDays, day].sort((a, b) => a - b);
       this.setData({
         hoursDays: days,
-        hoursError: "",
+        hoursDaysError: "",
         weekOptions: this.data.weekOptions.map((item) => ({
           ...item,
           selected: days.includes(item.day),
@@ -110,6 +114,10 @@ Component({
     },
     saveHours() {
       if (this.data.disabled) return;
+      if (!this.data.hoursDays.length) {
+        this.setData({ hoursDaysError: "请至少选择一天" });
+        return;
+      }
       const hours = [...(this.data.form as ShopDraft).businessHours];
       const group = {
         days: [...this.data.hoursDays],

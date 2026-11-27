@@ -1,11 +1,19 @@
 import { emptyStaff, type StaffDraft } from "../../../models/draft";
-import { isDraftReady, readDraft, saveDraft, staffValidationMessage } from "../../../utils/draft";
+import {
+  draftSaveError,
+  isDraftReady,
+  readDraft,
+  saveDraft,
+  staffFieldErrors,
+  type StaffFieldErrors,
+} from "../../../utils/draft";
 import { publishMyShop } from "../../../utils/publish";
 import { getMerchantProfile, saveStaff } from "../../../api/merchant";
 
 Page({
   data: {
     form: emptyStaff(),
+    fieldErrors: {} as StaffFieldErrors,
     editing: false,
     existing: false,
     publishing: false,
@@ -14,6 +22,7 @@ Page({
     loading: false,
     loadError: "",
   },
+  validateFields: false,
   personId: "",
   onLoad(query: Record<string, string | undefined>) {
     const draft = readDraft();
@@ -41,10 +50,13 @@ Page({
       },
     });
   },
-  async loadPerson() {
+  retry() {
+    void this.loadPerson(true);
+  },
+  async loadPerson(refresh = false) {
     this.setData({ loading: true, loadError: "" });
     try {
-      const { profile } = await getMerchantProfile();
+      const { profile } = await getMerchantProfile(refresh);
       const person = profile?.staff.find((person) => person.id === this.personId);
       if (!person) {
         this.setData({ invalid: true });
@@ -64,8 +76,13 @@ Page({
     if (this.data.publishing || this.data.loading || this.data.loadError) return;
     const { field, value } = event.detail;
     if (field === "id" || !(field in this.data.form)) return;
-    this.setData({ [`form.${field}`]: value, publishError: "" });
-    this.persist();
+    const form = { ...this.data.form, [field]: value };
+    this.setData({
+      form,
+      fieldErrors: this.validateFields ? staffFieldErrors(form) : {},
+      publishError: "",
+    });
+    if (!this.persist()) this.setData({ publishError: draftSaveError });
   },
   persist(): boolean {
     if (this.data.invalid) return false;
@@ -90,18 +107,16 @@ Page({
   async finish() {
     if (this.data.publishing || this.data.loading || this.data.loadError || this.data.invalid)
       return;
-    const message = staffValidationMessage(this.data.form);
-    if (message) {
-      wx.showToast({ title: message, icon: "none" });
+    this.validateFields = true;
+    const fieldErrors = staffFieldErrors(this.data.form);
+    this.setData({ fieldErrors, publishError: "" });
+    if (Object.keys(fieldErrors).length) return;
+    if (!this.persist()) {
+      this.setData({ publishError: draftSaveError });
       return;
     }
-    if (!this.persist()) return;
     if (!this.data.editing && !isDraftReady(readDraft())) {
-      wx.showModal({
-        title: "资料还未完善",
-        content: "请检查店铺资料和人员必填信息。",
-        showCancel: false,
-      });
+      this.setData({ publishError: "资料还未完善，请检查店铺资料和人员必填信息。" });
       return;
     }
     this.setData({ publishing: true, publishError: "" });
@@ -135,7 +150,10 @@ Page({
     }
   },
   preview() {
-    if (!this.persist()) return;
+    if (!this.persist()) {
+      this.setData({ publishError: draftSaveError });
+      return;
+    }
     wx.navigateTo({
       url: `/pages/staff/detail/index?mode=local&id=${encodeURIComponent(this.data.form.id)}`,
     });

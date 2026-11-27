@@ -3,6 +3,7 @@ import { hasShopLocation } from "./shop-location";
 import { businessHoursMessage, normalizeBusinessHours } from "./business-hours";
 
 const storageKey = "iparty:onboarding:v2";
+export const draftSaveError = "草稿保存失败，请检查设备存储空间";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -65,42 +66,61 @@ export function saveDraft(draft: OnboardingDraft): boolean {
     wx.setStorageSync(storageKey, { ...draft, updatedAt: Date.now() });
     return true;
   } catch {
-    wx.showToast({ title: "草稿保存失败，请检查设备存储空间", icon: "none" });
     return false;
   }
 }
 
-export function shopValidationMessage(shop: ShopDraft): string {
-  if (!shop.name.trim()) return "请填写店铺名称";
+export type ShopFieldErrors = Partial<
+  Record<
+    "name" | "description" | "location" | "addressDetail" | "contact" | "wechat" | "qq" | "phone" | "businessHours",
+    string
+  >
+>;
+
+export function shopFieldErrors(shop: ShopDraft): ShopFieldErrors {
+  const errors: ShopFieldErrors = {};
+  if (!shop.name.trim()) errors.name = "请填写店铺名称";
+  else if (shop.name.trim().length > 40) errors.name = "店铺名称最多 40 字";
+  if (shop.description.trim().length > 500) errors.description = "店铺介绍最多 500 字";
   if (!hasShopLocation(shop) || !shop.address.trim() || !shop.locationName.trim())
-    return "请在地图上选择门店位置";
-  if (shop.address.length > 200) return "门店地址最多 200 字";
-  if (shop.addressDetail.length > 120) return "详细地址最多 120 字";
-  if (shop.locationName.length > 100) return "位置名称最多 100 字";
+    errors.location = "请在地图上选择门店位置";
+  else if (shop.address.length > 200) errors.location = "门店地址最多 200 字";
+  else if (shop.locationName.length > 100) errors.location = "位置名称最多 100 字";
+  if (shop.addressDetail.length > 120) errors.addressDetail = "详细地址最多 120 字";
   const wechat = shop.wechat.trim();
   const qq = shop.qq.trim();
   const phone = shop.phone.trim();
-  if (!wechat && !qq && !phone) return "微信、QQ、电话至少填写一项";
-  if (wechat && (wechat.length > 64 || /\s/.test(wechat))) return "微信号最多 64 位，不能包含空格";
-  if (qq && !/^[1-9][0-9]{4,11}$/.test(qq)) return "请填写有效的 QQ 号（5–12 位数字）";
-  if (phone && !/^[0-9+()\-\s]{7,25}$/.test(phone)) return "请填写有效的店铺电话（7–25 位）";
-  if (shop.legacyBusinessHours) return "请重新选择营业时间，或清除原文字设置";
-  const hoursMessage = businessHoursMessage(shop.businessHours);
-  if (hoursMessage) return hoursMessage;
-  return "";
+  if (!wechat && !qq && !phone) errors.contact = "微信、QQ、电话至少填写一项";
+  if (wechat && (wechat.length > 64 || /\s/.test(wechat)))
+    errors.wechat = "微信号最多 64 位，不能包含空格";
+  if (qq && !/^[1-9][0-9]{4,11}$/.test(qq)) errors.qq = "请填写有效的 QQ 号（5–12 位数字）";
+  if (phone && !/^[0-9+()\-\s]{7,25}$/.test(phone))
+    errors.phone = "请填写有效的店铺电话（7–25 位）";
+  const hoursMessage = shop.legacyBusinessHours
+    ? "请重新选择营业时间，或清除原文字设置"
+    : businessHoursMessage(shop.businessHours);
+  if (hoursMessage) errors.businessHours = hoursMessage;
+  return errors;
 }
 
-export function staffValidationMessage(staff: StaffDraft): string {
-  if (!staff.name.trim()) return "请填写人员姓名或昵称";
-  if (!staff.title.trim()) return "请填写岗位名称";
-  if (!staff.skills.trim()) return "请填写擅长项目";
-  return "";
+export type StaffFieldErrors = Partial<Record<Exclude<keyof StaffDraft, "id">, string>>;
+
+export function staffFieldErrors(staff: StaffDraft): StaffFieldErrors {
+  const errors: StaffFieldErrors = {};
+  if (!staff.name.trim()) errors.name = "请填写人员姓名或昵称";
+  else if (staff.name.trim().length > 30) errors.name = "姓名或昵称最多 30 字";
+  if (!staff.title.trim()) errors.title = "请填写岗位名称";
+  else if (staff.title.trim().length > 40) errors.title = "岗位名称最多 40 字";
+  if (!staff.skills.trim()) errors.skills = "请填写擅长项目";
+  else if (staff.skills.trim().length > 150) errors.skills = "擅长项目最多 150 字";
+  if (staff.description.trim().length > 600) errors.description = "个人介绍最多 600 字";
+  return errors;
 }
 
 export function isDraftReady(draft: OnboardingDraft): boolean {
   return (
-    !shopValidationMessage(draft.shop) &&
+    !Object.keys(shopFieldErrors(draft.shop)).length &&
     draft.staff.length > 0 &&
-    draft.staff.every((staff) => !staffValidationMessage(staff))
+    draft.staff.every((staff) => !Object.keys(staffFieldErrors(staff)).length)
   );
 }

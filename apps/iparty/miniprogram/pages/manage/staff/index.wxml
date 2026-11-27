@@ -1,9 +1,9 @@
 <view class="staff-management">
-  <scroll-view class="staff-scroll" scroll-y="{{true}}">
+  <scroll-view class="staff-scroll" scroll-y="{{true}}" refresher-enabled="{{!deleting}}" refresher-triggered="{{refreshing}}" bindrefresherrefresh="refreshStaff">
     <view class="staff-list">
       <view wx:if="{{shopStatus === 'disabled'}}" class="local-notice">店铺已停用：{{statusReason}}。仍可编辑资料，但公开名片、分享与新增预约暂不可用。</view>
       <view wx:if="{{loading}}" class="card empty"><text class="muted">正在加载服务人员…</text></view>
-      <view wx:elif="{{error}}" class="card empty"><text class="muted">{{error}}</text><button class="text-button" bindtap="loadStaff">重新加载</button></view>
+      <view wx:elif="{{error}}" class="card empty"><text class="muted">{{error}}</text><button class="text-button" bindtap="retry">重新加载</button></view>
       <view wx:elif="{{!staff.length}}" class="card empty"><text class="empty-title">暂无服务人员</text><text class="muted">点击下方按钮添加</text></view>
       <block wx:else>
       <view wx:for="{{staff}}" wx:key="id" class="card staff-card">

@@ -140,13 +140,12 @@
 .contact-action {
   flex-shrink: 0;
   margin: 0;
-  padding: 12rpx 0 12rpx 20rpx;
+  padding: 0 0 0 20rpx;
   font-size: 24rpx;
 }
 .location-link {
+  justify-content: flex-start;
   margin: 12rpx 0 0;
-  padding: 8rpx 0;
-  text-align: left;
   font-size: 24rpx;
 }
 .bottom-bar {
@@ -171,7 +170,6 @@
   padding-right: 0;
   padding-left: 0;
   font-size: 26rpx;
-  line-height: 84rpx;
   white-space: nowrap;
 }
 .contact {

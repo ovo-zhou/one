@@ -3,12 +3,12 @@
     <view class="form-content">
       <view wx:if="{{editing && status === 'disabled'}}" class="local-notice">店铺已被平台停用，公开名片和新增预约不可用。原因：{{statusReason}}。编辑保存不会自动解除停用。</view>
       <view wx:if="{{loading}}" class="empty"><text class="muted">正在加载店铺资料…</text></view>
-      <view wx:elif="{{loadError}}" class="empty"><text class="muted">{{loadError}}</text><button class="text-button" bindtap="loadShop">重新加载</button></view>
-      <shop-form wx:else form="{{form}}" disabled="{{saving}}" bind:change="onFormChange" bind:busy="onLocationBusy" />
-      <text wx:if="{{saveError}}" class="publish-error">{{saveError}}</text>
+      <view wx:elif="{{loadError}}" class="empty"><text class="muted">{{loadError}}</text><button class="text-button" bindtap="retry">重新加载</button></view>
+      <shop-form wx:else form="{{form}}" errors="{{fieldErrors}}" disabled="{{saving}}" bind:change="onFormChange" bind:busy="onLocationBusy" />
     </view>
   </scroll-view>
   <view wx:if="{{!loading && !loadError}}" class="form-footer">
+    <text wx:if="{{saveError}}" class="form-error" aria-role="alert">{{saveError}}</text>
     <button class="primary" bindtap="next" disabled="{{saving || choosingLocation}}" loading="{{saving}}">{{saving ? '正在保存…' : editing ? '保存修改' : '添加服务人员'}}</button>
   </view>
 </view>
